@@ -1,0 +1,210 @@
+/* Custom styles for the cosmic theme */
+body {
+    background-color: #0a0a0a;
+    color: #FFFFFF;
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+}
+
+.font-heading {
+    font-family: 'Playfair Display', serif;
+}
+
+#cosmic-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0.5;
+}
+
+.content-wrapper {
+    position: relative;
+    z-index: 1;
+}
+
+/* Custom glassmorphism effect */
+.glass-card {
+    background: rgba(16, 16, 16, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Animation classes */
+.fade-in-up {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s cubic-bezier(0.645, 0.045, 0.355, 1), transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+.fade-in-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.product-card {
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.4s ease;
+    cursor: pointer;
+}
+
+.product-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Section flare effect */
+.section-flare {
+    position: relative;
+}
+
+.section-flare::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 80%;
+    height: 80%;
+    transform: translate(-50%, -50%);
+    background-image: radial-gradient(circle, rgba(128, 0, 0, 0.15), transparent 60%);
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* Style for the search prompt */
+#search-prompt {
+    overflow: hidden;
+}
+
+#search-prompt::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 150%;
+    height: 150%;
+    transform: translate(-50%, -50%);
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+#search-prompt input::placeholder {
+    color: #888;
+}
+
+/* Hero Section Hide on Scroll */
+#hero-section.hidden {
+    opacity: 0;
+    transform: translateY(-50px);
+    pointer-events: none;
+}
+
+#hero-section .subtitle.hidden {
+    opacity: 0;
+    transform: translateY(-20px);
+}
+
+.zodiac-btn {
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.zodiac-btn.active {
+    background-color: #D2B48C;
+    color: #0a0a0a;
+}
+
+/* Hero text glow animation */
+@keyframes pulse-glow {
+    0%, 100% {
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.2), 0 0 20px rgba(210, 180, 140, 0.1);
+    }
+    50% {
+        text-shadow: 0 0 20px rgba(255, 255, 255, 0.4), 0 0 40px rgba(210, 180, 140, 0.2);
+    }
+}
+
+.hero-heading {
+    color: white;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    animation: pulse-glow 5s ease-in-out infinite;
+    position: relative;
+}
+
+/* Product Grid Rows - Horizontal Scrolling, 4 items per row */
+.product-grid-row {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding: 0.5rem 0;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+    touch-action: pan-x pan-y;
+    cursor: grab;
+}
+
+.product-grid-row:active {
+    cursor: grabbing;
+}
+
+.product-grid-row::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+}
+
+.product-card-small {
+    flex: 0 0 calc(25% - 0.75rem); /* 4 items per row */
+    min-width: 200px;
+    max-width: 250px;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+}
+
+/* Mobile: Show 2 items, allow swipe */
+@media (max-width: 768px) {
+    .product-card-small {
+        flex: 0 0 calc(50% - 0.5rem); /* 2 items visible on mobile */
+        min-width: 150px;
+    }
+}
+
+/* Tablet: Show 3 items */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .product-card-small {
+        flex: 0 0 calc(33.333% - 0.67rem); /* 3 items */
+    }
+}
+
+/* Products Section - Always visible, fades in on scroll */
+#products-section {
+    opacity: 0.5;
+    transform: translateY(0);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+#products-section.visible {
+    opacity: 1;
+}
+
+/* Product Detail Modal */
+#product-modal-overlay {
+    transition: opacity 0.3s ease-in-out;
+}
+
+#product-modal {
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transform: translateX(100%);
+}
+
+#product-modal.open {
+    transform: translateX(0);
+}
+
+
+

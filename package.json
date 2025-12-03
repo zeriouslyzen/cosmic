@@ -1,0 +1,19 @@
+{
+  "name": "cosmic-voyager",
+  "version": "1.0.0",
+  "description": "Curated Art & Vintage Finds E-commerce Site",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "dev:simple": "node server.js",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "python3 -m http.server 8080"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  },
+  "dependencies": {}
+}
+
+

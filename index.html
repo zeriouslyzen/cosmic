@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>Cosmic Voyager - Curated Art & Vintage Finds</title>
+    <meta name="description" content="Discover a universe of curated vintage items, unique art, and dropshipping treasures. Cosmic Voyager offers a seamless shopping experience with a minimal, cosmic aesthetic.">
+    <meta name="keywords" content="vintage, art, dropshipping, ecommerce, cosmic, minimal, curated goods, unique finds, zodiac, astrology">
+    <meta name="author" content="Cosmic Voyager">
+    <meta property="og:title" content="Cosmic Voyager - Curated Art & Vintage Finds" />
+    <meta property="og:description" content="A universe of curated vintage items, unique art, and dropshipping treasures." />
+    <meta property="og:image" content="https://images.unsplash.com/photo-1534790566855-4cb788d389ec?q=80&w=1200&auto=format&fit=crop" />
+    <meta property="og:url" content="https://example.com" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="/src/styles/main.css">
+</head>
+<body class="antialiased">
+
+    <!-- Animated Cosmic Background -->
+    <canvas id="cosmic-canvas"></canvas>
+
+    <div class="content-wrapper">
+        <!-- Header -->
+        <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 glass-card">
+            <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                <a href="#" class="font-heading text-2xl font-bold text-white tracking-wider">cosmic deals</a>
+                <button class="text-gray-300 hover:text-white transition-colors duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main>
+            <!-- Hero Section (disappears on scroll) -->
+            <section id="hero-section" class="h-screen flex items-center justify-center text-center px-4 transition-all duration-500">
+                <div class="max-w-3xl fade-in-up">
+                    <h1 class="font-heading text-5xl md:text-7xl font-bold leading-tight text-white hero-heading">Cosmic Deals</h1>
+                    <p class="mt-6 text-lg md:text-xl text-gray-300 max-w-xl mx-auto subtitle">A curated collection of art, vintage relics, and unique finds from across the universe, delivered to your doorstep.</p>
+                </div>
+            </section>
+
+            <!-- Products Section (appears in rows on scroll) -->
+            <section id="products-section" class="py-20 md:py-32 px-4 section-flare">
+                <div class="container mx-auto space-y-12">
+                    
+                    <!-- Row 1: Rando -->
+                    <div class="product-row">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="font-heading text-2xl md:text-3xl font-bold text-white">rando</h2>
+                            <button class="text-gray-400 hover:text-white transition-colors text-sm">view more →</button>
+                        </div>
+                        <div class="product-grid-row">
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="random" data-title="Product 1" data-price="$99.00" data-category="Random" data-img="">
+                                <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
+                                    <span class="text-gray-600 text-sm">1</span>
+                                </div>
+                                <div class="p-3">
+                                    <h3 class="font-heading text-sm font-bold text-white">Product 1</h3>
+                                    <p class="text-gray-400 text-xs mt-1">$99.00</p>
+                                </div>
+                            </article>
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="random" data-title="Product 2" data-price="$99.00" data-category="Random" data-img="">
+                                <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
+                                    <span class="text-gray-600 text-sm">2</span>
+                                </div>
+                                <div class="p-3">
+                                    <h3 class="font-heading text-sm font-bold text-white">Product 2</h3>
+                                    <p class="text-gray-400 text-xs mt-1">$99.00</p>
+                                </div>
+                            </article>
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="random" data-title="Product 3" data-price="$99.00" data-category="Random" data-img="">
+                                <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
+                                    <span class="text-gray-600 text-sm">3</span>
+                                </div>
+                                <div class="p-3">
+                                    <h3 class="font-heading text-sm font-bold text-white">Product 3</h3>
+                                    <p class="text-gray-400 text-xs mt-1">$99.00</p>
+                                </div>
+                            </article>
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="random" data-title="Product 4" data-price="$99.00" data-category="Random" data-img="">
+                                <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
+                                    <span class="text-gray-600 text-sm">4</span>
+                                </div>
+                                <div class="p-3">
+                                    <h3 class="font-heading text-sm font-bold text-white">Product 4</h3>
+                                    <p class="text-gray-400 text-xs mt-1">$99.00</p>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Aries -->
+                    <div class="product-row">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="font-heading text-2xl md:text-3xl font-bold text-white">aries</h2>
+                        </div>
+                        <div class="product-grid-row">
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="aries" data-title="Aries 1" data-price="$99.00" data-category="Aries" data-img="">
+                                <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
+                                    <span class="text-gray-600 text-sm">1</span>
+                                </div>
+                                <div class="p-3">
+                                    <h3 class="font-heading text-sm font-bold text-white">Aries 1</h3>
+                                    <p class="text-gray-400 text-xs mt-1">$99.00</p>
+                                </div>
+                            </article>
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="aries" data-title="Aries 2" data-price="$99.00" data-category="Aries" data-img="">
+                                <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
+                                    <span class="text-gray-600 text-sm">2</span>
+                                </div>
+                                <div class="p-3">
+                                    <h3 class="font-heading text-sm font-bold text-white">Aries 2</h3>
+                                    <p class="text-gray-400 text-xs mt-1">$99.00</p>
+                                </div>
+                            </article>
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="aries" data-title="Aries 3" data-price="$99.00" data-category="Aries" data-img="">
+                                <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
+                                    <span class="text-gray-600 text-sm">3</span>
+                                </div>
+                                <div class="p-3">
+                                    <h3 class="font-heading text-sm font-bold text-white">Aries 3</h3>
+                                    <p class="text-gray-400 text-xs mt-1">$99.00</p>
+                                </div>
+                            </article>
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="aries" data-title="Aries 4" data-price="$99.00" data-category="Aries" data-img="">
+                                <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
+                                    <span class="text-gray-600 text-sm">4</span>
+                                </div>
+                                <div class="p-3">
+                                    <h3 class="font-heading text-sm font-bold text-white">Aries 4</h3>
+                                    <p class="text-gray-400 text-xs mt-1">$99.00</p>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Taurus -->
+                    <div class="product-row">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="font-heading text-2xl md:text-3xl font-bold text-white">taurus</h2>
+                        </div>
+                        <div class="product-grid-row">
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="taurus" data-title="Taurus 1" data-price="$99.00" data-category="Taurus" data-img="">
+                                <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
+                                    <span class="text-gray-600 text-sm">1</span>
+                                </div>
+                                <div class="p-3">
+                                    <h3 class="font-heading text-sm font-bold text-white">Taurus 1</h3>
+                                    <p class="text-gray-400 text-xs mt-1">$99.00</p>
+                                </div>
+                            </article>
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="taurus" data-title="Taurus 2" data-price="$99.00" data-category="Taurus" data-img="">
+                                <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
+                                    <span class="text-gray-600 text-sm">2</span>
+                                </div>
+                                <div class="p-3">
+                                    <h3 class="font-heading text-sm font-bold text-white">Taurus 2</h3>
+                                    <p class="text-gray-400 text-xs mt-1">$99.00</p>
+                                </div>
+                            </article>
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="taurus" data-title="Taurus 3" data-price="$99.00" data-category="Taurus" data-img="">
+                                <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
+                                    <span class="text-gray-600 text-sm">3</span>
+                                </div>
+                                <div class="p-3">
+                                    <h3 class="font-heading text-sm font-bold text-white">Taurus 3</h3>
+                                    <p class="text-gray-400 text-xs mt-1">$99.00</p>
+                                </div>
+                            </article>
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="taurus" data-title="Taurus 4" data-price="$99.00" data-category="Taurus" data-img="">
+                                <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
+                                    <span class="text-gray-600 text-sm">4</span>
+                                </div>
+                                <div class="p-3">
+                                    <h3 class="font-heading text-sm font-bold text-white">Taurus 4</h3>
+                                    <p class="text-gray-400 text-xs mt-1">$99.00</p>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+
+                    <!-- Row 4: Gemini -->
+                    <div class="product-row">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="font-heading text-2xl md:text-3xl font-bold text-white">gemini</h2>
+                        </div>
+                        <div class="product-grid-row">
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="gemini" data-title="Gemini 1" data-price="$99.00" data-category="Gemini" data-img="">
+                                <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
+                                    <span class="text-gray-600 text-sm">1</span>
+                                </div>
+                                <div class="p-3">
+                                    <h3 class="font-heading text-sm font-bold text-white">Gemini 1</h3>
+                                    <p class="text-gray-400 text-xs mt-1">$99.00</p>
+                                </div>
+                            </article>
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="gemini" data-title="Gemini 2" data-price="$99.00" data-category="Gemini" data-img="">
+                                <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
+                                    <span class="text-gray-600 text-sm">2</span>
+                                </div>
+                                <div class="p-3">
+                                    <h3 class="font-heading text-sm font-bold text-white">Gemini 2</h3>
+                                    <p class="text-gray-400 text-xs mt-1">$99.00</p>
+                                </div>
+                            </article>
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="gemini" data-title="Gemini 3" data-price="$99.00" data-category="Gemini" data-img="">
+                                <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
+                                    <span class="text-gray-600 text-sm">3</span>
+                                </div>
+                                <div class="p-3">
+                                    <h3 class="font-heading text-sm font-bold text-white">Gemini 3</h3>
+                                    <p class="text-gray-400 text-xs mt-1">$99.00</p>
+                                </div>
+                            </article>
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="gemini" data-title="Gemini 4" data-price="$99.00" data-category="Gemini" data-img="">
+                                <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
+                                    <span class="text-gray-600 text-sm">4</span>
+                                </div>
+                                <div class="p-3">
+                                    <h3 class="font-heading text-sm font-bold text-white">Gemini 4</h3>
+                                    <p class="text-gray-400 text-xs mt-1">$99.00</p>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+
+                    <!-- Row 5: Additional (to reach 20 total) -->
+                    <div class="product-row">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="font-heading text-2xl md:text-3xl font-bold text-white">more</h2>
+                        </div>
+                        <div class="product-grid-row">
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="random" data-title="Product 17" data-price="$99.00" data-category="Random" data-img="">
+                                <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
+                                    <span class="text-gray-600 text-sm">17</span>
+                                </div>
+                                <div class="p-3">
+                                    <h3 class="font-heading text-sm font-bold text-white">Product 17</h3>
+                                    <p class="text-gray-400 text-xs mt-1">$99.00</p>
+                                </div>
+                            </article>
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="random" data-title="Product 18" data-price="$99.00" data-category="Random" data-img="">
+                                <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
+                                    <span class="text-gray-600 text-sm">18</span>
+                                </div>
+                                <div class="p-3">
+                                    <h3 class="font-heading text-sm font-bold text-white">Product 18</h3>
+                                    <p class="text-gray-400 text-xs mt-1">$99.00</p>
+                                </div>
+                            </article>
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="random" data-title="Product 19" data-price="$99.00" data-category="Random" data-img="">
+                                <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
+                                    <span class="text-gray-600 text-sm">19</span>
+                                </div>
+                                <div class="p-3">
+                                    <h3 class="font-heading text-sm font-bold text-white">Product 19</h3>
+                                    <p class="text-gray-400 text-xs mt-1">$99.00</p>
+                                </div>
+                            </article>
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="random" data-title="Product 20" data-price="$99.00" data-category="Random" data-img="">
+                                <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
+                                    <span class="text-gray-600 text-sm">20</span>
+                                </div>
+                                <div class="p-3">
+                                    <h3 class="font-heading text-sm font-bold text-white">Product 20</h3>
+                                    <p class="text-gray-400 text-xs mt-1">$99.00</p>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+        </main>
+
+        <!-- Search & Filter Prompt -->
+        <div id="search-prompt" class="fixed bottom-4 left-1/2 -translate-x-1/2 w-11/12 max-w-2xl z-50 glass-card rounded-lg p-2 shadow-2xl">
+            <div class="flex flex-col md:flex-row items-center gap-2">
+                <input type="text" id="search-input" placeholder="Search for cosmic objects..." class="w-full bg-transparent text-white p-2 focus:outline-none relative z-10">
+                <div class="flex-shrink-0 flex items-center gap-1 overflow-x-auto p-1 relative z-10">
+                    <button class="zodiac-btn all active text-sm px-3 py-1 rounded-md" data-zodiac="all">All</button>
+                    <button class="zodiac-btn text-sm px-3 py-1 rounded-md" data-zodiac="aries">Aries</button>
+                    <button class="zodiac-btn text-sm px-3 py-1 rounded-md" data-zodiac="taurus">Taurus</button>
+                    <button class="zodiac-btn text-sm px-3 py-1 rounded-md" data-zodiac="gemini">Gemini</button>
+                    <button class="zodiac-btn text-sm px-3 py-1 rounded-md" data-zodiac="cancer">Cancer</button>
+                    <button class="zodiac-btn text-sm px-3 py-1 rounded-md" data-zodiac="leo">Leo</button>
+                    <button class="zodiac-btn text-sm px-3 py-1 rounded-md" data-zodiac="virgo">Virgo</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Detail Modal -->
+        <div id="product-modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-[60] hidden opacity-0"></div>
+        <div id="product-modal" class="fixed top-0 right-0 h-full w-full max-w-md bg-[#0a0a0a] border-l border-gray-800 shadow-2xl z-[70] overflow-y-auto">
+            <div class="p-6">
+                <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+                <img id="modal-img" src="" class="w-full h-auto rounded-lg mb-6">
+                <h2 id="modal-title" class="font-heading text-4xl font-bold text-white"></h2>
+                <p id="modal-category" class="text-gray-400 mt-2"></p>
+                <p id="modal-price" class="text-2xl font-medium text-white my-4"></p>
+                <p class="text-gray-300 leading-relaxed">A timeless piece, sourced from the far reaches of the galaxy. Its design speaks of forgotten constellations and ancient cosmic events. Perfect for the discerning collector.</p>
+                <div class="mt-8 space-y-4">
+                    <button class="w-full bg-tan-500 text-black font-bold py-3 rounded-lg" style="background-color: #D2B48C;">Add to Cart</button>
+                    <button class="w-full bg-gray-800 text-white font-bold py-3 rounded-lg">Checkout</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="pt-24 pb-32 px-4 border-t border-gray-800 mt-16">
+            <div class="container mx-auto text-center text-gray-500">
+                <p>&copy; 2024 Cosmic Voyager. All Rights Reserved.</p>
+                <p class="mt-2 text-sm">Engineered for simplicity and speed.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- JavaScript -->
+    <script type="module" src="/src/js/main.js"></script>
+
+</body>
+</html>
+
+
