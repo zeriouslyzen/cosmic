@@ -13,7 +13,10 @@
   "devDependencies": {
     "vite": "^5.0.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "@stripe/stripe-js": "^2.4.0"
+  }
 }
 
 

@@ -2,7 +2,10 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- Starfield Background Animation ---
     const canvas = document.getElementById('cosmic-canvas');
-    if (!canvas) return;
+    if (!canvas) {
+        console.error('Canvas element not found!');
+        return;
+    }
     
     const ctx = canvas.getContext('2d');
     // Enable advanced rendering
@@ -15,13 +18,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const starCount = 150;
     const maxShootingStars = 3;
     
-    // Original star colors
-    const starColors = [
-        'rgba(255, 255, 255, 0.8)',   // White
-        'rgba(210, 180, 140, 0.7)',   // Tan
-        'rgba(173, 216, 230, 0.7)',   // Light blue
-        'rgba(255, 218, 185, 0.7)'    // Peach
-    ];
+    // Get star colors based on theme
+    function getStarColors() {
+        const isLightMode = document.documentElement.getAttribute('data-theme') === 'light';
+        if (isLightMode) {
+            return [
+                'rgba(0, 0, 0, 0.9)',      // Black
+                'rgba(0, 0, 0, 0.8)',      // Dark black
+                'rgba(0, 0, 0, 0.85)',     // Medium black
+                'rgba(0, 0, 0, 0.75)'      // Lighter black
+            ];
+        }
+        return [
+            'rgba(255, 255, 255, 0.8)',   // White
+            'rgba(210, 180, 140, 0.7)',   // Tan
+            'rgba(173, 216, 230, 0.7)',   // Light blue
+            'rgba(255, 218, 185, 0.7)'    // Peach
+        ];
+    }
+    
+    let starColors = getStarColors();
     
     let lastShootingStarTime = 0;
     let shootingStarInterval = 3000 + Math.random() * 5000; // 3-8 seconds between shooting stars
@@ -259,7 +275,20 @@ document.addEventListener('DOMContentLoaded', () => {
         [5, 6]   // Right to center
     ];
     
-    const libraColor = { r: 210, g: 180, b: 140 }; // Tan/amber
+    // Get constellation colors based on theme
+    function getConstellationColors() {
+        const isLightMode = document.documentElement.getAttribute('data-theme') === 'light';
+        if (isLightMode) {
+            return {
+                libra: { r: 0, g: 0, b: 0 },      // Black
+                capricorn: { r: 0, g: 0, b: 0 }   // Black
+            };
+        }
+        return {
+            libra: { r: 210, g: 180, b: 140 },    // Tan/amber
+            capricorn: { r: 173, g: 216, b: 230 } // Light blue
+        };
+    }
     
     // Capricorn constellation pattern (sea-goat)
     const capricornStars = [
@@ -287,8 +316,6 @@ document.addEventListener('DOMContentLoaded', () => {
         [8, 9],  // Back leg to foot
         [9, 1]   // Back to neck
     ];
-    
-    const capricornColor = { r: 173, g: 216, b: 230 }; // Light blue
 
     function animate() {
         // Clear canvas
@@ -303,8 +330,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const capricornFade = switchCycle < 0.5 ? (switchCycle * 2) : (1 - (switchCycle - 0.5) * 2);
         
         // Draw constellations - alternating fade between Libra and Capricorn
-        drawConstellation(libraStars, libraConnections, libraColor, libraFade);
-        drawConstellation(capricornStars, capricornConnections, capricornColor, capricornFade);
+        const colors = getConstellationColors();
+        drawConstellation(libraStars, libraConnections, colors.libra, libraFade);
+        drawConstellation(capricornStars, capricornConnections, colors.capricorn, capricornFade);
         
         // Update and draw regular stars
         stars.forEach(s => { s.update(); s.draw(); });
@@ -363,6 +391,48 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (heroHeading) {
         updateNeonDim();
+    }
+
+    // --- Cycling Subtitle Messages ---
+    const heroSubtitle = document.getElementById('hero-subtitle');
+    const subtitleMessages = [
+        "Art, silver, thrift finds. Your zodiac sign won't help you find better deals, but we will.",
+        "Our zodiac sign didn't predict this, but here we are.",
+        "Good art, vintage silver, thrift finds. Your sign said you'd buy something today anyway."
+    ];
+    let currentSubtitleIndex = 0;
+    let subtitleCycleTime = 0;
+    const subtitleCycleInterval = 5000; // Change every 5 seconds
+    
+    function cycleSubtitle() {
+        if (!heroSubtitle) return;
+        
+        subtitleCycleTime += 16; // ~60fps
+        
+        if (subtitleCycleTime >= subtitleCycleInterval) {
+            subtitleCycleTime = 0;
+            
+            // Fade out
+            heroSubtitle.style.opacity = '0';
+            heroSubtitle.style.transition = 'opacity 0.5s ease';
+            
+            setTimeout(() => {
+                // Change text
+                currentSubtitleIndex = (currentSubtitleIndex + 1) % subtitleMessages.length;
+                heroSubtitle.textContent = subtitleMessages[currentSubtitleIndex];
+                
+                // Fade in
+                setTimeout(() => {
+                    heroSubtitle.style.opacity = '1';
+                }, 50);
+            }, 500);
+        }
+        
+        requestAnimationFrame(cycleSubtitle);
+    }
+    
+    if (heroSubtitle) {
+        cycleSubtitle();
     }
 
     // --- Scroll Detection: Hide Hero on Scroll, Show Products ---
@@ -631,12 +701,383 @@ document.addEventListener('DOMContentLoaded', () => {
     productCards.forEach(card => {
         card.addEventListener('click', () => openModal(card));
     });
+    
+    // Update modal add to cart button
+    const modalAddToCart = document.getElementById('modal-add-to-cart');
+    if (modalAddToCart) {
+        modalAddToCart.addEventListener('click', async () => {
+            const productId = modalAddToCart.dataset.productId;
+            if (productId) {
+                const { addProductToCart } = await import('./cart.js');
+                const success = await addProductToCart(productId, 1);
+                if (success) {
+                    closeModal();
+                    // Open cart sidebar
+                    const rightSidebarCart = document.getElementById('right-sidebar-cart');
+                    const rightSidebarOverlay = document.getElementById('right-sidebar-overlay');
+                    if (rightSidebarCart && rightSidebarOverlay) {
+                        rightSidebarCart.classList.add('open');
+                        rightSidebarOverlay.classList.remove('hidden');
+                        setTimeout(() => {
+                            rightSidebarOverlay.style.opacity = '1';
+                        }, 10);
+                        document.body.style.overflow = 'hidden';
+                    }
+                }
+            }
+        });
+    }
 
     if (closeModalBtn) {
         closeModalBtn.addEventListener('click', closeModal);
     }
     if (modalOverlay) {
         modalOverlay.addEventListener('click', closeModal);
+    }
+
+    // --- Sidebar Toggle Functionality ---
+    const leftSidebarTrigger = document.getElementById('left-sidebar-trigger');
+    const leftSidebar = document.getElementById('left-sidebar');
+    const leftSidebarOverlay = document.getElementById('left-sidebar-overlay');
+    const leftSidebarClose = document.getElementById('left-sidebar-close');
+    
+    const rightSidebarTrigger = document.getElementById('cart-trigger');
+    const rightSidebarCart = document.getElementById('right-sidebar-cart');
+    const rightSidebarOverlay = document.getElementById('right-sidebar-overlay');
+    const rightSidebarClose = document.getElementById('right-sidebar-close');
+    
+    function openLeftSidebar() {
+        if (leftSidebar && leftSidebarOverlay) {
+            leftSidebar.classList.add('open');
+            leftSidebarOverlay.classList.remove('hidden');
+            setTimeout(() => {
+                leftSidebarOverlay.style.opacity = '1';
+            }, 10);
+            document.body.style.overflow = 'hidden';
+        }
+    }
+    
+    function closeLeftSidebar() {
+        if (leftSidebar && leftSidebarOverlay) {
+            leftSidebar.classList.remove('open');
+            leftSidebarOverlay.style.opacity = '0';
+            setTimeout(() => {
+                leftSidebarOverlay.classList.add('hidden');
+            }, 300);
+            document.body.style.overflow = '';
+        }
+    }
+    
+    function openRightSidebar() {
+        if (rightSidebarCart && rightSidebarOverlay) {
+            rightSidebarCart.classList.add('open');
+            rightSidebarOverlay.classList.remove('hidden');
+            setTimeout(() => {
+                rightSidebarOverlay.style.opacity = '1';
+            }, 10);
+            document.body.style.overflow = 'hidden';
+        }
+    }
+    
+    function closeRightSidebar() {
+        if (rightSidebarCart && rightSidebarOverlay) {
+            rightSidebarCart.classList.remove('open');
+            rightSidebarOverlay.style.opacity = '0';
+            setTimeout(() => {
+                rightSidebarOverlay.classList.add('hidden');
+            }, 300);
+            document.body.style.overflow = '';
+        }
+    }
+    
+    if (leftSidebarTrigger) {
+        leftSidebarTrigger.addEventListener('click', openLeftSidebar);
+    }
+    if (leftSidebarClose) {
+        leftSidebarClose.addEventListener('click', closeLeftSidebar);
+    }
+    if (leftSidebarOverlay) {
+        leftSidebarOverlay.addEventListener('click', closeLeftSidebar);
+    }
+    
+    if (rightSidebarTrigger) {
+        rightSidebarTrigger.addEventListener('click', openRightSidebar);
+    }
+    if (rightSidebarClose) {
+        rightSidebarClose.addEventListener('click', closeRightSidebar);
+    }
+    if (rightSidebarOverlay) {
+        rightSidebarOverlay.addEventListener('click', closeRightSidebar);
+    }
+    
+    // Close sidebars on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeLeftSidebar();
+            closeRightSidebar();
+        }
+    });
+
+    // --- Theme Toggle ---
+    const themeToggle = document.getElementById('theme-toggle');
+    const sunIcon = document.getElementById('sun-icon');
+    const moonIcon = document.getElementById('moon-icon');
+    
+    // Load saved theme or default to dark
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(savedTheme);
+    // Update star colors when theme changes
+    starColors = getStarColors();
+    stars.forEach(star => {
+        const colors = getStarColors();
+        star.color = colors[Math.floor(Math.random() * colors.length)];
+    });
+    
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+            // Update star colors
+            starColors = getStarColors();
+            stars.forEach(star => {
+                const colors = getStarColors();
+                star.color = colors[Math.floor(Math.random() * colors.length)];
+            });
+        });
+    }
+    
+    function updateThemeIcon(theme) {
+        if (sunIcon && moonIcon) {
+            if (theme === 'light') {
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            } else {
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            }
+        }
+    }
+
+    // --- Initialize Authentication (temporarily disabled) ---
+    // import('./auth.js').then(({ initAuth }) => {
+    //     initAuth();
+    // }).catch(err => {
+    //     console.warn('Auth module not available:', err);
+    // });
+
+    // --- Initialize Cart ---
+    import('./cart.js').then(({ initCart }) => {
+        initCart();
+    }).catch(err => {
+        console.warn('Cart module not available:', err);
+    });
+
+    // --- Initialize Star Dust ---
+    import('./stardust.js').then(({ initStardust }) => {
+        initStardust();
+    }).catch(err => {
+        console.warn('Star dust module not available:', err);
+    });
+
+    // --- Initialize Payments ---
+    import('./payments.js').then(({ initPayments }) => {
+        initPayments();
+    }).catch(err => {
+        console.warn('Payments module not available:', err);
+    });
+
+    // --- Mobile Keyboard Handling for Prompt Bar v2 ---
+    // Note: searchInput is already declared above in Product Filter Logic section
+    const searchPrompt = document.getElementById('search-prompt');
+    const clearSearchBtn = document.getElementById('clear-search-btn');
+    
+    // Clear search button functionality
+    if (clearSearchBtn && searchInput) {
+        function updateClearButton() {
+            if (searchInput.value.trim().length > 0) {
+                clearSearchBtn.classList.remove('hidden');
+            } else {
+                clearSearchBtn.classList.add('hidden');
+            }
+        }
+        
+        searchInput.addEventListener('input', () => {
+            updateClearButton();
+            filterProducts(); // Also filter when typing
+        });
+        clearSearchBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            clearSearchBtn.classList.add('hidden');
+            filterProducts();
+            searchInput.focus();
+        });
+        
+        // Initial state
+        updateClearButton();
+    }
+    
+    // Improved keyboard handling
+    if (searchPrompt && searchInput) {
+        let initialViewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+        let isKeyboardOpen = false;
+        
+        function handleViewportResize() {
+            if (!searchPrompt || !searchInput) return;
+            
+            const currentViewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+            const viewportHeightDiff = initialViewportHeight - currentViewportHeight;
+            
+            // If keyboard is open (viewport shrunk significantly)
+            if (viewportHeightDiff > 150 && !isKeyboardOpen) {
+                isKeyboardOpen = true;
+                // Keep at bottom but ensure it's visible above keyboard
+                searchPrompt.style.bottom = '0';
+                // Scroll input into view if needed
+                setTimeout(() => {
+                    searchInput.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 100);
+            } else if (viewportHeightDiff <= 150 && isKeyboardOpen) {
+                isKeyboardOpen = false;
+                searchPrompt.style.bottom = '0';
+            }
+        }
+        
+        // Use Visual Viewport API if available (better for mobile)
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', handleViewportResize);
+            window.visualViewport.addEventListener('scroll', handleViewportResize);
+        } else {
+            // Fallback for browsers without Visual Viewport API
+            window.addEventListener('resize', handleViewportResize);
+        }
+        
+        // Handle input focus/blur
+        searchInput.addEventListener('focus', () => {
+            setTimeout(() => {
+                handleViewportResize();
+                // Ensure prompt stays visible
+                searchPrompt.style.bottom = '0';
+            }, 300);
+        });
+        
+        searchInput.addEventListener('blur', () => {
+            setTimeout(() => {
+                isKeyboardOpen = false;
+                searchPrompt.style.bottom = '0';
+            }, 300);
+        });
+    }
+
+    // --- Checkout Button Handler ---
+    const checkoutBtn = document.getElementById('checkout-btn');
+    const paymentMethods = document.getElementById('payment-methods');
+    
+    if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', () => {
+            if (paymentMethods) {
+                paymentMethods.classList.remove('hidden');
+            }
+        });
+    }
+
+    // Payment method handlers
+    const payStripe = document.getElementById('pay-stripe');
+    const payVenmo = document.getElementById('pay-venmo');
+    const payCashApp = document.getElementById('pay-cashapp');
+    const payCrypto = document.getElementById('pay-crypto');
+
+    if (payStripe) {
+        payStripe.addEventListener('click', async () => {
+            const { getCartItemsList, getCartTotal } = await import('./cart.js');
+            const { checkoutWithStripe } = await import('./payments.js');
+            const items = getCartItemsList();
+            const total = getCartTotal();
+            await checkoutWithStripe(items, total);
+        });
+    }
+
+    if (payVenmo) {
+        payVenmo.addEventListener('click', async () => {
+            const { getCartItemsList, getCartTotal } = await import('./cart.js');
+            const { checkoutWithVenmo } = await import('./payments.js');
+            const items = getCartItemsList();
+            const total = getCartTotal();
+            await checkoutWithVenmo(items, total);
+        });
+    }
+
+    if (payCashApp) {
+        payCashApp.addEventListener('click', async () => {
+            const { getCartItemsList, getCartTotal } = await import('./cart.js');
+            const { checkoutWithCashApp } = await import('./payments.js');
+            const items = getCartItemsList();
+            const total = getCartTotal();
+            await checkoutWithCashApp(items, total);
+        });
+    }
+
+    if (payCrypto) {
+        payCrypto.addEventListener('click', async () => {
+            const { getCartItemsList, getCartTotal } = await import('./cart.js');
+            const { checkoutWithCrypto } = await import('./payments.js');
+            const items = getCartItemsList();
+            const total = getCartTotal();
+            await checkoutWithCrypto(items, total);
+        });
+    }
+
+    // --- Auth Form Handlers ---
+    const authSubmit = document.getElementById('auth-submit');
+    const authEmail = document.getElementById('auth-email');
+    const authPhone = document.getElementById('auth-phone');
+    const signOutBtn = document.getElementById('sign-out-btn');
+    
+    if (authSubmit) {
+        authSubmit.addEventListener('click', async () => {
+            const email = authEmail?.value;
+            const phone = authPhone?.value;
+            
+            if (!email && !phone) {
+                alert('Please enter an email or phone number');
+                return;
+            }
+            
+            const { signInWithEmail, signUpWithEmail, signInWithPhone } = await import('./auth.js');
+            
+            if (email) {
+                // For demo, create account if doesn't exist
+                // In production, separate sign in/sign up flows
+                const password = prompt('Enter password (or leave blank to create account)');
+                if (password) {
+                    const result = await signInWithEmail(email, password);
+                    if (!result.success) {
+                        alert('Sign in failed. Creating new account...');
+                        await signUpWithEmail(email, password, phone);
+                    }
+                } else {
+                    await signUpWithEmail(email, 'temp123', phone);
+                }
+            } else if (phone) {
+                await signInWithPhone(phone);
+                alert('Check your phone for OTP code');
+                const token = prompt('Enter OTP code:');
+                if (token) {
+                    const { verifyOTP } = await import('./auth.js');
+                    await verifyOTP(phone, token);
+                }
+            }
+        });
+    }
+    
+    if (signOutBtn) {
+        signOutBtn.addEventListener('click', async () => {
+            const { signOut } = await import('./auth.js');
+            await signOut();
+        });
     }
 });
 

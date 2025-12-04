@@ -2,7 +2,7 @@
 <html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     
     <!-- SEO Meta Tags -->
     <title>Cosmic Voyager - Curated Art & Vintage Finds</title>
@@ -34,13 +34,30 @@
     <div class="content-wrapper">
         <!-- Header -->
         <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 glass-card">
-            <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-                <a href="#" class="font-heading text-2xl font-bold text-white tracking-wider">cosmic deals</a>
-                <button class="text-gray-300 hover:text-white transition-colors duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                </button>
+            <div class="container mx-auto px-3 py-4 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <!-- Left Sidebar Trigger - Gold Sphere -->
+                    <button id="left-sidebar-trigger" class="gold-sphere-btn relative" aria-label="Open dashboard">
+                        <div class="gold-sphere"></div>
+                    </button>
+                    <a href="#" class="font-heading text-xl font-bold text-white tracking-wider">cosmic deals</a>
+                </div>
+                <div class="flex items-center gap-4">
+                    <!-- Theme Toggle -->
+                    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                        <svg class="theme-toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path id="sun-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                            <path id="moon-icon" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                        </svg>
+                    </button>
+                    <!-- Right Sidebar Cart Trigger -->
+                    <button id="cart-trigger" class="text-gray-300 hover:text-white transition-colors duration-300 relative" aria-label="Open cart">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        <span id="cart-count" class="absolute -top-2 -right-2 bg-tan-500 text-black text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+                    </button>
+                </div>
             </div>
         </header>
 
@@ -50,7 +67,7 @@
             <section id="hero-section" class="h-screen flex items-center justify-center text-center px-4 transition-all duration-500">
                 <div class="max-w-3xl fade-in-up">
                     <h1 class="font-heading text-5xl md:text-7xl font-bold leading-tight text-white hero-heading">Cosmic Deals</h1>
-                    <p class="mt-6 text-lg md:text-xl text-gray-300 max-w-xl mx-auto subtitle">A curated collection of art, vintage relics, and unique finds from across the universe, delivered to your doorstep.</p>
+                    <p class="mt-6 text-lg md:text-xl text-gray-300 max-w-xl mx-auto subtitle" id="hero-subtitle">Art, silver, thrift finds. Your zodiac sign won't help you find better deals, but we will.</p>
                 </div>
             </section>
 
@@ -65,7 +82,7 @@
                             <button class="text-gray-400 hover:text-white transition-colors text-sm">view more →</button>
                         </div>
                         <div class="product-grid-row">
-                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="random" data-title="Product 1" data-price="$99.00" data-category="Random" data-img="">
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="random" data-title="Product 1" data-product-id="product-1" data-price="$99.00" data-category="Random" data-img="">
                                 <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
                                     <span class="text-gray-600 text-sm">1</span>
                                 </div>
@@ -74,7 +91,7 @@
                                     <p class="text-gray-400 text-xs mt-1">$99.00</p>
                                 </div>
                             </article>
-                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="random" data-title="Product 2" data-price="$99.00" data-category="Random" data-img="">
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="random" data-title="Product 2" data-product-id="product-2" data-price="$99.00" data-category="Random" data-img="">
                                 <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
                                     <span class="text-gray-600 text-sm">2</span>
                                 </div>
@@ -83,7 +100,7 @@
                                     <p class="text-gray-400 text-xs mt-1">$99.00</p>
                                 </div>
                             </article>
-                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="random" data-title="Product 3" data-price="$99.00" data-category="Random" data-img="">
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="random" data-title="Product 3" data-product-id="product-3" data-price="$99.00" data-category="Random" data-img="">
                                 <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
                                     <span class="text-gray-600 text-sm">3</span>
                                 </div>
@@ -92,7 +109,7 @@
                                     <p class="text-gray-400 text-xs mt-1">$99.00</p>
                                 </div>
                             </article>
-                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="random" data-title="Product 4" data-price="$99.00" data-category="Random" data-img="">
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="random" data-title="Product 4" data-product-id="product-4" data-price="$99.00" data-category="Random" data-img="">
                                 <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
                                     <span class="text-gray-600 text-sm">4</span>
                                 </div>
@@ -110,7 +127,7 @@
                             <h2 class="font-heading text-2xl md:text-3xl font-bold text-white">aries</h2>
                         </div>
                         <div class="product-grid-row">
-                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="aries" data-title="Aries 1" data-price="$99.00" data-category="Aries" data-img="">
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="aries" data-title="Aries 1" data-product-id="aries-1" data-price="$99.00" data-category="Aries" data-img="">
                                 <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
                                     <span class="text-gray-600 text-sm">1</span>
                                 </div>
@@ -119,7 +136,7 @@
                                     <p class="text-gray-400 text-xs mt-1">$99.00</p>
                                 </div>
                             </article>
-                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="aries" data-title="Aries 2" data-price="$99.00" data-category="Aries" data-img="">
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="aries" data-title="Aries 2" data-product-id="aries-2" data-price="$99.00" data-category="Aries" data-img="">
                                 <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
                                     <span class="text-gray-600 text-sm">2</span>
                                 </div>
@@ -128,7 +145,7 @@
                                     <p class="text-gray-400 text-xs mt-1">$99.00</p>
                                 </div>
                             </article>
-                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="aries" data-title="Aries 3" data-price="$99.00" data-category="Aries" data-img="">
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="aries" data-title="Aries 3" data-product-id="aries-3" data-price="$99.00" data-category="Aries" data-img="">
                                 <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
                                     <span class="text-gray-600 text-sm">3</span>
                                 </div>
@@ -137,7 +154,7 @@
                                     <p class="text-gray-400 text-xs mt-1">$99.00</p>
                                 </div>
                             </article>
-                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="aries" data-title="Aries 4" data-price="$99.00" data-category="Aries" data-img="">
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="aries" data-title="Aries 4" data-product-id="aries-4" data-price="$99.00" data-category="Aries" data-img="">
                                 <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
                                     <span class="text-gray-600 text-sm">4</span>
                                 </div>
@@ -155,7 +172,7 @@
                             <h2 class="font-heading text-2xl md:text-3xl font-bold text-white">taurus</h2>
                         </div>
                         <div class="product-grid-row">
-                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="taurus" data-title="Taurus 1" data-price="$99.00" data-category="Taurus" data-img="">
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="taurus" data-title="Taurus 1" data-product-id="taurus-1" data-price="$99.00" data-category="Taurus" data-img="">
                                 <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
                                     <span class="text-gray-600 text-sm">1</span>
                                 </div>
@@ -164,7 +181,7 @@
                                     <p class="text-gray-400 text-xs mt-1">$99.00</p>
                                 </div>
                             </article>
-                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="taurus" data-title="Taurus 2" data-price="$99.00" data-category="Taurus" data-img="">
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="taurus" data-title="Taurus 2" data-product-id="taurus-2" data-price="$99.00" data-category="Taurus" data-img="">
                                 <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
                                     <span class="text-gray-600 text-sm">2</span>
                                 </div>
@@ -173,7 +190,7 @@
                                     <p class="text-gray-400 text-xs mt-1">$99.00</p>
                                 </div>
                             </article>
-                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="taurus" data-title="Taurus 3" data-price="$99.00" data-category="Taurus" data-img="">
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="taurus" data-title="Taurus 3" data-product-id="taurus-3" data-price="$99.00" data-category="Taurus" data-img="">
                                 <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
                                     <span class="text-gray-600 text-sm">3</span>
                                 </div>
@@ -182,7 +199,7 @@
                                     <p class="text-gray-400 text-xs mt-1">$99.00</p>
                                 </div>
                             </article>
-                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="taurus" data-title="Taurus 4" data-price="$99.00" data-category="Taurus" data-img="">
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="taurus" data-title="Taurus 4" data-product-id="taurus-4" data-price="$99.00" data-category="Taurus" data-img="">
                                 <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
                                     <span class="text-gray-600 text-sm">4</span>
                                 </div>
@@ -200,7 +217,7 @@
                             <h2 class="font-heading text-2xl md:text-3xl font-bold text-white">gemini</h2>
                         </div>
                         <div class="product-grid-row">
-                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="gemini" data-title="Gemini 1" data-price="$99.00" data-category="Gemini" data-img="">
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="gemini" data-title="Gemini 1" data-product-id="gemini-1" data-price="$99.00" data-category="Gemini" data-img="">
                                 <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
                                     <span class="text-gray-600 text-sm">1</span>
                                 </div>
@@ -209,7 +226,7 @@
                                     <p class="text-gray-400 text-xs mt-1">$99.00</p>
                                 </div>
                             </article>
-                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="gemini" data-title="Gemini 2" data-price="$99.00" data-category="Gemini" data-img="">
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="gemini" data-title="Gemini 2" data-product-id="gemini-2" data-price="$99.00" data-category="Gemini" data-img="">
                                 <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
                                     <span class="text-gray-600 text-sm">2</span>
                                 </div>
@@ -218,7 +235,7 @@
                                     <p class="text-gray-400 text-xs mt-1">$99.00</p>
                                 </div>
                             </article>
-                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="gemini" data-title="Gemini 3" data-price="$99.00" data-category="Gemini" data-img="">
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="gemini" data-title="Gemini 3" data-product-id="gemini-3" data-price="$99.00" data-category="Gemini" data-img="">
                                 <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
                                     <span class="text-gray-600 text-sm">3</span>
                                 </div>
@@ -227,7 +244,7 @@
                                     <p class="text-gray-400 text-xs mt-1">$99.00</p>
                                 </div>
                             </article>
-                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="gemini" data-title="Gemini 4" data-price="$99.00" data-category="Gemini" data-img="">
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="gemini" data-title="Gemini 4" data-product-id="gemini-4" data-price="$99.00" data-category="Gemini" data-img="">
                                 <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
                                     <span class="text-gray-600 text-sm">4</span>
                                 </div>
@@ -245,7 +262,7 @@
                             <h2 class="font-heading text-2xl md:text-3xl font-bold text-white">more</h2>
                         </div>
                         <div class="product-grid-row">
-                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="random" data-title="Product 17" data-price="$99.00" data-category="Random" data-img="">
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="random" data-title="Product 17" data-product-id="product-17" data-price="$99.00" data-category="Random" data-img="">
                                 <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
                                     <span class="text-gray-600 text-sm">17</span>
                                 </div>
@@ -254,7 +271,7 @@
                                     <p class="text-gray-400 text-xs mt-1">$99.00</p>
                                 </div>
                             </article>
-                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="random" data-title="Product 18" data-price="$99.00" data-category="Random" data-img="">
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="random" data-title="Product 18" data-product-id="product-18" data-price="$99.00" data-category="Random" data-img="">
                                 <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
                                     <span class="text-gray-600 text-sm">18</span>
                                 </div>
@@ -263,7 +280,7 @@
                                     <p class="text-gray-400 text-xs mt-1">$99.00</p>
                                 </div>
                             </article>
-                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="random" data-title="Product 19" data-price="$99.00" data-category="Random" data-img="">
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="random" data-title="Product 19" data-product-id="product-19" data-price="$99.00" data-category="Random" data-img="">
                                 <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
                                     <span class="text-gray-600 text-sm">19</span>
                                 </div>
@@ -272,7 +289,7 @@
                                     <p class="text-gray-400 text-xs mt-1">$99.00</p>
                                 </div>
                             </article>
-                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="random" data-title="Product 20" data-price="$99.00" data-category="Random" data-img="">
+                            <article class="product-card-small rounded-lg overflow-hidden glass-card fade-in-up" data-zodiac="random" data-title="Product 20" data-product-id="product-20" data-price="$99.00" data-category="Random" data-img="">
                                 <div class="w-full h-40 bg-gray-800 flex items-center justify-center">
                                     <span class="text-gray-600 text-sm">20</span>
                                 </div>
@@ -288,21 +305,168 @@
             </section>
         </main>
 
-        <!-- Search & Filter Prompt -->
-        <div id="search-prompt" class="fixed bottom-4 left-1/2 -translate-x-1/2 w-11/12 max-w-2xl z-50 glass-card rounded-lg p-2 shadow-2xl">
-            <div class="flex flex-col md:flex-row items-center gap-2">
-                <input type="text" id="search-input" placeholder="Search for cosmic objects..." class="w-full bg-transparent text-white p-2 focus:outline-none relative z-10">
-                <div class="flex-shrink-0 flex items-center gap-1 overflow-x-auto p-1 relative z-10">
-                    <button class="zodiac-btn all active text-sm px-3 py-1 rounded-md" data-zodiac="all">All</button>
-                    <button class="zodiac-btn text-sm px-3 py-1 rounded-md" data-zodiac="aries">Aries</button>
-                    <button class="zodiac-btn text-sm px-3 py-1 rounded-md" data-zodiac="taurus">Taurus</button>
-                    <button class="zodiac-btn text-sm px-3 py-1 rounded-md" data-zodiac="gemini">Gemini</button>
-                    <button class="zodiac-btn text-sm px-3 py-1 rounded-md" data-zodiac="cancer">Cancer</button>
-                    <button class="zodiac-btn text-sm px-3 py-1 rounded-md" data-zodiac="leo">Leo</button>
-                    <button class="zodiac-btn text-sm px-3 py-1 rounded-md" data-zodiac="virgo">Virgo</button>
+        <!-- Search & Filter Prompt v2 -->
+        <div id="search-prompt" class="search-prompt-v2 z-50 glass-card shadow-2xl">
+            <div class="search-prompt-content">
+                <!-- Zodiac Filter Buttons - All 12 Signs -->
+                <div class="zodiac-filters-container">
+                    <div class="zodiac-filters-scroll">
+                        <button class="zodiac-btn all active" data-zodiac="all">All</button>
+                        <button class="zodiac-btn" data-zodiac="aries">Aries</button>
+                        <button class="zodiac-btn" data-zodiac="taurus">Taurus</button>
+                        <button class="zodiac-btn" data-zodiac="gemini">Gemini</button>
+                        <button class="zodiac-btn" data-zodiac="cancer">Cancer</button>
+                        <button class="zodiac-btn" data-zodiac="leo">Leo</button>
+                        <button class="zodiac-btn" data-zodiac="virgo">Virgo</button>
+                        <button class="zodiac-btn" data-zodiac="libra">Libra</button>
+                        <button class="zodiac-btn" data-zodiac="scorpio">Scorpio</button>
+                        <button class="zodiac-btn" data-zodiac="sagittarius">Sagittarius</button>
+                        <button class="zodiac-btn" data-zodiac="capricorn">Capricorn</button>
+                        <button class="zodiac-btn" data-zodiac="aquarius">Aquarius</button>
+                        <button class="zodiac-btn" data-zodiac="pisces">Pisces</button>
+                    </div>
+                </div>
+                <!-- Search Input with Clear Button -->
+                <div class="search-input-container">
+                    <input type="text" id="search-input" placeholder="We organize by zodiac (for fun, not science) Search..." class="search-input" autocomplete="off">
+                    <button id="clear-search-btn" class="clear-search-btn hidden" aria-label="Clear search">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
             </div>
         </div>
+
+        <!-- Left Sidebar Dashboard -->
+        <div id="left-sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-[80] hidden opacity-0 transition-opacity duration-300"></div>
+        <aside id="left-sidebar" class="fixed top-0 left-0 h-full w-full max-w-sm bg-[#0a0a0a] border-r border-gray-800 shadow-2xl z-[90] transform -translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto">
+            <div class="p-6">
+                <!-- Close Button -->
+                <button id="left-sidebar-close" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+                
+                <!-- User Zodiac Sign -->
+                <div id="user-zodiac-section" class="mb-8">
+                    <h2 id="user-zodiac" class="font-heading text-4xl font-bold text-white mb-2">Select Your Sign</h2>
+                    <div id="zodiac-selector" class="grid grid-cols-3 gap-2 mb-4">
+                        <!-- Zodiac options will be populated by JS -->
+                    </div>
+                </div>
+                
+                <!-- Daily Horoscope -->
+                <div id="horoscope-section" class="mb-8 hidden">
+                    <h3 class="font-heading text-xl font-bold text-white mb-3">Today's Horoscope</h3>
+                    <p id="horoscope-text" class="text-gray-300 text-sm leading-relaxed"></p>
+                </div>
+                
+                <!-- Sign In Section (temporarily disabled) -->
+                <div id="signin-section" class="mb-8 hidden">
+                    <h3 class="font-heading text-xl font-bold text-white mb-4">Sign In</h3>
+                    <div id="auth-form" class="space-y-4">
+                        <input type="email" id="auth-email" placeholder="Email" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-tan-500">
+                        <input type="tel" id="auth-phone" placeholder="Phone (optional)" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-tan-500">
+                        <button id="auth-submit" class="w-full bg-tan-500 text-black font-bold py-2 rounded-lg hover:bg-tan-600 transition-colors" style="background-color: #D2B48C;">Sign In / Sign Up</button>
+                    </div>
+                    <div id="user-info" class="hidden mt-4">
+                        <p class="text-gray-300 text-sm">Signed in as: <span id="user-email-display" class="text-white"></span></p>
+                        <button id="sign-out-btn" class="mt-2 text-gray-400 hover:text-white text-sm">Sign Out</button>
+                    </div>
+                </div>
+                
+                <!-- Star Dust Balance -->
+                <div id="stardust-section" class="mb-8 hidden">
+                    <h3 class="font-heading text-xl font-bold text-white mb-2">Star Dust</h3>
+                    <p class="text-3xl font-bold text-tan-500" style="color: #D2B48C;"><span id="stardust-balance">0</span></p>
+                    <p class="text-gray-400 text-xs mt-1">100 star dust = $1 discount</p>
+                </div>
+                
+                <!-- Settings -->
+                <div id="settings-section" class="mb-8">
+                    <h3 class="font-heading text-xl font-bold text-white mb-4">Settings</h3>
+                    <div class="space-y-3">
+                        <label class="flex items-center justify-between text-gray-300">
+                            <span>Email Notifications</span>
+                            <input type="checkbox" id="setting-email-notifications" class="toggle-checkbox">
+                        </label>
+                        <label class="flex items-center justify-between text-gray-300">
+                            <span>SMS Notifications</span>
+                            <input type="checkbox" id="setting-sms-notifications" class="toggle-checkbox">
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Policies Links -->
+                <div class="border-t border-gray-800 pt-4">
+                    <a href="/src/html/policies.html#privacy-policy" id="privacy-policy-link" class="block text-gray-400 hover:text-white text-sm mb-2">Privacy Policy</a>
+                    <a href="/src/html/policies.html#terms" id="terms-link" class="block text-gray-400 hover:text-white text-sm mb-2">Terms of Service</a>
+                    <a href="/src/html/policies.html#returns" id="returns-link" class="block text-gray-400 hover:text-white text-sm">Return Policy</a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Right Sidebar Cart -->
+        <div id="right-sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-[80] hidden opacity-0 transition-opacity duration-300"></div>
+        <aside id="right-sidebar-cart" class="fixed top-0 right-0 h-full w-full max-w-md bg-[#0a0a0a] border-l border-gray-800 shadow-2xl z-[90] transform translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto">
+            <div class="p-6">
+                <!-- Close Button -->
+                <button id="right-sidebar-close" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+                
+                <!-- Cart Header -->
+                <h2 class="font-heading text-3xl font-bold text-white mb-6">Cart</h2>
+                
+                <!-- Star Dust Balance in Cart -->
+                <div id="cart-stardust" class="mb-4 p-3 bg-gray-900 rounded-lg border border-gray-800 hidden">
+                    <p class="text-gray-400 text-sm">Your Star Dust</p>
+                    <p class="text-2xl font-bold text-tan-500" style="color: #D2B48C;"><span id="cart-stardust-balance">0</span></p>
+                </div>
+                
+                <!-- Cart Items -->
+                <div id="cart-items" class="space-y-4 mb-6">
+                    <p class="text-gray-500 text-center py-8">Your cart is empty</p>
+                </div>
+                
+                <!-- Cart Summary -->
+                <div id="cart-summary" class="border-t border-gray-800 pt-4 mb-4 hidden">
+                    <div class="flex justify-between text-gray-300 mb-2">
+                        <span>Subtotal</span>
+                        <span id="cart-subtotal">$0.00</span>
+                    </div>
+                    <div class="flex justify-between text-gray-300 mb-2">
+                        <span>Star Dust Discount</span>
+                        <span id="cart-discount">-$0.00</span>
+                    </div>
+                    <div class="flex justify-between text-white font-bold text-lg mb-4">
+                        <span>Total</span>
+                        <span id="cart-total">$0.00</span>
+                    </div>
+                </div>
+                
+                <!-- Payment Method Selection -->
+                <div id="payment-methods" class="mb-4 hidden">
+                    <p class="text-gray-400 text-sm mb-2">Payment Method</p>
+                    <div class="space-y-2">
+                        <button id="pay-stripe" class="w-full bg-blue-600 text-white font-bold py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm">Card (Stripe)</button>
+                        <button id="pay-venmo" class="w-full bg-tan-500 text-black font-bold py-2 rounded-lg hover:bg-tan-600 transition-colors text-sm" style="background-color: #D2B48C;">Venmo</button>
+                        <button id="pay-cashapp" class="w-full bg-green-600 text-white font-bold py-2 rounded-lg hover:bg-green-700 transition-colors text-sm">CashApp</button>
+                        <button id="pay-crypto" class="w-full bg-yellow-600 text-black font-bold py-2 rounded-lg hover:bg-yellow-700 transition-colors text-sm">Crypto</button>
+                    </div>
+                </div>
+                
+                <!-- Checkout Button -->
+                <button id="checkout-btn" class="w-full bg-tan-500 text-black font-bold py-3 rounded-lg hover:bg-tan-600 transition-colors hidden" style="background-color: #D2B48C;">Checkout</button>
+                
+                <!-- Continue Shopping -->
+                <button id="continue-shopping" class="w-full bg-gray-800 text-white font-bold py-3 rounded-lg hover:bg-gray-700 transition-colors mt-2">Continue Shopping</button>
+            </div>
+        </aside>
 
         <!-- Product Detail Modal -->
         <div id="product-modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-[60] hidden opacity-0"></div>
@@ -316,9 +480,12 @@
                 <p id="modal-category" class="text-gray-400 mt-2"></p>
                 <p id="modal-price" class="text-2xl font-medium text-white my-4"></p>
                 <p class="text-gray-300 leading-relaxed">A timeless piece, sourced from the far reaches of the galaxy. Its design speaks of forgotten constellations and ancient cosmic events. Perfect for the discerning collector.</p>
+                <div id="modal-stardust-earn" class="mt-4 p-3 bg-gray-900 rounded-lg border border-gray-800 hidden">
+                    <p class="text-gray-400 text-sm">Earn <span id="modal-stardust-amount" class="text-tan-500 font-bold" style="color: #D2B48C;">0</span> star dust with this purchase</p>
+                </div>
                 <div class="mt-8 space-y-4">
-                    <button class="w-full bg-tan-500 text-black font-bold py-3 rounded-lg" style="background-color: #D2B48C;">Add to Cart</button>
-                    <button class="w-full bg-gray-800 text-white font-bold py-3 rounded-lg">Checkout</button>
+                    <button id="modal-add-to-cart" class="w-full bg-tan-500 text-black font-bold py-3 rounded-lg hover:bg-tan-600 transition-colors" style="background-color: #D2B48C;">Add to Cart</button>
+                    <button id="modal-checkout" class="w-full bg-gray-800 text-white font-bold py-3 rounded-lg hover:bg-gray-700 transition-colors">Checkout</button>
                 </div>
             </div>
         </div>
@@ -328,6 +495,11 @@
             <div class="container mx-auto text-center text-gray-500">
                 <p>&copy; 2024 Cosmic Voyager. All Rights Reserved.</p>
                 <p class="mt-2 text-sm">Engineered for simplicity and speed.</p>
+                <div class="mt-4 space-x-4 text-sm">
+                    <a href="/src/html/policies.html#privacy-policy" class="hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="/src/html/policies.html#terms" class="hover:text-white transition-colors">Terms of Service</a>
+                    <a href="/src/html/policies.html#returns" class="hover:text-white transition-colors">Return Policy</a>
+                </div>
             </div>
         </footer>
     </div>
