@@ -284,6 +284,84 @@ main {
     transform: translateY(-20px);
 }
 
+/* Subtitle styling with better font */
+#hero-subtitle,
+.subtitle {
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    font-weight: 300;
+    letter-spacing: 0.02em;
+    line-height: 1.6;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+/* Subtle lightning effect animations */
+@keyframes lightning-flash {
+    0%, 100% {
+        filter: brightness(1);
+        text-shadow: 0 0 0 rgba(255, 255, 255, 0);
+    }
+    10% {
+        filter: brightness(1.3);
+        text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+    }
+    20% {
+        filter: brightness(1.1);
+        text-shadow: 0 0 4px rgba(255, 255, 255, 0.2);
+    }
+    30% {
+        filter: brightness(1.4);
+        text-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
+    }
+    40% {
+        filter: brightness(1);
+        text-shadow: 0 0 0 rgba(255, 255, 255, 0);
+    }
+}
+
+@keyframes lightning-entrance {
+    0% {
+        filter: brightness(1.5);
+        text-shadow: 
+            0 0 10px rgba(255, 255, 255, 0.4),
+            0 0 20px rgba(255, 255, 255, 0.2);
+        transform: translateY(0) scale(1);
+    }
+    15% {
+        filter: brightness(1.2);
+        text-shadow: 
+            0 0 8px rgba(255, 255, 255, 0.3),
+            0 0 15px rgba(255, 255, 255, 0.15);
+        transform: translateY(0) scale(1.01);
+    }
+    30% {
+        filter: brightness(1.4);
+        text-shadow: 
+            0 0 12px rgba(255, 255, 255, 0.5),
+            0 0 25px rgba(255, 255, 255, 0.25);
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        filter: brightness(1.1);
+        text-shadow: 
+            0 0 6px rgba(255, 255, 255, 0.2),
+            0 0 12px rgba(255, 255, 255, 0.1);
+        transform: translateY(0) scale(1);
+    }
+    100% {
+        filter: brightness(1);
+        text-shadow: 0 0 0 rgba(255, 255, 255, 0);
+        transform: translateY(0) scale(1);
+    }
+}
+
+.lightning-flash {
+    animation: lightning-flash 0.4s ease-out;
+}
+
+.lightning-entrance {
+    animation: lightning-entrance 0.8s ease-out;
+}
+
 .zodiac-btn {
     transition: background-color 0.3s, color 0.3s;
 }

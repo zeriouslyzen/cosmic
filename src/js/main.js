@@ -398,7 +398,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const subtitleMessages = [
         "Art, silver, thrift finds. Your zodiac sign won't help you find better deals, but we will.",
         "Our zodiac sign didn't predict this, but here we are.",
-        "Good art, vintage silver, thrift finds. Your sign said you'd buy something today anyway."
+        "Your sign said you'd buy something today anyway."
     ];
     let currentSubtitleIndex = 0;
     let subtitleCycleTime = 0;
@@ -412,20 +412,32 @@ document.addEventListener('DOMContentLoaded', () => {
         if (subtitleCycleTime >= subtitleCycleInterval) {
             subtitleCycleTime = 0;
             
-            // Fade out
+            // Subtle lightning effect on transition
+            heroSubtitle.classList.add('lightning-flash');
+            
+            // Fade out with subtle transform
             heroSubtitle.style.opacity = '0';
-            heroSubtitle.style.transition = 'opacity 0.5s ease';
+            heroSubtitle.style.transform = 'translateY(10px)';
+            heroSubtitle.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
             
             setTimeout(() => {
                 // Change text
                 currentSubtitleIndex = (currentSubtitleIndex + 1) % subtitleMessages.length;
                 heroSubtitle.textContent = subtitleMessages[currentSubtitleIndex];
                 
-                // Fade in
+                // Remove lightning class
+                heroSubtitle.classList.remove('lightning-flash');
+                
+                // Fade in with subtle lightning entrance
                 setTimeout(() => {
                     heroSubtitle.style.opacity = '1';
+                    heroSubtitle.style.transform = 'translateY(0)';
+                    heroSubtitle.classList.add('lightning-entrance');
+                    setTimeout(() => {
+                        heroSubtitle.classList.remove('lightning-entrance');
+                    }, 800);
                 }, 50);
-            }, 500);
+            }, 600);
         }
         
         requestAnimationFrame(cycleSubtitle);
