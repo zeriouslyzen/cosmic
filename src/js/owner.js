@@ -1,5 +1,5 @@
 // Owner Dashboard Management
-import { supabase } from './supabase.js';
+import { supabaseClient } from './supabase.js';
 import { getProducts, getProductById } from './api.js';
 
 let isOwner = false;
@@ -10,7 +10,7 @@ export async function checkOwnerAccess() {
     if (ownerDevMode) {
         // In dev mode, treat current user as owner if any session exists
         try {
-            const { data: { user } } = await supabase.auth.getUser();
+            const { data: { user } } = await supabaseClient.auth.getUser();
             isOwner = !!user;
             return isOwner;
         } catch {
@@ -20,7 +20,7 @@ export async function checkOwnerAccess() {
         }
     }
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabaseClient.auth.getUser();
     if (!user) return false;
     
     // Check owner_settings for owner email/ID
@@ -33,7 +33,7 @@ export async function checkOwnerAccess() {
 
 // Owner authentication
 export async function ownerLogin(email, password) {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
         email,
         password
     });
@@ -44,7 +44,7 @@ export async function ownerLogin(email, password) {
     
     const isOwnerUser = await checkOwnerAccess();
     if (!isOwnerUser) {
-        await supabase.auth.signOut();
+        await supabaseClient.auth.signOut();
         return { success: false, error: { message: 'Not an owner account' } };
     }
     
@@ -58,15 +58,36 @@ export async function getDashboardStats() {
         if (!isOwner) return null;
     }
     
-    const { data: orders } = await supabase
+    const { useLocalStorage } = await import('./supabase.js');
+    
+    if (useLocalStorage) {
+        // Use localStorage fallback for development
+        const orders = JSON.parse(localStorage.getItem('all_orders') || '[]');
+        const products = await getProducts();
+        const transactions = JSON.parse(localStorage.getItem('all_stardust_transactions') || '[]');
+        
+        const totalRevenue = orders.reduce((sum, order) => sum + parseFloat(order.total || 0), 0);
+        const pendingOrders = orders.filter(o => o.status === 'pending').length;
+        const totalStardust = transactions.reduce((sum, t) => sum + (t.type === 'earned' ? t.amount : -t.amount), 0);
+        
+        return {
+            totalOrders: orders.length,
+            pendingOrders,
+            totalProducts: products.length,
+            totalRevenue,
+            totalStardust
+        };
+    }
+    
+    const { data: orders } = await supabaseClient
         .from('orders')
         .select('*');
     
-    const { data: products } = await supabase
+    const { data: products } = await supabaseClient
         .from('products')
         .select('*');
     
-    const { data: transactions } = await supabase
+    const { data: transactions } = await supabaseClient
         .from('stardust_transactions')
         .select('*');
     
@@ -90,7 +111,23 @@ export async function createProduct(productData) {
         if (!isOwner) return null;
     }
     
-    const { data, error } = await supabase
+    const { useLocalStorage } = await import('./supabase.js');
+    
+    if (useLocalStorage) {
+        // Store in localStorage for development
+        const products = await getProducts();
+        const newProduct = {
+            id: 'product-' + Date.now(),
+            ...productData,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        };
+        products.push(newProduct);
+        localStorage.setItem('all_products', JSON.stringify(products));
+        return newProduct;
+    }
+    
+    const { data, error } = await supabaseClient
         .from('products')
         .insert(productData)
         .select()
@@ -110,7 +147,21 @@ export async function updateProduct(productId, productData) {
         if (!isOwner) return null;
     }
     
-    const { data, error } = await supabase
+    const { useLocalStorage } = await import('./supabase.js');
+    
+    if (useLocalStorage) {
+        // Update in localStorage for development
+        const products = await getProducts();
+        const index = products.findIndex(p => p.id === productId);
+        if (index !== -1) {
+            products[index] = { ...products[index], ...productData, updated_at: new Date().toISOString() };
+            localStorage.setItem('all_products', JSON.stringify(products));
+            return products[index];
+        }
+        return null;
+    }
+    
+    const { data, error } = await supabaseClient
         .from('products')
         .update(productData)
         .eq('id', productId)
@@ -131,7 +182,17 @@ export async function deleteProduct(productId) {
         if (!isOwner) return false;
     }
     
-    const { error } = await supabase
+    const { useLocalStorage } = await import('./supabase.js');
+    
+    if (useLocalStorage) {
+        // Delete from localStorage for development
+        const products = await getProducts();
+        const filtered = products.filter(p => p.id !== productId);
+        localStorage.setItem('all_products', JSON.stringify(filtered));
+        return true;
+    }
+    
+    const { error } = await supabaseClient
         .from('products')
         .delete()
         .eq('id', productId);
@@ -151,7 +212,18 @@ export async function getOrders(filters = {}) {
         if (!isOwner) return [];
     }
     
-    let query = supabase.from('orders').select('*');
+    const { useLocalStorage } = await import('./supabase.js');
+    
+    if (useLocalStorage) {
+        // Get orders from localStorage for development
+        let orders = JSON.parse(localStorage.getItem('all_orders') || '[]');
+        if (filters.status) {
+            orders = orders.filter(o => o.status === filters.status);
+        }
+        return orders.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+    }
+    
+    let query = supabaseClient.from('orders').select('*');
     
     if (filters.status) {
         query = query.eq('status', filters.status);
@@ -173,7 +245,22 @@ export async function updateOrderStatus(orderId, status) {
         if (!isOwner) return false;
     }
     
-    const { error } = await supabase
+    const { useLocalStorage } = await import('./supabase.js');
+    
+    if (useLocalStorage) {
+        // Update order in localStorage for development
+        const orders = JSON.parse(localStorage.getItem('all_orders') || '[]');
+        const order = orders.find(o => o.id === orderId);
+        if (order) {
+            order.status = status;
+            order.updated_at = new Date().toISOString();
+            localStorage.setItem('all_orders', JSON.stringify(orders));
+            return true;
+        }
+        return false;
+    }
+    
+    const { error } = await supabaseClient
         .from('orders')
         .update({ status })
         .eq('id', orderId);
@@ -193,7 +280,15 @@ export async function getSetting(key) {
         if (!isOwner) return null;
     }
     
-    const { data, error } = await supabase
+    const { useLocalStorage } = await import('./supabase.js');
+    
+    if (useLocalStorage) {
+        // Get setting from localStorage for development
+        const settings = JSON.parse(localStorage.getItem('owner_settings') || '{}');
+        return settings[key] || null;
+    }
+    
+    const { data, error } = await supabaseClient
         .from('owner_settings')
         .select('value')
         .eq('key', key)
@@ -213,7 +308,17 @@ export async function setSetting(key, value) {
         if (!isOwner) return false;
     }
     
-    const { error } = await supabase
+    const { useLocalStorage } = await import('./supabase.js');
+    
+    if (useLocalStorage) {
+        // Store setting in localStorage for development
+        const settings = JSON.parse(localStorage.getItem('owner_settings') || '{}');
+        settings[key] = value;
+        localStorage.setItem('owner_settings', JSON.stringify(settings));
+        return true;
+    }
+    
+    const { error } = await supabaseClient
         .from('owner_settings')
         .upsert({
             key,

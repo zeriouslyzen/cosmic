@@ -51,20 +51,29 @@ export async function createOrUpdateProfile(userId, profileData) {
 // Product Operations
 export async function getProducts(filters = {}) {
     if (useLocalStorage) {
-        // Return mock products from existing HTML for development
-        const productCards = document.querySelectorAll('.product-card-small, .product-card');
-        const products = [];
-        productCards.forEach((card, index) => {
-            products.push({
-                id: card.dataset.productId || `product-${index}`,
-                title: card.dataset.title || 'Product ' + (index + 1),
-                price: parseFloat((card.dataset.price || '$99').replace('$', '').replace(',', '')) || 99,
-                zodiac: card.dataset.zodiac || 'random',
-                image_url: card.dataset.img || '',
-                category: card.dataset.category || 'Random',
-                description: 'A cosmic product'
+        // Try to get products from localStorage first
+        let products = JSON.parse(localStorage.getItem('all_products') || '[]');
+        
+        // If no products in localStorage, try to get from DOM (for main page)
+        if (products.length === 0 && typeof document !== 'undefined') {
+            const productCards = document.querySelectorAll('.product-card-small, .product-card');
+            products = [];
+            productCards.forEach((card, index) => {
+                products.push({
+                    id: card.dataset.productId || `product-${index}`,
+                    title: card.dataset.title || 'Product ' + (index + 1),
+                    price: parseFloat((card.dataset.price || '$99').replace('$', '').replace(',', '')) || 99,
+                    zodiac: card.dataset.zodiac || 'random',
+                    image_url: card.dataset.img || '',
+                    category: card.dataset.category || 'Random',
+                    description: 'A cosmic product'
+                });
             });
-        });
+            // Save to localStorage for future use
+            if (products.length > 0) {
+                localStorage.setItem('all_products', JSON.stringify(products));
+            }
+        }
         
         let filtered = products;
         if (filters.zodiac && filters.zodiac !== 'all') {
@@ -97,7 +106,12 @@ export async function getProducts(filters = {}) {
 }
 
 export async function getProductById(productId) {
-    const { data, error } = await supabase
+    if (useLocalStorage) {
+        const products = await getProducts();
+        return products.find(p => p.id === productId) || null;
+    }
+    
+    const { data, error } = await supabaseClient
         .from('products')
         .select('*')
         .eq('id', productId)
