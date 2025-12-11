@@ -1,0 +1,18 @@
+0 verbose cli /opt/homebrew/Cellar/node/25.1.0_1/bin/node /opt/homebrew/bin/npm
+1 info using npm@11.6.2
+2 info using node@v25.1.0
+3 silly config load:file:/opt/homebrew/lib/node_modules/npm/npmrc
+4 silly config load:file:/Users/jackdanger/Applications/Cosmic/.npmrc
+5 silly config load:file:/opt/homebrew/etc/npmrc
+6 verbose title npm run dev
+7 verbose argv "run" "dev"
+8 verbose logfile logs-max:10 dir:/Users/jackdanger/Applications/Cosmic/.npm-cache/_logs/2025-12-10T09_29_15_615Z-
+9 verbose logfile /Users/jackdanger/Applications/Cosmic/.npm-cache/_logs/2025-12-10T09_29_15_615Z-debug-0.log
+10 silly logfile done cleaning log files
+11 verbose cwd /Users/jackdanger/Applications/Cosmic
+12 verbose os Darwin 25.0.0
+13 verbose node v25.1.0
+14 verbose npm  v11.6.2
+15 verbose exit 1
+16 verbose code 1
+17 error A complete log of this run can be found in: /Users/jackdanger/Applications/Cosmic/.npm-cache/_logs/2025-12-10T09_29_15_615Z-debug-0.log
