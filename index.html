@@ -5,15 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     
     <!-- SEO Meta Tags -->
-    <title>Cosmic Voyager - Curated Art & Vintage Finds</title>
-    <meta name="description" content="Discover a universe of curated vintage items, unique art, and dropshipping treasures. Cosmic Voyager offers a seamless shopping experience with a minimal, cosmic aesthetic.">
-    <meta name="keywords" content="vintage, art, dropshipping, ecommerce, cosmic, minimal, curated goods, unique finds, zodiac, astrology">
-    <meta name="author" content="Cosmic Voyager">
-    <meta property="og:title" content="Cosmic Voyager - Curated Art & Vintage Finds" />
+    <title>Cosmic Deals - Curated Art & Vintage Finds</title>
+    <meta name="description" content="Shop Cosmic Deals for curated vintage items, unique art, and rare finds delivered with a fast, minimal experience.">
+    <meta name="keywords" content="cosmic deals, vintage, art, ecommerce, curated goods, unique finds, zodiac gifts, home decor">
+    <meta name="author" content="Cosmic Deals">
+    <link rel="canonical" href="https://www.cosmic-deals.com/">
+    <meta name="robots" content="index,follow">
+    <meta property="og:title" content="Cosmic Deals - Curated Art & Vintage Finds" />
     <meta property="og:description" content="A universe of curated vintage items, unique art, and dropshipping treasures." />
     <meta property="og:image" content="https://images.unsplash.com/photo-1534790566855-4cb788d389ec?q=80&w=1200&auto=format&fit=crop" />
-    <meta property="og:url" content="https://example.com" />
+    <meta property="og:url" content="https://www.cosmic-deals.com/" />
+    <meta property="og:site_name" content="Cosmic Deals" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@cosmicdeals" />
+    <meta name="twitter:title" content="Cosmic Deals - Curated Art & Vintage Finds" />
+    <meta name="twitter:description" content="Curated vintage items, unique art, and rare finds with a cosmic aesthetic." />
+    <meta name="twitter:image" content="https://images.unsplash.com/photo-1534790566855-4cb788d389ec?q=80&w=1200&auto=format&fit=crop" />
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -25,6 +32,21 @@
 
     <!-- Custom Styles -->
     <link rel="stylesheet" href="/src/styles/main.css">
+
+    <!-- Structured Data for indexing -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Cosmic Deals",
+      "url": "https://www.cosmic-deals.com/",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://www.cosmic-deals.com/?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
 </head>
 <body class="antialiased">
 
@@ -40,9 +62,14 @@
                     <button id="left-sidebar-trigger" class="gold-sphere-btn relative" aria-label="Open dashboard">
                         <div class="gold-sphere"></div>
                     </button>
-                    <a href="#" class="font-heading text-xl font-bold text-white tracking-wider">cosmic deals</a>
+                    <a href="#" id="brand-name" class="font-heading text-xl font-bold text-white tracking-wider">CD</a>
                 </div>
                 <div class="flex items-center gap-4">
+                    <button id="about-trigger" class="nav-pill hidden md:inline-flex" aria-label="About Cosmic Deals">About</button>
+                    <button id="live-trigger" class="nav-pill hidden md:inline-flex relative" aria-label="Live Streaming">
+                        Live
+                        <span id="live-indicator" class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full hidden animate-pulse"></span>
+                    </button>
                     <!-- Theme Toggle -->
                     <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
                         <svg class="theme-toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -408,6 +435,11 @@
                     </div>
                 </div>
                 
+                <!-- Owner Dashboard Link -->
+                <div id="owner-dashboard-link" class="mb-4 border-t border-gray-800 pt-4 hidden">
+                    <a href="/src/html/owner-dashboard.html" class="block text-tan-500 hover:text-tan-400 text-sm font-semibold mb-2" style="color: #D2B48C;">Owner Dashboard</a>
+                </div>
+                
                 <!-- Policies Links -->
                 <div class="border-t border-gray-800 pt-4">
                     <a href="/src/html/policies.html#privacy-policy" id="privacy-policy-link" class="block text-gray-400 hover:text-white text-sm mb-2">Privacy Policy</a>
@@ -498,6 +530,72 @@
                 </div>
             </div>
         </div>
+
+        <!-- Slide Panels -->
+        <aside id="about-panel" class="slide-panel" aria-hidden="true">
+            <div class="slide-panel__header">
+                <h2 class="font-heading text-2xl text-white">About Cosmic Deals</h2>
+                <button class="slide-panel__close" aria-label="Close about">×</button>
+            </div>
+            <div class="slide-panel__body text-sm text-gray-100 space-y-4">
+                <div class="panel-tag rainbow-chip">Single-owner • Caffeine-driven • Zero corporate</div>
+                <div class="panel-card">
+                    <p>Cosmic Deals is a one-person, coffee-fueled command center. Expect jokes, late-night drops, and picks that look like they fell from orbit or a mid-century loft.</p>
+                    <div class="panel-bubbles">
+                        <span class="panel-bubble">Turkish coffee = rocket fuel</span>
+                        <span class="panel-bubble">Owner packs live on stream</span>
+                        <span class="panel-bubble">No AI fluff, just real finds</span>
+                    </div>
+                </div>
+                <div class="panel-card">
+                    <div class="panel-heading">What We Hunt</div>
+                    <div class="panel-list relaxed">
+                        <span>Vintage + art + oddities</span>
+                        <span>Silver, analog, audio gear</span>
+                        <span>Lamps, sculptural decor, weirdly good denim</span>
+                    </div>
+                </div>
+                <div class="panel-card">
+                    <div class="panel-heading">Support</div>
+                    <p>It’s just me—the bussing-owner-artist hybrid. Ping during a stream for a straight answer, tracking number, and probably a zodiac quip.</p>
+                </div>
+            </div>
+        </aside>
+
+        <aside id="live-panel" class="slide-panel" aria-hidden="true">
+            <div class="slide-panel__header">
+                <h2 class="font-heading text-2xl text-white">Live Streaming — Whatnot</h2>
+                <button class="slide-panel__close" aria-label="Close live streaming">×</button>
+            </div>
+            <div class="slide-panel__body text-sm text-gray-100 space-y-4">
+                <div class="panel-tag aurora-chip">Whatnot • Auctions • Pop-ups</div>
+                <div class="panel-card">
+                    <div class="panel-heading">Hours</div>
+                    <p>Weeknights 7–10 PM PT. Weekend pop-ups whenever the caffeine hits and the haul is hot.</p>
+                </div>
+                <div class="panel-card">
+                    <div class="panel-heading">Pop-up Shows & Alerts</div>
+                    <p>Follow on Whatnot for go-live pings. Flash drops, one-offs, auctions. No filler, just orbit-ready inventory.</p>
+                    <div class="panel-bubbles">
+                        <span class="panel-bubble">Follow for alerts</span>
+                        <span class="panel-bubble">Flash drops</span>
+                        <span class="panel-bubble">Live Q&A</span>
+                    </div>
+                </div>
+                <div class="panel-card">
+                    <div class="panel-heading">Past Streams</div>
+                    <ul class="panel-list relaxed">
+                        <li>“Meteoric Monday” — silver + spacey decor (sold out)</li>
+                        <li>“Zodiac Garage Sale” — vintage tees + jewelry</li>
+                        <li>“Night Shift Finds” — cameras, lamps, oddities</li>
+                    </ul>
+                </div>
+                <div class="panel-card">
+                    <div class="panel-heading">Sold Highlights</div>
+                    <p>Vintage orb lamps, hand-poured silver bars, analog watches, sculptural decor, and a suspicious number of denim jackets.</p>
+                </div>
+            </div>
+        </aside>
 
         <!-- Footer -->
         <footer class="pt-24 pb-32 px-4 border-t border-gray-800 mt-16">

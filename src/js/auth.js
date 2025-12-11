@@ -1,6 +1,7 @@
 // Authentication Management
 import { supabaseClient } from './supabase.js';
 import { createOrUpdateProfile, getUserProfile } from './api.js';
+import { checkOwnerAccess } from './owner.js';
 
 const zodiacSigns = [
     'aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo',
@@ -178,6 +179,9 @@ function updateAuthUI(user, profile = null) {
         if (stardustBalance) {
             stardustBalance.textContent = profile?.stardust_balance || 0;
         }
+        
+        // Show owner dashboard link if user is owner
+        checkAndShowOwnerLink(user);
     } else {
         // User is not signed in
         if (authForm) authForm.classList.remove('hidden');
@@ -252,6 +256,31 @@ export async function initAuth() {
     
     // Load initial user state
     await loadUserProfile();
+}
+
+// Check if user is owner and show dashboard link
+async function checkAndShowOwnerLink(user) {
+    if (!user) return;
+    
+    const ownerDashboardLink = document.getElementById('owner-dashboard-link');
+    if (!ownerDashboardLink) return;
+    
+    try {
+        const isOwner = await checkOwnerAccess();
+        if (isOwner) {
+            ownerDashboardLink.classList.remove('hidden');
+        } else {
+            ownerDashboardLink.classList.add('hidden');
+        }
+    } catch (error) {
+        // In dev mode with localStorage, always show link
+        const { useLocalStorage } = await import('./supabase.js');
+        if (useLocalStorage) {
+            ownerDashboardLink.classList.remove('hidden');
+        } else {
+            ownerDashboardLink.classList.add('hidden');
+        }
+    }
 }
 
 // Export zodiac signs for use in other modules

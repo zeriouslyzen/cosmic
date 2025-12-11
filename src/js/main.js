@@ -1,5 +1,49 @@
+// Check live status from settings
+async function checkLiveStatus() {
+    try {
+        const { getSetting } = await import('./owner.js');
+        const isLive = await getSetting('live_status');
+        const liveIndicator = document.getElementById('live-indicator');
+        if (liveIndicator) {
+            if (isLive) {
+                liveIndicator.classList.remove('hidden');
+            } else {
+                liveIndicator.classList.add('hidden');
+            }
+        }
+    } catch (error) {
+        // If owner.js not available, check localStorage directly
+        const liveStatus = localStorage.getItem('setting_live_status');
+        const liveIndicator = document.getElementById('live-indicator');
+        if (liveIndicator) {
+            if (liveStatus === 'true') {
+                liveIndicator.classList.remove('hidden');
+            } else {
+                liveIndicator.classList.add('hidden');
+            }
+        }
+    }
+}
+
+// Listen for live status updates
+window.addEventListener('live-status-updated', (e) => {
+    const liveIndicator = document.getElementById('live-indicator');
+    if (liveIndicator) {
+        if (e.detail.isLive) {
+            liveIndicator.classList.remove('hidden');
+        } else {
+            liveIndicator.classList.add('hidden');
+        }
+    }
+});
+
+// Poll for live status changes (check every 5 seconds)
+setInterval(checkLiveStatus, 5000);
+
 // Wait for DOM to be ready
 document.addEventListener('DOMContentLoaded', () => {
+    // Check live status on load
+    checkLiveStatus();
     // --- Starfield Background Animation ---
     const canvas = document.getElementById('cosmic-canvas');
     if (!canvas) {
@@ -451,6 +495,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const heroSection = document.getElementById('hero-section');
     const subtitle = document.querySelector('.subtitle');
     const productsSection = document.getElementById('products-section');
+    const brandName = document.getElementById('brand-name');
+    const aboutTrigger = document.getElementById('about-trigger');
+    const liveTrigger = document.getElementById('live-trigger');
+    const aboutPanel = document.getElementById('about-panel');
+    const livePanel = document.getElementById('live-panel');
     let lastScrollY = 0;
     let scrollThreshold = 100; // Hide after 100px scroll
     
@@ -490,9 +539,47 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
+        // Brand text expand/retract
+        if (brandName) {
+            if (currentScrollY > scrollThreshold && brandName.textContent !== 'cosmic deals') {
+                brandName.textContent = 'cosmic deals';
+            } else if (currentScrollY <= scrollThreshold && brandName.textContent !== 'CD') {
+                brandName.textContent = 'CD';
+            }
+        }
+        
         lastScrollY = currentScrollY;
     }
     
+    function closePanels() {
+        [aboutPanel, livePanel].forEach(panel => {
+            if (panel) {
+                panel.classList.remove('open');
+                panel.setAttribute('aria-hidden', 'true');
+            }
+        });
+    }
+
+    function openPanel(panel) {
+        if (!panel) return;
+        closePanels();
+        panel.classList.add('open');
+        panel.setAttribute('aria-hidden', 'false');
+    }
+
+    if (aboutTrigger) {
+        aboutTrigger.addEventListener('click', () => openPanel(aboutPanel));
+    }
+    if (liveTrigger) {
+        liveTrigger.addEventListener('click', () => openPanel(livePanel));
+    }
+    document.querySelectorAll('.slide-panel__close').forEach(btn => {
+        btn.addEventListener('click', () => closePanels());
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closePanels();
+    });
+
     window.addEventListener('scroll', handleScroll, { passive: true });
     
     // Make products visible initially and show them when scrolled

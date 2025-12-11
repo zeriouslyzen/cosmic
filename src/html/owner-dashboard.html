@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Semi's Dash - Cosmic Deals</title>
+    <title>Owner Dashboard - Cosmic Deals</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -19,41 +19,114 @@
     
     <style>
         body {
-            background-color: #0a0a0a;
-            color: #FFFFFF;
+            background-color: #f5f5f5;
+            color: #1a1a1a;
             font-family: 'Inter', sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            padding-bottom: 80px;
         }
         .font-heading {
             font-family: 'Playfair Display', serif;
         }
-        .glass-card {
-            background: rgba(16, 16, 16, 0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .light-card {
+            background: #ffffff;
+            border: 1px solid #e5e5e5;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Global overflow control */
+        html, body {
+            overflow-x: hidden !important;
+            overflow-y: auto;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            max-width: 100vw;
+        }
+        
+        /* Swipeable Container */
+        .swipe-container {
+            display: flex;
+            overflow-x: hidden;
+            width: 400vw; /* 4 sections * 100vw */
+            position: relative;
+            transition: transform 0.3s ease;
+            min-height: calc(100vh - 70px);
+            will-change: transform;
+        }
+        
+        .swipe-section {
+            min-width: 100vw;
+            width: 100vw;
+            max-width: 100vw;
+            flex-shrink: 0;
+            padding: 1rem;
+            padding-bottom: 6rem;
+            display: block;
+            box-sizing: border-box;
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border-top: 1px solid #e5e5e5;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0.5rem 0;
+            z-index: 100;
+            height: 70px;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+            padding: 0.5rem;
+            border: none;
+            background: transparent;
+            color: #6b7280;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: color 0.2s ease;
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .nav-item.active {
+            color: #D2B48C;
+        }
+        
+        .nav-item svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 1.5;
+        }
+        
+        .post-item-btn {
+            color: #D2B48C;
+            font-weight: 600;
+        }
+        
+        .post-item-btn.active {
+            color: #D2B48C;
         }
         
         /* Mobile Optimizations */
         @media (max-width: 768px) {
-            .min-h-screen {
+            .swipe-section {
                 padding: 1rem;
+                padding-bottom: 6rem;
             }
             
-            /* Compact metrics bar */
-            .metrics-bar {
-                flex-wrap: wrap;
-                gap: 0.5rem;
-                font-size: 0.75rem;
-            }
-            
-            /* Stack widgets on mobile */
-            .widget-grid {
-                grid-template-columns: 1fr !important;
-            }
-            
-            /* Optimize modals for mobile */
             .modal-content {
                 width: 95vw !important;
                 max-width: 95vw !important;
@@ -63,60 +136,42 @@
                 -webkit-overflow-scrolling: touch;
             }
             
-            /* Touch-friendly buttons */
             button {
                 min-height: 44px;
                 min-width: 44px;
                 touch-action: manipulation;
             }
             
-            /* Optimize image preview */
             #media-preview {
                 max-height: 200px !important;
             }
             
-            /* Compact form inputs */
             input, select, textarea {
-                font-size: 16px !important; /* Prevents zoom on iOS */
+                font-size: 16px !important;
                 padding: 0.75rem !important;
             }
             
-            /* Zodiac checkboxes grid - 2 columns on mobile */
             .zodiac-grid {
                 grid-template-columns: repeat(2, 1fr) !important;
                 max-height: 200px;
                 font-size: 0.875rem;
             }
             
-            /* Hide less important widgets on mobile */
-            .hide-mobile {
-                display: none !important;
-            }
-            
-            /* Compact editing controls */
             #edit-controls {
                 grid-template-columns: repeat(2, 1fr) !important;
             }
             
-            /* Optimize file upload area */
             #upload-area {
                 padding: 1.5rem !important;
             }
-            
-            /* Better spacing */
-            .space-y-4 > * + * {
-                margin-top: 0.75rem;
-            }
         }
         
-        /* Optimize image/video for mobile */
         img, video {
             max-width: 100%;
             height: auto;
             object-fit: contain;
         }
         
-        /* Prevent text selection during touch */
         .no-select {
             -webkit-user-select: none;
             -moz-user-select: none;
@@ -125,16 +180,15 @@
             -webkit-touch-callout: none;
         }
         
-        /* Smooth scrolling */
         * {
             -webkit-overflow-scrolling: touch;
         }
         
-        /* Modern Slider Styles */
+        /* Modern Slider Styles - Light Theme */
         .modern-slider {
             -webkit-appearance: none;
             appearance: none;
-            background: linear-gradient(to right, #1f2937 0%, #1f2937 50%, #D2B48C 50%, #D2B48C 100%);
+            background: linear-gradient(to right, #e5e5e5 0%, #e5e5e5 50%, #D2B48C 50%, #D2B48C 100%);
             background-size: 100% 100%;
             outline: none;
             transition: background 0.3s ease;
@@ -150,16 +204,12 @@
             cursor: pointer;
             box-shadow: 0 2px 6px rgba(210, 180, 140, 0.4);
             transition: all 0.2s ease;
-            border: 2px solid #0a0a0a;
+            border: 2px solid #ffffff;
         }
         
         .modern-slider::-webkit-slider-thumb:hover {
             transform: scale(1.2);
             box-shadow: 0 4px 12px rgba(210, 180, 140, 0.6);
-        }
-        
-        .modern-slider::-webkit-slider-thumb:active {
-            transform: scale(1.1);
         }
         
         .modern-slider::-moz-range-thumb {
@@ -170,33 +220,22 @@
             cursor: pointer;
             box-shadow: 0 2px 6px rgba(210, 180, 140, 0.4);
             transition: all 0.2s ease;
-            border: 2px solid #0a0a0a;
-        }
-        
-        .modern-slider::-moz-range-thumb:hover {
-            transform: scale(1.2);
-            box-shadow: 0 4px 12px rgba(210, 180, 140, 0.6);
+            border: 2px solid #ffffff;
         }
         
         .modern-slider::-moz-range-track {
             height: 8px;
-            background: #1f2937;
+            background: #e5e5e5;
             border-radius: 4px;
         }
         
-        /* Update slider background based on value */
-        .modern-slider[value="100"] {
-            background: linear-gradient(to right, #1f2937 0%, #1f2937 50%, #D2B48C 50%, #D2B48C 100%);
-        }
-        
-        /* Edit tool button animations */
         .edit-tool-btn:active {
             transform: scale(0.95);
         }
         
         .edit-tool-btn.active {
             border-color: #D2B48C;
-            background: linear-gradient(to-br, rgba(210, 180, 140, 0.2), rgba(210, 180, 140, 0.1));
+            background: linear-gradient(to-br, rgba(210, 180, 140, 0.1), rgba(210, 180, 140, 0.05));
         }
         
         .edit-tool-btn.active svg {
@@ -206,269 +245,411 @@
         .edit-tool-btn.active span {
             color: #D2B48C;
         }
+        
+        /* Filter button active state */
+        .order-filter-btn.active,
+        .message-filter-btn.active {
+            background-color: #D2B48C;
+            color: #1a1a1a;
+            border-color: #D2B48C;
+        }
+        
+        /* Status badges */
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
-    <div class="min-h-screen p-3 md:p-6">
-        <!-- Header -->
-        <header class="mb-4">
-            <h1 class="font-heading text-2xl font-bold text-white mb-1">Semi's Dash</h1>
-            <p class="text-gray-400 text-sm">Manage products, orders, and settings</p>
-        </header>
-
-        <!-- Login Section (temporarily disabled in development) -->
-        <div id="login-section" class="max-w-md mx-auto glass-card rounded-lg p-6 hidden">
-            <h2 class="font-heading text-2xl font-bold text-white mb-2">Owner Login (disabled)</h2>
-            <p class="text-gray-400 text-sm">Login is turned off for now. Dashboard is visible for development only.</p>
-        </div>
-
-        <!-- Dashboard Content (always visible in development) -->
-        <div id="dashboard-content" class="">
-            <!-- Mini Metrics Bar -->
-            <div class="flex flex-wrap items-center gap-4 mb-6 pb-4 border-b border-gray-800">
-                <div class="flex items-center gap-2">
-                    <span class="text-gray-400 text-xs">Orders:</span>
-                    <span class="text-white text-sm font-semibold" id="stat-orders">0</span>
+    <!-- Debug: Remove this after testing -->
+    <div id="debug-info" style="position: fixed; top: 10px; right: 10px; background: red; color: white; padding: 10px; z-index: 9999; display: none;">
+        Page loaded, JS initializing...
+    </div>
+    
+    <!-- Swipeable Content Container Wrapper -->
+    <div style="overflow-x: hidden; width: 100vw; position: relative;">
+        <div class="swipe-container" id="swipe-container">
+        <!-- Semi's Cloud Section -->
+        <section id="section-my-site" class="swipe-section">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="font-heading text-2xl font-bold text-gray-900 mb-6">Semi's Cloud</h2>
+                <div class="light-card rounded-lg p-6 mb-4">
+                    <p class="text-gray-600 mb-4">View your live site</p>
+                    <button onclick="window.open('/', '_blank')" class="w-full bg-[#D2B48C] text-gray-900 font-semibold px-4 py-3 rounded-lg hover:bg-[#c4a67a] transition-colors">
+                        Cosmic Deals
+                    </button>
                 </div>
-                <div class="flex items-center gap-2">
-                    <span class="text-gray-400 text-xs">Pending:</span>
-                    <span class="text-yellow-500 text-sm font-semibold" id="stat-pending">0</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="text-gray-400 text-xs">Revenue:</span>
-                    <span class="text-green-500 text-sm font-semibold" id="stat-revenue">$0.00</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="text-gray-400 text-xs">Products:</span>
-                    <span class="text-white text-sm font-semibold" id="stat-products">0</span>
-                </div>
-            </div>
-
-            <!-- Widgets Grid -->
-            <div class="widget-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                <!-- Recent Orders Widget -->
-                <div class="glass-card rounded-lg p-4">
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="font-heading text-sm font-bold text-white">Recent Orders</h3>
-                        <button onclick="switchTab('orders')" class="text-xs text-gray-400 hover:text-white">View All</button>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="light-card rounded-lg p-4">
+                        <p class="text-gray-500 text-sm mb-1">Products</p>
+                        <p class="text-2xl font-bold text-gray-900" id="stat-products-quick">0</p>
                     </div>
-                    <div id="recent-orders-widget" class="space-y-2 max-h-48 overflow-y-auto">
-                        <p class="text-gray-500 text-xs">No orders yet</p>
+                    <div class="light-card rounded-lg p-4">
+                        <p class="text-gray-500 text-sm mb-1">Orders</p>
+                        <p class="text-2xl font-bold text-gray-900" id="stat-orders-quick">0</p>
                     </div>
                 </div>
-
-
-                <!-- Quick Actions Widget -->
-                <div class="glass-card rounded-lg p-4">
-                    <h3 class="font-heading text-sm font-bold text-white mb-3">Quick Actions</h3>
-                    <div class="space-y-2">
-                        <button id="quick-add-product" class="w-full text-left px-3 py-2 rounded bg-gray-900 hover:bg-gray-800 text-white text-xs transition-colors">
-                            + Add New Product
-                        </button>
-                        <button onclick="switchTab('orders')" class="w-full text-left px-3 py-2 rounded bg-gray-900 hover:bg-gray-800 text-white text-xs transition-colors">
-                            View Orders
-                        </button>
-                        <button onclick="switchTab('settings')" class="w-full text-left px-3 py-2 rounded bg-gray-900 hover:bg-gray-800 text-white text-xs transition-colors">
-                            Settings
-                        </button>
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="light-card rounded-lg p-4">
+                        <p class="text-gray-500 text-sm mb-1">Users Today</p>
+                        <p class="text-2xl font-bold text-gray-900" id="stat-users-today">0</p>
                     </div>
-                </div>
-
-                <!-- Revenue Chart Widget -->
-                <div class="glass-card rounded-lg p-4">
-                    <h3 class="font-heading text-sm font-bold text-white mb-3">Revenue (Last 7 Days)</h3>
-                    <div id="revenue-chart-widget" class="h-32 flex items-end justify-between gap-1">
-                        <div class="text-gray-500 text-xs text-center">
-                            <div class="bg-gray-800 rounded-t w-8 h-4 mb-1"></div>
-                            <div>Mon</div>
-                        </div>
-                        <div class="text-gray-500 text-xs text-center">
-                            <div class="bg-gray-800 rounded-t w-8 h-4 mb-1"></div>
-                            <div>Tue</div>
-                        </div>
-                        <div class="text-gray-500 text-xs text-center">
-                            <div class="bg-gray-800 rounded-t w-8 h-4 mb-1"></div>
-                            <div>Wed</div>
-                        </div>
-                        <div class="text-gray-500 text-xs text-center">
-                            <div class="bg-gray-800 rounded-t w-8 h-4 mb-1"></div>
-                            <div>Thu</div>
-                        </div>
-                        <div class="text-gray-500 text-xs text-center">
-                            <div class="bg-gray-800 rounded-t w-8 h-4 mb-1"></div>
-                            <div>Fri</div>
-                        </div>
-                        <div class="text-gray-500 text-xs text-center">
-                            <div class="bg-gray-800 rounded-t w-8 h-4 mb-1"></div>
-                            <div>Sat</div>
-                        </div>
-                        <div class="text-gray-500 text-xs text-center">
-                            <div class="bg-gray-800 rounded-t w-8 h-4 mb-1"></div>
-                            <div>Sun</div>
-                        </div>
+                    <div class="light-card rounded-lg p-4">
+                        <p class="text-gray-500 text-sm mb-1">Users This Year</p>
+                        <p class="text-2xl font-bold text-gray-900" id="stat-users-year">0</p>
                     </div>
-                    <p id="revenue-chart-summary" class="text-gray-400 text-xs mt-2 text-center">No data available</p>
-                </div>
-
-                <!-- Order Status Widget -->
-                <div class="glass-card rounded-lg p-4">
-                    <h3 class="font-heading text-sm font-bold text-white mb-3">Order Status</h3>
-                    <div id="order-status-widget" class="space-y-2">
-                        <div class="flex items-center justify-between text-xs">
-                            <span class="text-gray-400">Pending</span>
-                            <span class="text-yellow-500 font-semibold" id="status-pending">0</span>
-                        </div>
-                        <div class="flex items-center justify-between text-xs">
-                            <span class="text-gray-400">Processing</span>
-                            <span class="text-blue-500 font-semibold" id="status-processing">0</span>
-                        </div>
-                        <div class="flex items-center justify-between text-xs">
-                            <span class="text-gray-400">Shipped</span>
-                            <span class="text-purple-500 font-semibold" id="status-shipped">0</span>
-                        </div>
-                        <div class="flex items-center justify-between text-xs">
-                            <span class="text-gray-400">Delivered</span>
-                            <span class="text-green-500 font-semibold" id="status-delivered">0</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Analytics Summary Widget -->
-                <div class="glass-card rounded-lg p-4">
-                    <h3 class="font-heading text-sm font-bold text-white mb-3">Analytics</h3>
-                    <div id="analytics-widget" class="space-y-2 text-xs">
-                        <p id="analytics-summary" class="text-gray-400">
-                            No orders yet. Analytics will appear here once orders are available.
-                        </p>
+                    <div class="light-card rounded-lg p-4">
+                        <p class="text-gray-500 text-sm mb-1">Avg Time Spent</p>
+                        <p class="text-2xl font-bold text-gray-900" id="stat-time-spent">0m</p>
                     </div>
                 </div>
             </div>
+        </section>
 
-            <!-- Tabs -->
-            <div class="mb-6 border-b border-gray-800">
-                <button class="tab-btn active px-4 py-2 text-white border-b-2 border-tan-500" data-tab="products">Products</button>
-                <button class="tab-btn px-4 py-2 text-gray-400 hover:text-white" data-tab="orders">Orders</button>
-                <button class="tab-btn px-4 py-2 text-gray-400 hover:text-white" data-tab="settings">Settings</button>
-            </div>
-
-            <!-- Products Tab -->
-            <div id="tab-products" class="tab-content">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="font-heading text-lg font-bold text-white">Products</h2>
-                    <div class="flex gap-2">
-                        <button id="bulk-upload-btn" class="bg-gray-700 text-white font-bold px-3 py-1.5 rounded text-sm hover:bg-gray-600 transition-colors">
-                            Bulk Upload
-                        </button>
-                        <button id="add-product-btn" class="bg-tan-500 text-black font-bold px-3 py-1.5 rounded text-sm hover:bg-tan-600 transition-colors" style="background-color: #D2B48C;">Add Product</button>
+        <!-- Orders Section -->
+        <section id="section-orders" class="swipe-section">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="font-heading text-2xl font-bold text-gray-900">Orders</h2>
+                    <button id="export-orders-btn" class="text-sm text-gray-600 hover:text-gray-900 px-3 py-1.5 border border-gray-300 rounded-lg hover:border-gray-400 transition-colors">
+                        Export CSV
+                    </button>
+                </div>
+                
+                <!-- Sales Summary -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="light-card rounded-lg p-4">
+                        <p class="text-gray-500 text-xs mb-1">Today's Sales</p>
+                        <p class="text-xl font-bold text-gray-900" id="sales-today">$0.00</p>
+                    </div>
+                    <div class="light-card rounded-lg p-4">
+                        <p class="text-gray-500 text-xs mb-1">This Week</p>
+                        <p class="text-xl font-bold text-gray-900" id="sales-week">$0.00</p>
+                    </div>
+                    <div class="light-card rounded-lg p-4">
+                        <p class="text-gray-500 text-xs mb-1">This Month</p>
+                        <p class="text-xl font-bold text-gray-900" id="sales-month">$0.00</p>
+                    </div>
+                    <div class="light-card rounded-lg p-4">
+                        <p class="text-gray-500 text-xs mb-1">All Time</p>
+                        <p class="text-xl font-bold text-gray-900" id="sales-total">$0.00</p>
                     </div>
                 </div>
-                <div id="products-list" class="space-y-2">
-                    <!-- Products will be loaded here -->
+                
+                <!-- Order Filters -->
+                <div class="flex gap-2 mb-4 overflow-x-auto pb-2">
+                    <button class="order-filter-btn active px-4 py-2 rounded-lg text-sm border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition-colors whitespace-nowrap" data-filter="all">
+                        All Orders
+                    </button>
+                    <button class="order-filter-btn px-4 py-2 rounded-lg text-sm border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap" data-filter="pending">
+                        Pending
+                    </button>
+                    <button class="order-filter-btn px-4 py-2 rounded-lg text-sm border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap" data-filter="processing">
+                        Processing
+                    </button>
+                    <button class="order-filter-btn px-4 py-2 rounded-lg text-sm border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap" data-filter="shipped">
+                        Shipped
+                    </button>
+                    <button class="order-filter-btn px-4 py-2 rounded-lg text-sm border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap" data-filter="delivered">
+                        Delivered
+                    </button>
                 </div>
-            </div>
-
-            <!-- Orders Tab -->
-            <div id="tab-orders" class="tab-content hidden">
-                <h2 class="font-heading text-lg font-bold text-white mb-4">Orders</h2>
-                <div id="orders-list" class="space-y-2">
+                
+                <!-- Orders List -->
+                <div id="orders-list" class="space-y-3">
                     <!-- Orders will be loaded here -->
                 </div>
             </div>
+        </section>
 
-            <!-- Settings Tab -->
-            <div id="tab-settings" class="tab-content hidden">
-                <h2 class="font-heading text-lg font-bold text-white mb-4">Settings</h2>
-                <div class="glass-card rounded-lg p-4 space-y-3">
-                    <div>
-                        <label class="block text-gray-400 text-sm mb-1">Star Dust Rate (per $1)</label>
-                        <input type="number" id="setting-stardust-rate" value="1" class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-1.5 text-white text-sm">
+        <!-- Messages Section -->
+        <section id="section-messages" class="swipe-section">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="font-heading text-2xl font-bold text-gray-900">Messages</h2>
+                    <button id="mark-all-read-btn" class="text-sm text-gray-600 hover:text-gray-900 px-3 py-1.5 border border-gray-300 rounded-lg hover:border-gray-400 transition-colors">
+                        Mark All Read
+                    </button>
+                </div>
+                
+                <!-- Message Filters -->
+                <div class="flex gap-2 mb-4 overflow-x-auto pb-2">
+                    <button class="message-filter-btn active px-4 py-2 rounded-lg text-sm border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition-colors whitespace-nowrap" data-filter="all">
+                        All
+                    </button>
+                    <button class="message-filter-btn px-4 py-2 rounded-lg text-sm border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap" data-filter="unread">
+                        Unread
+                    </button>
+                    <button class="message-filter-btn px-4 py-2 rounded-lg text-sm border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap" data-filter="order">
+                        Order Related
+                    </button>
+                    <button class="message-filter-btn px-4 py-2 rounded-lg text-sm border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap" data-filter="general">
+                        General
+                    </button>
+                </div>
+                
+                <div id="messages-list" class="space-y-3">
+                    <div class="light-card rounded-lg p-6 text-center">
+                        <p class="text-gray-500">No messages yet</p>
+                        <p class="text-sm text-gray-400 mt-2">Customer inquiries and order messages will appear here</p>
                     </div>
-                    <div>
-                        <label class="block text-gray-400 text-sm mb-1">Daily Check-in Bonus</label>
-                        <input type="number" id="setting-checkin-bonus" value="5" class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-1.5 text-white text-sm">
-                    </div>
-                    <button id="save-settings-btn" class="bg-tan-500 text-black font-bold px-3 py-1.5 rounded text-sm hover:bg-tan-600 transition-colors" style="background-color: #D2B48C;">Save Settings</button>
                 </div>
             </div>
+        </section>
+
+        <!-- Settings Section -->
+        <section id="section-settings" class="swipe-section">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="font-heading text-2xl font-bold text-gray-900 mb-6">Settings</h2>
+                <div class="space-y-4">
+                    <!-- Star Dust Settings -->
+                    <div class="light-card rounded-lg p-4 space-y-3">
+                        <h3 class="font-heading text-sm font-bold text-gray-900 mb-3">Star Dust System</h3>
+                        <div>
+                            <label class="block text-gray-600 text-sm mb-1">Star Dust Rate (per $1)</label>
+                            <input type="number" id="setting-stardust-rate" value="1" class="w-full bg-white border border-gray-300 rounded px-3 py-1.5 text-gray-900 text-sm focus:outline-none focus:border-[#D2B48C]">
+                        </div>
+                        <div>
+                            <label class="block text-gray-600 text-sm mb-1">Daily Check-in Bonus</label>
+                            <input type="number" id="setting-checkin-bonus" value="5" class="w-full bg-white border border-gray-300 rounded px-3 py-1.5 text-gray-900 text-sm focus:outline-none focus:border-[#D2B48C]">
+                        </div>
+                    </div>
+                    
+                    <!-- Whatnot & Live Streaming -->
+                    <div class="light-card rounded-lg p-4 space-y-3">
+                        <h3 class="font-heading text-sm font-bold text-gray-900 mb-3">Whatnot & Live Streaming</h3>
+                        <div class="flex items-center justify-between pb-3 border-b border-gray-200">
+                            <div>
+                                <label class="text-gray-600 text-sm font-medium">Go Live on Whatnot</label>
+                                <p class="text-xs text-gray-500 mt-0.5">Shows red notification on main site</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="setting-live-status" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#D2B48C] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
+                            </label>
+                        </div>
+                        <div>
+                            <label class="block text-gray-600 text-sm mb-1">Whatnot Username</label>
+                            <input type="text" id="setting-whatnot-username" placeholder="@yourusername" class="w-full bg-white border border-gray-300 rounded px-3 py-1.5 text-gray-900 text-sm focus:outline-none focus:border-[#D2B48C]">
+                        </div>
+                        <div>
+                            <label class="block text-gray-600 text-sm mb-1">Live Stream Schedule</label>
+                            <textarea id="setting-live-schedule" rows="4" placeholder="e.g., Mon-Fri 7-9 PM EST, Pop-up shows announced 24hrs in advance" class="w-full bg-white border border-gray-300 rounded px-3 py-1.5 text-gray-900 text-sm focus:outline-none focus:border-[#D2B48C]"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-gray-600 text-sm mb-1">Whatnot Profile URL</label>
+                            <input type="url" id="setting-whatnot-url" placeholder="https://www.whatnot.com/user/..." class="w-full bg-white border border-gray-300 rounded px-3 py-1.5 text-gray-900 text-sm focus:outline-none focus:border-[#D2B48C]">
+                        </div>
+                    </div>
+                    
+                    <!-- Order Processing Settings -->
+                    <div class="light-card rounded-lg p-4 space-y-3">
+                        <h3 class="font-heading text-sm font-bold text-gray-900 mb-3">Order Processing</h3>
+                        <div>
+                            <label class="block text-gray-600 text-sm mb-1">Default Shipping Method</label>
+                            <select id="setting-default-shipping" class="w-full bg-white border border-gray-300 rounded px-3 py-1.5 text-gray-900 text-sm focus:outline-none focus:border-[#D2B48C]">
+                                <option value="standard">Standard Shipping</option>
+                                <option value="express">Express Shipping</option>
+                                <option value="priority">Priority Shipping</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-gray-600 text-sm mb-1">Processing Time (days)</label>
+                            <input type="number" id="setting-processing-days" value="1" min="0" class="w-full bg-white border border-gray-300 rounded px-3 py-1.5 text-gray-900 text-sm focus:outline-none focus:border-[#D2B48C]">
+                        </div>
+                        <div>
+                            <label class="block text-gray-600 text-sm mb-1">Auto-Update Status</label>
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-600 text-sm">Automatically mark as processing after payment</span>
+                                <input type="checkbox" id="setting-auto-process" class="w-4 h-4 rounded border-gray-300 text-[#D2B48C] focus:ring-[#D2B48C]">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Customer Communication -->
+                    <div class="light-card rounded-lg p-4 space-y-3">
+                        <h3 class="font-heading text-sm font-bold text-gray-900 mb-3">Customer Communication</h3>
+                        <div>
+                            <label class="block text-gray-600 text-sm mb-1">Order Confirmation Email Template</label>
+                            <textarea id="setting-confirmation-email" rows="3" placeholder="Thank you for your order!..." class="w-full bg-white border border-gray-300 rounded px-3 py-1.5 text-gray-900 text-sm focus:outline-none focus:border-[#D2B48C]"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-gray-600 text-sm mb-1">Shipping Notification Email Template</label>
+                            <textarea id="setting-shipping-email" rows="3" placeholder="Your order has shipped!..." class="w-full bg-white border border-gray-300 rounded px-3 py-1.5 text-gray-900 text-sm focus:outline-none focus:border-[#D2B48C]"></textarea>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label class="text-gray-600 text-sm">Send Order Updates via Email</label>
+                            <input type="checkbox" id="setting-send-order-updates" class="w-4 h-4 rounded border-gray-300 text-[#D2B48C] focus:ring-[#D2B48C]">
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Settings -->
+                    <div class="light-card rounded-lg p-4 space-y-3">
+                        <h3 class="font-heading text-sm font-bold text-gray-900 mb-3">Payment Processing</h3>
+                        <div>
+                            <label class="block text-gray-600 text-sm mb-1">Accepted Payment Methods</label>
+                            <div class="space-y-2">
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" id="setting-payment-stripe" class="w-4 h-4 rounded border-gray-300 text-[#D2B48C] focus:ring-[#D2B48C]">
+                                    <span class="text-gray-600 text-sm">Credit/Debit Cards (Stripe)</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" id="setting-payment-venmo" class="w-4 h-4 rounded border-gray-300 text-[#D2B48C] focus:ring-[#D2B48C]">
+                                    <span class="text-gray-600 text-sm">Venmo</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" id="setting-payment-crypto" class="w-4 h-4 rounded border-gray-300 text-[#D2B48C] focus:ring-[#D2B48C]">
+                                    <span class="text-gray-600 text-sm">Cryptocurrency</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-gray-600 text-sm mb-1">Auto-Refund Policy (days)</label>
+                            <input type="number" id="setting-refund-days" value="30" min="0" class="w-full bg-white border border-gray-300 rounded px-3 py-1.5 text-gray-900 text-sm focus:outline-none focus:border-[#D2B48C]">
+                        </div>
+                    </div>
+                    
+                    <!-- Notifications -->
+                    <div class="light-card rounded-lg p-4 space-y-3">
+                        <h3 class="font-heading text-sm font-bold text-gray-900 mb-3">Notifications</h3>
+                        <div class="flex items-center justify-between">
+                            <label class="text-gray-600 text-sm">Email Notifications</label>
+                            <input type="checkbox" id="setting-email-notifications" class="w-4 h-4 rounded border-gray-300 text-[#D2B48C] focus:ring-[#D2B48C]">
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label class="text-gray-600 text-sm">SMS Notifications</label>
+                            <input type="checkbox" id="setting-sms-notifications" class="w-4 h-4 rounded border-gray-300 text-[#D2B48C] focus:ring-[#D2B48C]">
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label class="text-gray-600 text-sm">New Order Alerts</label>
+                            <input type="checkbox" id="setting-new-order-alerts" class="w-4 h-4 rounded border-gray-300 text-[#D2B48C] focus:ring-[#D2B48C]">
+                        </div>
+                    </div>
+                    
+                    <button id="save-settings-btn" class="w-full bg-[#D2B48C] text-gray-900 font-bold px-3 py-1.5 rounded text-sm hover:bg-[#c4a67a] transition-colors">
+                        Save All Settings
+                    </button>
+                </div>
+            </div>
+        </section>
         </div>
     </div>
 
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" data-section="my-site">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+            <span>Semi's Cloud</span>
+        </button>
+        <button class="nav-item" data-section="orders">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            <span>Orders</span>
+        </button>
+        <button class="nav-item post-item-btn" id="post-item-btn" data-section="post-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Post Item</span>
+        </button>
+        <button class="nav-item" data-section="messages">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            <span>Messages</span>
+        </button>
+        <button class="nav-item" data-section="settings">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span>Settings</span>
+        </button>
+    </nav>
+
     <!-- Product Modal -->
     <div id="owner-product-modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div id="owner-product-modal" class="glass-card rounded-lg p-6 w-full max-w-lg relative">
-            <button id="owner-product-modal-close" class="absolute top-3 right-3 text-gray-400 hover:text-white transition-colors">
+        <div id="owner-product-modal" class="light-card rounded-lg p-6 w-full max-w-lg relative max-h-[90vh] overflow-y-auto">
+            <button id="owner-product-modal-close" class="absolute top-3 right-3 text-gray-400 hover:text-gray-900 transition-colors">
                 ✕
             </button>
-            <h2 id="owner-product-modal-title" class="font-heading text-2xl font-bold text-white mb-4">Add Product</h2>
+            <h2 id="owner-product-modal-title" class="font-heading text-2xl font-bold text-gray-900 mb-4">Add Product</h2>
             <form id="owner-product-form" class="space-y-4">
                 <input type="hidden" id="owner-product-id">
 
                 <div>
-                    <label for="owner-product-title" class="block text-gray-300 text-sm mb-1">Title</label>
+                    <label for="owner-product-title" class="block text-gray-600 text-sm mb-1">Title</label>
                     <input id="owner-product-title" type="text" required
-                           class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-tan-500">
+                           class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-[#D2B48C]">
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label for="owner-product-price" class="block text-gray-300 text-sm mb-1">Price (USD)</label>
+                        <label for="owner-product-price" class="block text-gray-600 text-sm mb-1">Price (USD)</label>
                         <input id="owner-product-price" type="number" step="0.01" min="0" required
-                               class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-tan-500">
+                               class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-[#D2B48C]">
                     </div>
                     <div>
-                        <label for="owner-product-zodiac" class="block text-gray-300 text-sm mb-1">Zodiac Signs (select multiple)</label>
-                        <div class="zodiac-grid grid grid-cols-3 gap-2 mt-2 max-h-40 overflow-y-auto p-2 bg-gray-900 border border-gray-700 rounded-lg">
-                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-800 p-2 rounded">
+                        <label for="owner-product-zodiac" class="block text-gray-600 text-sm mb-1">Zodiac Signs (select multiple)</label>
+                        <div class="zodiac-grid grid grid-cols-3 gap-2 mt-2 max-h-40 overflow-y-auto p-2 bg-gray-50 border border-gray-300 rounded-lg">
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
                                 <input type="checkbox" value="all" class="zodiac-checkbox" data-zodiac="all">
-                                <span class="text-white text-xs">All</span>
+                                <span class="text-gray-900 text-xs">All</span>
                             </label>
-                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-800 p-2 rounded">
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
                                 <input type="checkbox" value="aries" class="zodiac-checkbox" data-zodiac="aries">
-                                <span class="text-white text-xs">Aries</span>
+                                <span class="text-gray-900 text-xs">Aries</span>
                             </label>
-                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-800 p-2 rounded">
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
                                 <input type="checkbox" value="taurus" class="zodiac-checkbox" data-zodiac="taurus">
-                                <span class="text-white text-xs">Taurus</span>
+                                <span class="text-gray-900 text-xs">Taurus</span>
                             </label>
-                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-800 p-2 rounded">
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
                                 <input type="checkbox" value="gemini" class="zodiac-checkbox" data-zodiac="gemini">
-                                <span class="text-white text-xs">Gemini</span>
+                                <span class="text-gray-900 text-xs">Gemini</span>
                             </label>
-                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-800 p-2 rounded">
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
                                 <input type="checkbox" value="cancer" class="zodiac-checkbox" data-zodiac="cancer">
-                                <span class="text-white text-xs">Cancer</span>
+                                <span class="text-gray-900 text-xs">Cancer</span>
                             </label>
-                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-800 p-2 rounded">
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
                                 <input type="checkbox" value="leo" class="zodiac-checkbox" data-zodiac="leo">
-                                <span class="text-white text-xs">Leo</span>
+                                <span class="text-gray-900 text-xs">Leo</span>
                             </label>
-                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-800 p-2 rounded">
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
                                 <input type="checkbox" value="virgo" class="zodiac-checkbox" data-zodiac="virgo">
-                                <span class="text-white text-xs">Virgo</span>
+                                <span class="text-gray-900 text-xs">Virgo</span>
                             </label>
-                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-800 p-2 rounded">
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
                                 <input type="checkbox" value="libra" class="zodiac-checkbox" data-zodiac="libra">
-                                <span class="text-white text-xs">Libra</span>
+                                <span class="text-gray-900 text-xs">Libra</span>
                             </label>
-                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-800 p-2 rounded">
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
                                 <input type="checkbox" value="scorpio" class="zodiac-checkbox" data-zodiac="scorpio">
-                                <span class="text-white text-xs">Scorpio</span>
+                                <span class="text-gray-900 text-xs">Scorpio</span>
                             </label>
-                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-800 p-2 rounded">
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
                                 <input type="checkbox" value="sagittarius" class="zodiac-checkbox" data-zodiac="sagittarius">
-                                <span class="text-white text-xs">Sagittarius</span>
+                                <span class="text-gray-900 text-xs">Sagittarius</span>
                             </label>
-                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-800 p-2 rounded">
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
                                 <input type="checkbox" value="capricorn" class="zodiac-checkbox" data-zodiac="capricorn">
-                                <span class="text-white text-xs">Capricorn</span>
+                                <span class="text-gray-900 text-xs">Capricorn</span>
                             </label>
-                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-800 p-2 rounded">
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
                                 <input type="checkbox" value="aquarius" class="zodiac-checkbox" data-zodiac="aquarius">
-                                <span class="text-white text-xs">Aquarius</span>
+                                <span class="text-gray-900 text-xs">Aquarius</span>
                             </label>
-                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-800 p-2 rounded">
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
                                 <input type="checkbox" value="pisces" class="zodiac-checkbox" data-zodiac="pisces">
-                                <span class="text-white text-xs">Pisces</span>
+                                <span class="text-gray-900 text-xs">Pisces</span>
                             </label>
                         </div>
                         <input type="hidden" id="owner-product-zodiac" value="">
@@ -476,31 +657,55 @@
                 </div>
 
                 <div>
-                    <label for="owner-product-category" class="block text-gray-300 text-sm mb-1">Category</label>
+                    <label for="owner-product-category" class="block text-gray-600 text-sm mb-1">Category</label>
                     <input id="owner-product-category" type="text"
-                           class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-tan-500"
+                           class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-[#D2B48C]"
                            placeholder="Art, Silver, Thrift, etc.">
                 </div>
 
                 <!-- Image/Video Upload Section -->
                 <div>
-                    <label class="block text-gray-300 text-sm mb-1">Product Image/Video</label>
+                    <label class="block text-gray-600 text-sm mb-1">Product Image/Video</label>
                     <div class="space-y-3">
-                        <!-- Upload Area -->
-                        <div id="upload-area" class="no-select border-2 border-dashed border-gray-700 rounded-lg p-4 md:p-6 text-center cursor-pointer hover:border-tan-500 active:border-tan-500 transition-colors touch-manipulation">
+                        <!-- Camera Preview -->
+                        <div id="camera-preview-container" class="hidden">
+                            <div class="relative rounded-lg overflow-hidden bg-gray-900 border border-gray-300">
+                                <video id="camera-preview" autoplay playsinline class="w-full h-64 object-cover"></video>
+                                <canvas id="camera-canvas" class="hidden"></canvas>
+                                <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-4">
+                                    <button type="button" id="capture-photo-btn" class="bg-white rounded-full p-3 hover:bg-gray-100 transition-colors">
+                                        <svg class="w-8 h-8 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                    </button>
+                                    <button type="button" id="switch-camera-btn" class="bg-white rounded-full p-3 hover:bg-gray-100 transition-colors">
+                                        <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                        </svg>
+                                    </button>
+                                    <button type="button" id="close-camera-btn" class="bg-white rounded-full p-3 hover:bg-gray-100 transition-colors">
+                                        <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Upload Area (simplified - just icon) -->
+                        <div id="upload-area" class="no-select border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-[#D2B48C] active:border-[#D2B48C] transition-colors touch-manipulation">
                             <input type="file" id="owner-product-file" accept="image/*,video/*" class="hidden">
                             <div id="upload-placeholder" class="py-4">
-                                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                <svg class="mx-auto h-16 w-16 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                                     <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                 </svg>
-                                <p class="mt-2 text-sm text-gray-400">Click to upload or drag and drop</p>
-                                <p class="text-xs text-gray-500 mt-1">PNG, JPG, GIF, MP4, MOV up to 10MB</p>
                             </div>
                         </div>
                         
                         <!-- Preview Area -->
                         <div id="preview-container" class="hidden">
-                            <div class="relative rounded-lg overflow-hidden bg-gray-900 border border-gray-700">
+                            <div class="relative rounded-lg overflow-hidden bg-gray-50 border border-gray-300">
                                 <div id="media-preview" class="w-full h-32 md:h-48 flex items-center justify-center">
                                     <!-- Preview will be inserted here -->
                                 </div>
@@ -508,27 +713,26 @@
                             </div>
                             
                             <!-- Editing Controls -->
-                            <!-- Modern Editing Controls -->
                             <div id="edit-controls" class="mt-4 space-y-4">
                                 <!-- Transform Tools -->
                                 <div class="flex items-center justify-center gap-3">
-                                    <button type="button" id="crop-btn" class="edit-tool-btn group relative flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 hover:border-tan-500 transition-all hover:scale-105 active:scale-95">
-                                        <svg class="w-6 h-6 text-gray-300 group-hover:text-tan-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <button type="button" id="crop-btn" class="edit-tool-btn group relative flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-gray-50 border border-gray-300 hover:border-[#D2B48C] transition-all hover:scale-105 active:scale-95">
+                                        <svg class="w-6 h-6 text-gray-600 group-hover:text-[#D2B48C] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                         </svg>
-                                        <span class="text-[10px] text-gray-400 mt-0.5">Crop</span>
+                                        <span class="text-[10px] text-gray-500 mt-0.5">Crop</span>
                                     </button>
-                                    <button type="button" id="rotate-btn" class="edit-tool-btn group relative flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 hover:border-tan-500 transition-all hover:scale-105 active:scale-95">
-                                        <svg class="w-6 h-6 text-gray-300 group-hover:text-tan-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <button type="button" id="rotate-btn" class="edit-tool-btn group relative flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-gray-50 border border-gray-300 hover:border-[#D2B48C] transition-all hover:scale-105 active:scale-95">
+                                        <svg class="w-6 h-6 text-gray-600 group-hover:text-[#D2B48C] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                         </svg>
-                                        <span class="text-[10px] text-gray-400 mt-0.5">Rotate</span>
+                                        <span class="text-[10px] text-gray-500 mt-0.5">Rotate</span>
                                     </button>
-                                    <button type="button" id="resize-btn" class="edit-tool-btn group relative flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 hover:border-tan-500 transition-all hover:scale-105 active:scale-95">
-                                        <svg class="w-6 h-6 text-gray-300 group-hover:text-tan-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <button type="button" id="resize-btn" class="edit-tool-btn group relative flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-gray-50 border border-gray-300 hover:border-[#D2B48C] transition-all hover:scale-105 active:scale-95">
+                                        <svg class="w-6 h-6 text-gray-600 group-hover:text-[#D2B48C] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
                                         </svg>
-                                        <span class="text-[10px] text-gray-400 mt-0.5">Resize</span>
+                                        <span class="text-[10px] text-gray-500 mt-0.5">Resize</span>
                                     </button>
                                 </div>
 
@@ -538,17 +742,17 @@
                                     <div id="brightness-control" class="hidden">
                                         <div class="flex items-center justify-between mb-2">
                                             <div class="flex items-center gap-2">
-                                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                                                 </svg>
-                                                <span class="text-sm text-gray-300 font-medium">Brightness</span>
+                                                <span class="text-sm text-gray-700 font-medium">Brightness</span>
                                             </div>
-                                            <div class="w-12 h-6 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center">
-                                                <span id="brightness-value" class="text-xs text-tan-500 font-semibold">100</span>
+                                            <div class="w-12 h-6 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center">
+                                                <span id="brightness-value" class="text-xs text-[#D2B48C] font-semibold">100</span>
                                             </div>
                                         </div>
                                         <div class="relative">
-                                            <input type="range" id="brightness-slider" min="0" max="200" value="100" class="modern-slider w-full h-2 bg-gray-800 rounded-lg appearance-none cursor-pointer">
+                                            <input type="range" id="brightness-slider" min="0" max="200" value="100" class="modern-slider w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
                                         </div>
                                     </div>
 
@@ -556,17 +760,17 @@
                                     <div id="contrast-control" class="hidden">
                                         <div class="flex items-center justify-between mb-2">
                                             <div class="flex items-center gap-2">
-                                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
                                                 </svg>
-                                                <span class="text-sm text-gray-300 font-medium">Contrast</span>
+                                                <span class="text-sm text-gray-700 font-medium">Contrast</span>
                                             </div>
-                                            <div class="w-12 h-6 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center">
-                                                <span id="contrast-value" class="text-xs text-tan-500 font-semibold">100</span>
+                                            <div class="w-12 h-6 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center">
+                                                <span id="contrast-value" class="text-xs text-[#D2B48C] font-semibold">100</span>
                                             </div>
                                         </div>
                                         <div class="relative">
-                                            <input type="range" id="contrast-slider" min="0" max="200" value="100" class="modern-slider w-full h-2 bg-gray-800 rounded-lg appearance-none cursor-pointer">
+                                            <input type="range" id="contrast-slider" min="0" max="200" value="100" class="modern-slider w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
                                         </div>
                                     </div>
 
@@ -574,46 +778,46 @@
                                     <div id="saturation-control" class="hidden">
                                         <div class="flex items-center justify-between mb-2">
                                             <div class="flex items-center gap-2">
-                                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
                                                 </svg>
-                                                <span class="text-sm text-gray-300 font-medium">Saturation</span>
+                                                <span class="text-sm text-gray-700 font-medium">Saturation</span>
                                             </div>
-                                            <div class="w-12 h-6 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center">
-                                                <span id="saturation-value" class="text-xs text-tan-500 font-semibold">100</span>
+                                            <div class="w-12 h-6 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center">
+                                                <span id="saturation-value" class="text-xs text-[#D2B48C] font-semibold">100</span>
                                             </div>
                                         </div>
                                         <div class="relative">
-                                            <input type="range" id="saturation-slider" min="0" max="200" value="100" class="modern-slider w-full h-2 bg-gray-800 rounded-lg appearance-none cursor-pointer">
+                                            <input type="range" id="saturation-slider" min="0" max="200" value="100" class="modern-slider w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Resize Controls - Modern -->
+                                <!-- Resize Controls -->
                                 <div id="resize-controls" class="hidden">
                                     <div class="flex items-center gap-3 mb-3">
-                                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
                                         </svg>
-                                        <span class="text-sm text-gray-300 font-medium">Dimensions</span>
+                                        <span class="text-sm text-gray-700 font-medium">Dimensions</span>
                                     </div>
                                     <div class="grid grid-cols-2 gap-3">
                                         <div class="relative">
-                                            <label class="block text-xs text-gray-400 mb-1.5">Width</label>
+                                            <label class="block text-xs text-gray-500 mb-1.5">Width</label>
                                             <div class="relative">
-                                                <input type="text" id="resize-width" placeholder="Auto" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:border-tan-500 transition-colors">
-                                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500">px</span>
+                                                <input type="text" id="resize-width" placeholder="Auto" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2.5 text-gray-900 text-sm focus:outline-none focus:border-[#D2B48C] transition-colors">
+                                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">px</span>
                                             </div>
                                         </div>
                                         <div class="relative">
-                                            <label class="block text-xs text-gray-400 mb-1.5">Height</label>
+                                            <label class="block text-xs text-gray-500 mb-1.5">Height</label>
                                             <div class="relative">
-                                                <input type="text" id="resize-height" placeholder="Auto" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:border-tan-500 transition-colors">
-                                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500">px</span>
+                                                <input type="text" id="resize-height" placeholder="Auto" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2.5 text-gray-900 text-sm focus:outline-none focus:border-[#D2B48C] transition-colors">
+                                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">px</span>
                                             </div>
                                         </div>
                                     </div>
-                                    <button type="button" id="apply-resize" class="mt-3 w-full px-4 py-2.5 bg-gradient-to-r from-tan-500 to-tan-600 text-black font-semibold rounded-lg hover:from-tan-600 hover:to-tan-700 transition-all active:scale-95 shadow-lg shadow-tan-500/20">
+                                    <button type="button" id="apply-resize" class="mt-3 w-full px-4 py-2.5 bg-gradient-to-r from-[#D2B48C] to-[#c4a67a] text-gray-900 font-semibold rounded-lg hover:from-[#c4a67a] hover:to-[#b89668] transition-all active:scale-95 shadow-lg shadow-[#D2B48C]/20">
                                         Apply Resize
                                     </button>
                                 </div>
@@ -623,20 +827,19 @@
                 </div>
 
                 <div>
-                    <label for="owner-product-description" class="block text-gray-300 text-sm mb-1">Description</label>
+                    <label for="owner-product-description" class="block text-gray-600 text-sm mb-1">Description</label>
                     <textarea id="owner-product-description" rows="3"
-                              class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-tan-500"
+                              class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-[#D2B48C]"
                               placeholder="Short description for this product"></textarea>
                 </div>
 
                 <div class="flex justify-end gap-3 pt-2">
                     <button type="button" id="owner-product-cancel"
-                            class="px-4 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-800 transition-colors">
+                            class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">
                         Cancel
                     </button>
                     <button type="submit"
-                            class="px-4 py-2 rounded-lg bg-tan-500 text-black font-bold hover:bg-tan-600 transition-colors"
-                            style="background-color: #D2B48C;">
+                            class="px-4 py-2 rounded-lg bg-[#D2B48C] text-gray-900 font-bold hover:bg-[#c4a67a] transition-colors">
                         Save Product
                     </button>
                 </div>
@@ -646,43 +849,43 @@
 
     <!-- Crop Modal -->
     <div id="crop-modal-overlay" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
-        <div class="modal-content glass-card rounded-lg p-4 md:p-6 w-full max-w-2xl relative">
-            <button id="crop-modal-close" class="absolute top-3 right-3 text-gray-400 hover:text-white transition-colors z-10">✕</button>
-            <h3 class="font-heading text-xl font-bold text-white mb-4">Crop Image</h3>
+        <div class="modal-content light-card rounded-lg p-4 md:p-6 w-full max-w-2xl relative">
+            <button id="crop-modal-close" class="absolute top-3 right-3 text-gray-400 hover:text-gray-900 transition-colors z-10">✕</button>
+            <h3 class="font-heading text-xl font-bold text-gray-900 mb-4">Crop Image</h3>
             <div class="mb-4">
                 <img id="crop-image" src="" alt="Crop" class="max-w-full max-h-96">
             </div>
             <div class="flex justify-end gap-3">
-                <button id="crop-cancel" class="px-4 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-800 transition-colors">Cancel</button>
-                <button id="crop-apply" class="px-4 py-2 rounded-lg bg-tan-500 text-black font-bold hover:bg-tan-600 transition-colors">Apply Crop</button>
+                <button id="crop-cancel" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">Cancel</button>
+                <button id="crop-apply" class="px-4 py-2 rounded-lg bg-[#D2B48C] text-gray-900 font-bold hover:bg-[#c4a67a] transition-colors">Apply Crop</button>
             </div>
         </div>
     </div>
 
     <!-- Bulk Upload Modal -->
     <div id="bulk-upload-modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div id="bulk-upload-modal" class="modal-content glass-card rounded-lg p-4 md:p-6 w-full max-w-4xl relative max-h-[90vh] overflow-y-auto">
-            <button id="bulk-upload-close" class="absolute top-3 right-3 text-gray-400 hover:text-white transition-colors">✕</button>
-            <h2 class="font-heading text-2xl font-bold text-white mb-4">Bulk Upload Products</h2>
+        <div id="bulk-upload-modal" class="modal-content light-card rounded-lg p-4 md:p-6 w-full max-w-4xl relative max-h-[90vh] overflow-y-auto">
+            <button id="bulk-upload-close" class="absolute top-3 right-3 text-gray-400 hover:text-gray-900 transition-colors">✕</button>
+            <h2 class="font-heading text-2xl font-bold text-gray-900 mb-4">Bulk Upload Products</h2>
             
             <!-- Upload Method Tabs -->
-            <div class="flex gap-2 mb-4 border-b border-gray-800">
-                <button class="bulk-tab-btn active px-4 py-2 text-white border-b-2 border-tan-500" data-method="files">Upload Files</button>
-                <button class="bulk-tab-btn px-4 py-2 text-gray-400 hover:text-white" data-method="csv">CSV Import</button>
-                <button class="bulk-tab-btn px-4 py-2 text-gray-400 hover:text-white" data-method="manual">Manual Entry</button>
+            <div class="flex gap-2 mb-4 border-b border-gray-300">
+                <button class="bulk-tab-btn active px-4 py-2 text-gray-900 border-b-2 border-[#D2B48C]" data-method="files">Upload Files</button>
+                <button class="bulk-tab-btn px-4 py-2 text-gray-500 hover:text-gray-900" data-method="csv">CSV Import</button>
+                <button class="bulk-tab-btn px-4 py-2 text-gray-500 hover:text-gray-900" data-method="manual">Manual Entry</button>
             </div>
 
             <!-- Upload Files Method -->
             <div id="bulk-method-files" class="bulk-method-content">
-                <div class="border-2 border-dashed border-gray-700 rounded-lg p-8 text-center mb-4">
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center mb-4">
                     <input type="file" id="bulk-files-input" multiple accept="image/*,video/*" class="hidden">
                     <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                         <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
-                    <p class="text-gray-400 mb-2">Drag and drop multiple images/videos here</p>
-                    <p class="text-gray-500 text-sm mb-4">or</p>
-                    <button id="bulk-select-files" class="bg-tan-500 text-black font-bold px-4 py-2 rounded hover:bg-tan-600 transition-colors">Select Files</button>
-                    <p class="text-gray-500 text-xs mt-2">Selected: <span id="bulk-files-count">0</span> files</p>
+                    <p class="text-gray-600 mb-2">Drag and drop multiple images/videos here</p>
+                    <p class="text-gray-400 text-sm mb-4">or</p>
+                    <button id="bulk-select-files" class="bg-[#D2B48C] text-gray-900 font-bold px-4 py-2 rounded hover:bg-[#c4a67a] transition-colors">Select Files</button>
+                    <p class="text-gray-400 text-xs mt-2">Selected: <span id="bulk-files-count">0</span> files</p>
                 </div>
                 <div id="bulk-files-preview" class="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-4"></div>
             </div>
@@ -690,14 +893,14 @@
             <!-- CSV Import Method -->
             <div id="bulk-method-csv" class="bulk-method-content hidden">
                 <div class="mb-4">
-                    <label class="block text-gray-300 text-sm mb-2">Upload CSV File</label>
-                    <input type="file" id="csv-file-input" accept=".csv" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm">
-                    <p class="text-gray-500 text-xs mt-2">CSV format: title,price,zodiac,category,description,image_url</p>
+                    <label class="block text-gray-600 text-sm mb-2">Upload CSV File</label>
+                    <input type="file" id="csv-file-input" accept=".csv" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 text-sm">
+                    <p class="text-gray-400 text-xs mt-2">CSV format: title,price,zodiac,category,description,image_url</p>
                 </div>
                 <div id="csv-preview" class="hidden mb-4">
-                    <h4 class="text-white text-sm font-semibold mb-2">Preview:</h4>
-                    <div class="bg-gray-900 rounded p-4 max-h-64 overflow-y-auto">
-                        <table id="csv-preview-table" class="w-full text-xs text-gray-300"></table>
+                    <h4 class="text-gray-900 text-sm font-semibold mb-2">Preview:</h4>
+                    <div class="bg-gray-50 rounded p-4 max-h-64 overflow-y-auto">
+                        <table id="csv-preview-table" class="w-full text-xs text-gray-700"></table>
                     </div>
                 </div>
             </div>
@@ -706,8 +909,8 @@
             <div id="bulk-method-manual" class="bulk-method-content hidden">
                 <div class="space-y-4 mb-4">
                     <div class="flex justify-between items-center">
-                        <h4 class="text-white text-sm font-semibold">Products</h4>
-                        <button type="button" id="add-manual-product" class="bg-gray-700 text-white px-3 py-1 rounded text-xs hover:bg-gray-600">+ Add Product</button>
+                        <h4 class="text-gray-900 text-sm font-semibold">Products</h4>
+                        <button type="button" id="add-manual-product" class="bg-gray-200 text-gray-700 px-3 py-1 rounded text-xs hover:bg-gray-300">+ Add Product</button>
                     </div>
                     <div id="manual-products-list" class="space-y-3 max-h-96 overflow-y-auto">
                         <!-- Manual product forms will be added here -->
@@ -716,11 +919,11 @@
             </div>
 
             <!-- Common Fields for All Methods -->
-            <div class="border-t border-gray-800 pt-4 mt-4">
+            <div class="border-t border-gray-300 pt-4 mt-4">
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div>
-                        <label class="block text-gray-300 text-sm mb-1">Default Zodiac</label>
-                        <select id="bulk-default-zodiac" class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-white text-sm">
+                        <label class="block text-gray-600 text-sm mb-1">Default Zodiac</label>
+                        <select id="bulk-default-zodiac" class="w-full bg-white border border-gray-300 rounded px-3 py-2 text-gray-900 text-sm">
                             <option value="">All</option>
                             <option value="aries">Aries</option>
                             <option value="taurus">Taurus</option>
@@ -737,13 +940,13 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-gray-300 text-sm mb-1">Default Category</label>
-                        <input type="text" id="bulk-default-category" placeholder="Art, Silver, Thrift, etc." class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-white text-sm">
+                        <label class="block text-gray-600 text-sm mb-1">Default Category</label>
+                        <input type="text" id="bulk-default-category" placeholder="Art, Silver, Thrift, etc." class="w-full bg-white border border-gray-300 rounded px-3 py-2 text-gray-900 text-sm">
                     </div>
                 </div>
                 <div class="flex justify-end gap-3">
-                    <button id="bulk-upload-cancel" class="px-4 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-800 transition-colors">Cancel</button>
-                    <button id="bulk-upload-save" class="px-4 py-2 rounded-lg bg-tan-500 text-black font-bold hover:bg-tan-600 transition-colors">Save All Products</button>
+                    <button id="bulk-upload-cancel" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">Cancel</button>
+                    <button id="bulk-upload-save" class="px-4 py-2 rounded-lg bg-[#D2B48C] text-gray-900 font-bold hover:bg-[#c4a67a] transition-colors">Save All Products</button>
                 </div>
             </div>
         </div>
@@ -751,18 +954,44 @@
 
     <!-- Order Detail Modal -->
     <div id="owner-order-modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div id="owner-order-modal" class="glass-card rounded-lg p-6 w-full max-w-xl relative">
-            <button id="owner-order-modal-close" class="absolute top-3 right-3 text-gray-400 hover:text-white transition-colors">
+        <div id="owner-order-modal" class="light-card rounded-lg p-6 w-full max-w-2xl relative max-h-[90vh] overflow-y-auto">
+            <button id="owner-order-modal-close" class="absolute top-3 right-3 text-gray-400 hover:text-gray-900 transition-colors">
                 ✕
             </button>
-            <h2 class="font-heading text-2xl font-bold text-white mb-4">Order Detail</h2>
-            <div id="owner-order-modal-body" class="space-y-3 text-sm text-gray-200">
+            <h2 class="font-heading text-2xl font-bold text-gray-900 mb-4">Order Details</h2>
+            <div id="owner-order-modal-body" class="space-y-4 text-sm text-gray-700">
                 <!-- Filled by JS -->
             </div>
-            <div class="flex justify-end mt-4">
+            <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
                 <button id="owner-order-modal-close-btn"
-                        class="px-4 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-800 transition-colors">
+                        class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">
                     Close
+                </button>
+                <button id="owner-order-print-btn"
+                        class="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                    Print
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Message Reply Modal -->
+    <div id="message-reply-modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div id="message-reply-modal" class="light-card rounded-lg p-6 w-full max-w-lg relative">
+            <button id="message-reply-close" class="absolute top-3 right-3 text-gray-400 hover:text-gray-900 transition-colors">
+                ✕
+            </button>
+            <h2 class="font-heading text-xl font-bold text-gray-900 mb-4">Reply to Message</h2>
+            <div id="message-reply-original" class="mb-4 p-3 bg-gray-50 rounded-lg text-sm text-gray-600">
+                <!-- Original message will be shown here -->
+            </div>
+            <textarea id="message-reply-text" rows="5" placeholder="Type your reply..." class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 text-sm focus:outline-none focus:border-[#D2B48C] mb-4"></textarea>
+            <div class="flex justify-end gap-3">
+                <button id="message-reply-cancel" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">
+                    Cancel
+                </button>
+                <button id="message-reply-send" class="px-4 py-2 rounded-lg bg-[#D2B48C] text-gray-900 font-semibold hover:bg-[#c4a67a] transition-colors">
+                    Send Reply
                 </button>
             </div>
         </div>
@@ -772,4 +1001,3 @@
     <script type="module" src="/src/js/owner-dashboard.js"></script>
 </body>
 </html>
-

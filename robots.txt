@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://www.cosmic-deals.com/sitemap.xml
+

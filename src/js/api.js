@@ -54,6 +54,49 @@ export async function getProducts(filters = {}) {
         // Try to get products from localStorage first
         let products = JSON.parse(localStorage.getItem('all_products') || '[]');
         
+        // Seed a default set for local fallback so the page is never empty
+        if (products.length === 0) {
+            products = [
+                {
+                    id: 'demo-1',
+                    title: 'Vintage Orb Lamp',
+                    price: 120,
+                    zodiac: 'random',
+                    image_url: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=400&fit=crop',
+                    category: 'Random',
+                    description: 'Retro chrome orb lamp with warm glow.'
+                },
+                {
+                    id: 'demo-2',
+                    title: 'Silver Signet',
+                    price: 85,
+                    zodiac: 'aries',
+                    image_url: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=400&fit=crop',
+                    category: 'Aries',
+                    description: 'Handmade silver signet ring.'
+                },
+                {
+                    id: 'demo-3',
+                    title: 'Studio Headphones',
+                    price: 199,
+                    zodiac: 'taurus',
+                    image_url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop',
+                    category: 'Taurus',
+                    description: 'Closed-back studio monitors.'
+                },
+                {
+                    id: 'demo-4',
+                    title: 'Analog Watch',
+                    price: 210,
+                    zodiac: 'gemini',
+                    image_url: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop',
+                    category: 'Gemini',
+                    description: 'Minimal steel case, leather band.'
+                }
+            ];
+            localStorage.setItem('all_products', JSON.stringify(products));
+        }
+        
         // If no products in localStorage, try to get from DOM (for main page)
         if (products.length === 0 && typeof document !== 'undefined') {
             const productCards = document.querySelectorAll('.product-card-small, .product-card');
