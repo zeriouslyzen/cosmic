@@ -1,0 +1,3 @@
+# Netlify redirects (for production)
+/dashboard /src/html/owner-dashboard.html 200
+

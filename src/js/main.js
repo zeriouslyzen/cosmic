@@ -62,17 +62,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const starCount = 150;
     const maxShootingStars = 3;
     
-    // Get star colors based on theme
+    // Get star colors (dark mode only)
     function getStarColors() {
-        const isLightMode = document.documentElement.getAttribute('data-theme') === 'light';
-        if (isLightMode) {
-            return [
-                'rgba(0, 0, 0, 0.9)',      // Black
-                'rgba(0, 0, 0, 0.8)',      // Dark black
-                'rgba(0, 0, 0, 0.85)',     // Medium black
-                'rgba(0, 0, 0, 0.75)'      // Lighter black
-            ];
-        }
         return [
             'rgba(255, 255, 255, 0.8)',   // White
             'rgba(210, 180, 140, 0.7)',   // Tan
@@ -319,15 +310,8 @@ document.addEventListener('DOMContentLoaded', () => {
         [5, 6]   // Right to center
     ];
     
-    // Get constellation colors based on theme
+    // Get constellation colors (dark mode only)
     function getConstellationColors() {
-        const isLightMode = document.documentElement.getAttribute('data-theme') === 'light';
-        if (isLightMode) {
-            return {
-                libra: { r: 0, g: 0, b: 0 },      // Black
-                capricorn: { r: 0, g: 0, b: 0 }   // Black
-            };
-        }
         return {
             libra: { r: 210, g: 180, b: 140 },    // Tan/amber
             capricorn: { r: 173, g: 216, b: 230 } // Light blue
@@ -584,8 +568,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Make products visible initially and show them when scrolled
     if (productsSection) {
-        productsSection.style.opacity = '0.5';
+        productsSection.style.opacity = '1';
         productsSection.style.transform = 'translateY(0)';
+        productsSection.classList.add('visible');
     }
     
     // Initial check
@@ -743,10 +728,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const productsByZodiac = {};
         products.forEach(product => {
             // Handle comma-separated zodiacs
-            const zodiacs = product.zodiac ? product.zodiac.split(',').map(z => z.trim()) : ['random'];
+            const zodiacs = product.zodiac ? product.zodiac.split(',').map(z => z.trim()) : ['just-in'];
             
             zodiacs.forEach(zodiac => {
-                const zodiacKey = zodiac || 'random';
+                const zodiacKey = zodiac || 'just-in';
                 if (!productsByZodiac[zodiacKey]) {
                     productsByZodiac[zodiacKey] = [];
                 }
@@ -776,9 +761,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 row = document.createElement('div');
                 row.className = 'product-row';
                 row.setAttribute('data-zodiac', zodiac);
+                const displayName = zodiac === 'just-in' ? 'Just In' : zodiac.charAt(0).toUpperCase() + zodiac.slice(1);
                 row.innerHTML = `
                     <div class="flex items-center justify-between mb-4">
-                        <h2 class="font-heading text-2xl md:text-3xl font-bold text-white">${zodiac}</h2>
+                        <h2 class="font-heading text-2xl md:text-3xl font-bold text-white">${displayName}</h2>
                         <button class="text-gray-400 hover:text-white transition-colors text-sm">view more →</button>
                     </div>
                     <div class="product-grid-row"></div>
@@ -791,28 +777,29 @@ document.addEventListener('DOMContentLoaded', () => {
             
             productsByZodiac[zodiac].forEach(product => {
                 const card = document.createElement('article');
-                card.className = 'product-card-small rounded-lg overflow-hidden glass-card fade-in-up';
+                card.className = 'product-card-small rounded-lg overflow-hidden glass-card fade-in-up visible';
                 // Use first zodiac for data attribute (for filtering)
-                const firstZodiac = product.zodiac ? product.zodiac.split(',')[0].trim() : 'random';
+                const firstZodiac = product.zodiac ? product.zodiac.split(',')[0].trim() : 'just-in';
                 card.setAttribute('data-zodiac', firstZodiac);
                 card.setAttribute('data-title', product.title);
                 card.setAttribute('data-product-id', product.id);
                 card.setAttribute('data-price', `$${parseFloat(product.price || 0).toFixed(2)}`);
-                card.setAttribute('data-category', product.category || 'Random');
+                card.setAttribute('data-category', product.category || 'Just In');
                 card.setAttribute('data-img', product.image_url || '');
                 
                 const isVideo = product.image_url && (product.image_url.match(/\.(mp4|mov|webm|ogg)$/i) || product.image_url.startsWith('data:video'));
+                const price = `$${parseFloat(product.price || 0).toFixed(2)}`;
                 
                 card.innerHTML = `
-                    <div class="w-full h-40 bg-gray-800 overflow-hidden">
+                    <div class="product-card-image-container">
                         ${isVideo 
                             ? `<video src="${product.image_url}" class="w-full h-full object-cover" muted loop></video>`
                             : `<img src="${product.image_url || ''}" alt="${product.title}" class="w-full h-full object-cover" loading="eager" onerror="console.error('Image failed to load'); this.style.display='none'">`
                         }
-                    </div>
-                    <div class="p-3">
-                        <h3 class="font-heading text-sm font-bold text-white">${product.title}</h3>
-                        <p class="text-gray-400 text-xs mt-1">$${parseFloat(product.price || 0).toFixed(2)}</p>
+                        <div class="product-card-overlay">
+                            <h3 class="product-card-title">${product.title}</h3>
+                            <p class="product-card-price">${price}</p>
+                        </div>
                     </div>
                 `;
                 
@@ -957,7 +944,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const productId = card.dataset.productId;
         const productImg = card.dataset.img || 'https://placehold.co/400x400/1a1a1a/FFFFFF?text=Product';
         const productTitle = card.dataset.title || 'Product';
-        const productCategory = card.dataset.category || 'Random';
+        const productCategory = card.dataset.category || 'Just In';
         const productPrice = card.dataset.price || '$99.00';
         
         // Extract numeric price for calculations
@@ -1221,49 +1208,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- Theme Toggle ---
-    const themeToggle = document.getElementById('theme-toggle');
-    const sunIcon = document.getElementById('sun-icon');
-    const moonIcon = document.getElementById('moon-icon');
-    
-    // Load saved theme or default to dark
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    updateThemeIcon(savedTheme);
-    // Update star colors when theme changes
-    starColors = getStarColors();
-    stars.forEach(star => {
-        const colors = getStarColors();
-        star.color = colors[Math.floor(Math.random() * colors.length)];
-    });
-    
-    if (themeToggle) {
-        themeToggle.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateThemeIcon(newTheme);
-            // Update star colors
-            starColors = getStarColors();
-            stars.forEach(star => {
-                const colors = getStarColors();
-                star.color = colors[Math.floor(Math.random() * colors.length)];
-            });
-        });
-    }
-    
-    function updateThemeIcon(theme) {
-        if (sunIcon && moonIcon) {
-            if (theme === 'light') {
-                sunIcon.classList.add('hidden');
-                moonIcon.classList.remove('hidden');
-            } else {
-                sunIcon.classList.remove('hidden');
-                moonIcon.classList.add('hidden');
-            }
-        }
-    }
+    // Dark mode only - no theme toggle
+    document.documentElement.setAttribute('data-theme', 'dark');
 
     // --- Initialize Authentication (temporarily disabled) ---
     // import('./auth.js').then(({ initAuth }) => {
