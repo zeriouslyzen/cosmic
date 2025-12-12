@@ -117,7 +117,7 @@
                 <!-- Zodiac Filter Buttons - All 12 Signs -->
                 <div class="zodiac-filters-container">
                     <div class="zodiac-filters-scroll">
-                        <button class="zodiac-btn all active" data-zodiac="all">All</button>
+                        <button class="zodiac-btn styles-btn active" data-filter-type="styles-toggle">Styles</button>
                         <button class="zodiac-btn" data-zodiac="aries">Aries</button>
                         <button class="zodiac-btn" data-zodiac="taurus">Taurus</button>
                         <button class="zodiac-btn" data-zodiac="gemini">Gemini</button>
@@ -286,7 +286,24 @@
                 <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
-                <img id="modal-img" src="" class="w-full h-auto rounded-lg mb-6">
+                <div class="relative mb-6">
+                    <div class="relative">
+                        <img id="modal-img" src="" class="w-full h-auto rounded-lg">
+                        <button id="modal-img-prev" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full transition-all hidden">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                        </button>
+                        <button id="modal-img-next" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full transition-all hidden">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="modal-img-indicators" class="flex justify-center gap-2 mt-3 hidden">
+                        <!-- Indicators will be generated dynamically -->
+                    </div>
+                </div>
                 <h2 id="modal-title" class="font-heading text-4xl font-bold text-white"></h2>
                 <p id="modal-category" class="text-gray-400 mt-2"></p>
                 <p id="modal-price" class="text-2xl font-medium text-white my-4"></p>

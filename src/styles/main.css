@@ -730,6 +730,37 @@ main {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), 0 0 24px rgba(120, 231, 255, 0.08);
 }
 
+/* Product Detail Modal Image Navigation */
+#modal-img-prev,
+#modal-img-next {
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.2s ease;
+}
+
+#modal-img-prev:hover,
+#modal-img-next:hover {
+    background-opacity: 0.75;
+    transform: scale(1.1);
+}
+
+#modal-img-prev:disabled,
+#modal-img-next:disabled {
+    cursor: not-allowed;
+    opacity: 0.3;
+}
+
+#modal-img-indicators button {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+#modal-img-indicators button:hover {
+    transform: scale(1.2);
+}
+
 /* Product Detail Modal */
 #product-modal-overlay {
     transition: opacity 0.3s ease-in-out;

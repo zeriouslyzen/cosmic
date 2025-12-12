@@ -59,11 +59,17 @@ export async function getProducts(filters = {}) {
             products = [
                 {
                     id: 'demo-1',
-                    title: 'Vintage Orb Lamp',
+                    title: 'Siriusly Gold',
                     price: 120,
-                    zodiac: 'random',
-                    image_url: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=400&fit=crop',
-                    category: 'Random',
+                    zodiac: 'just-in',
+                    image_url: '/images/products/product-1-1.jpg',
+                    image_urls: [
+                        '/images/products/product-1-1.jpg',
+                        '/images/products/product-1-2.jpg',
+                        '/images/products/product-1-3.jpg',
+                        '/images/products/product-1-4.jpg'
+                    ],
+                    category: 'Just In',
                     description: 'Retro chrome orb lamp with warm glow.'
                 },
                 {

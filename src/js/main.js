@@ -582,13 +582,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Zodiac Carousel ---
     const zodiacCarousel = document.getElementById('zodiac-carousel');
-    const zodiacSigns = [
+    const zodiacCarouselSigns = [
         'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
         'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'
     ];
 
     if (zodiacCarousel) {
-        zodiacSigns.forEach(sign => {
+        zodiacCarouselSigns.forEach(sign => {
             const card = document.createElement('div');
             card.className = 'zodiac-card';
             card.dataset.zodiac = sign.toLowerCase();
@@ -599,13 +599,10 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             card.addEventListener('click', () => {
                 // Filter products by zodiac
+                filterMode = 'zodiac';
                 activeZodiac = sign.toLowerCase();
-                zodiacBtns.forEach(btn => {
-                    btn.classList.remove('active');
-                    if (btn.dataset.zodiac === activeZodiac) {
-                        btn.classList.add('active');
-                    }
-                });
+                // Re-render buttons to show zodiac mode with correct active state
+                renderFilterButtons();
                 filterProducts();
                 // Scroll to products section
                 const productsSection = document.getElementById('products-section');
@@ -628,8 +625,116 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Product Filter Logic ---
     const searchInput = document.getElementById('search-input');
     const zodiacBtns = document.querySelectorAll('.zodiac-btn');
+    const zodiacFiltersScroll = document.querySelector('.zodiac-filters-scroll');
     let productCards = [];
     let activeZodiac = 'all';
+    let activeStyle = 'all';
+    let filterMode = 'zodiac'; // 'zodiac' or 'styles'
+    
+    // Style categories
+    const styleCategories = [
+        { value: 'all', label: 'All' },
+        { value: 'jewelry', label: 'Jewelry' },
+        { value: 'silver', label: 'Silver' },
+        { value: 'gold art', label: 'Gold Art' },
+        { value: 'clothing', label: 'Clothing' },
+        { value: 'accessories', label: 'Accessories' }
+    ];
+    
+    // Zodiac signs
+    const zodiacSigns = [
+        { value: 'all', label: 'All' },
+        { value: 'aries', label: 'Aries' },
+        { value: 'taurus', label: 'Taurus' },
+        { value: 'gemini', label: 'Gemini' },
+        { value: 'cancer', label: 'Cancer' },
+        { value: 'leo', label: 'Leo' },
+        { value: 'virgo', label: 'Virgo' },
+        { value: 'libra', label: 'Libra' },
+        { value: 'scorpio', label: 'Scorpio' },
+        { value: 'sagittarius', label: 'Sagittarius' },
+        { value: 'capricorn', label: 'Capricorn' },
+        { value: 'aquarius', label: 'Aquarius' },
+        { value: 'pisces', label: 'Pisces' }
+    ];
+    
+    // Function to render filter buttons
+    function renderFilterButtons() {
+        if (!zodiacFiltersScroll) return;
+        
+        zodiacFiltersScroll.innerHTML = '';
+        
+        if (filterMode === 'styles') {
+            // Render style category buttons
+            styleCategories.forEach(style => {
+                const btn = document.createElement('button');
+                btn.className = 'zodiac-btn';
+                if (style.value === 'all') {
+                    btn.classList.add('styles-btn');
+                    // Make "All" button toggle back to zodiac mode
+                    btn.setAttribute('data-filter-type', 'zodiac-toggle');
+                } else {
+                    btn.setAttribute('data-filter-type', 'styles');
+                    btn.setAttribute('data-style', style.value);
+                }
+                btn.textContent = style.label;
+                if (style.value === activeStyle) {
+                    btn.classList.add('active');
+                }
+                btn.addEventListener('click', () => {
+                    if (style.value === 'all' && btn.hasAttribute('data-filter-type') && btn.getAttribute('data-filter-type') === 'zodiac-toggle') {
+                        // Toggle back to zodiac mode
+                        filterMode = 'zodiac';
+                        activeZodiac = 'all';
+                        renderFilterButtons();
+                        filterProducts();
+                    } else {
+                        // Filter by style
+                        document.querySelectorAll('[data-filter-type="styles"]').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        activeStyle = style.value;
+                        filterProducts();
+                        setTimeout(attachProductCardHandlers, 50);
+                    }
+                });
+                zodiacFiltersScroll.appendChild(btn);
+            });
+        } else {
+            // Render zodiac buttons
+            zodiacSigns.forEach(zodiac => {
+                const btn = document.createElement('button');
+                btn.className = 'zodiac-btn';
+                if (zodiac.value === 'all') {
+                    btn.classList.add('styles-btn');
+                    btn.setAttribute('data-filter-type', 'styles-toggle');
+                    btn.textContent = 'Styles';
+                } else {
+                    btn.setAttribute('data-zodiac', zodiac.value);
+                    btn.textContent = zodiac.label;
+                }
+                if (zodiac.value === activeZodiac) {
+                    btn.classList.add('active');
+                }
+                btn.addEventListener('click', () => {
+                    if (zodiac.value === 'all' && btn.hasAttribute('data-filter-type') && btn.getAttribute('data-filter-type') === 'styles-toggle') {
+                        // Toggle to styles mode
+                        filterMode = 'styles';
+                        activeStyle = 'all';
+                        renderFilterButtons();
+                        filterProducts();
+                    } else {
+                        // Filter by zodiac
+                        document.querySelectorAll('[data-zodiac]').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        activeZodiac = zodiac.value;
+                        filterProducts();
+                        setTimeout(attachProductCardHandlers, 50);
+                    }
+                });
+                zodiacFiltersScroll.appendChild(btn);
+            });
+        }
+    }
 
     // Load product images immediately - no delay, must be visible
     function loadProductImages() {
@@ -835,9 +940,24 @@ document.addEventListener('DOMContentLoaded', () => {
         productCards.forEach(card => {
             const title = card.dataset.title ? card.dataset.title.toLowerCase() : '';
             const zodiac = card.dataset.zodiac || '';
+            const category = card.dataset.category ? card.dataset.category.toLowerCase() : '';
             const matchesSearch = !searchTerm || title.includes(searchTerm);
-            const matchesZodiac = activeZodiac === 'all' || zodiac === activeZodiac;
-            card.style.display = (matchesSearch && matchesZodiac) ? 'flex' : 'none';
+            
+            let matchesFilter = false;
+            if (filterMode === 'styles') {
+                // Filter by style category
+                if (activeStyle === 'all') {
+                    matchesFilter = true;
+                } else {
+                    // Check if category matches the active style
+                    matchesFilter = category.includes(activeStyle.toLowerCase());
+                }
+            } else {
+                // Filter by zodiac
+                matchesFilter = activeZodiac === 'all' || zodiac === activeZodiac;
+            }
+            
+            card.style.display = (matchesSearch && matchesFilter) ? 'flex' : 'none';
         });
     }
 
@@ -848,15 +968,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    zodiacBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            zodiacBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            activeZodiac = btn.dataset.zodiac;
-            filterProducts();
-            setTimeout(attachProductCardHandlers, 50);
-        });
-    });
+    // Initialize filter buttons
+    renderFilterButtons();
 
     // --- Touch/Swipe Support for Mobile (Horizontal Only) ---
     const productGridRows = document.querySelectorAll('.product-grid-row');
@@ -939,28 +1052,46 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let currentModalProductId = null;
     let currentModalPrice = 0;
+    let currentModalImages = [];
+    let currentModalImageIndex = 0;
 
-    function openModal(card) {
+    async function openModal(card) {
         const productId = card.dataset.productId;
         const productImg = card.dataset.img || 'https://placehold.co/400x400/1a1a1a/FFFFFF?text=Product';
         const productTitle = card.dataset.title || 'Product';
         const productCategory = card.dataset.category || 'Just In';
         const productPrice = card.dataset.price || '$99.00';
         
+        // Try to get full product data to check for multiple images
+        let productImages = [productImg];
+        if (productId) {
+            try {
+                const { getProductById } = await import('./api.js');
+                const product = await getProductById(productId);
+                if (product && product.image_urls && Array.isArray(product.image_urls) && product.image_urls.length > 0) {
+                    productImages = product.image_urls;
+                } else if (product && product.image_url) {
+                    productImages = [product.image_url];
+                }
+            } catch (error) {
+                console.warn('Could not fetch product details:', error);
+            }
+        }
+        
         // Extract numeric price for calculations
         currentModalPrice = parseFloat(productPrice.replace('$', '').replace(',', '')) || 99;
         currentModalProductId = productId;
+        currentModalImages = productImages;
+        currentModalImageIndex = 0;
         
         // Set modal content
-        if (modalImg) {
-            modalImg.src = productImg;
-            modalImg.onerror = function() {
-                this.src = 'https://placehold.co/400x400/1a1a1a/FFFFFF?text=Product';
-            };
-        }
+        updateModalImage();
         if (modalTitle) modalTitle.textContent = productTitle;
         if (modalCategory) modalCategory.textContent = productCategory;
         if (modalPrice) modalPrice.textContent = productPrice;
+        
+        // Update navigation controls
+        updateModalNavigation();
         
         // Calculate and show star dust earnings (1 star dust per $1)
         const stardustEarned = Math.floor(currentModalPrice);
@@ -984,6 +1115,80 @@ document.addEventListener('DOMContentLoaded', () => {
                 modalOverlay.classList.remove('opacity-0');
                 if (modal) modal.classList.add('open');
             }, 10);
+        }
+    }
+    
+    function updateModalImage() {
+        if (!modalImg || currentModalImages.length === 0) return;
+        
+        const imageUrl = currentModalImages[currentModalImageIndex];
+        modalImg.src = imageUrl;
+        modalImg.onerror = function() {
+            this.src = 'https://placehold.co/400x400/1a1a1a/FFFFFF?text=Product';
+        };
+    }
+    
+    function updateModalNavigation() {
+        const prevBtn = document.getElementById('modal-img-prev');
+        const nextBtn = document.getElementById('modal-img-next');
+        const indicators = document.getElementById('modal-img-indicators');
+        
+        if (currentModalImages.length <= 1) {
+            // Hide navigation if only one image
+            if (prevBtn) prevBtn.classList.add('hidden');
+            if (nextBtn) nextBtn.classList.add('hidden');
+            if (indicators) indicators.classList.add('hidden');
+            return;
+        }
+        
+        // Show navigation buttons
+        if (prevBtn) prevBtn.classList.remove('hidden');
+        if (nextBtn) nextBtn.classList.remove('hidden');
+        if (indicators) indicators.classList.remove('hidden');
+        
+        // Update button states
+        if (prevBtn) {
+            prevBtn.disabled = currentModalImageIndex === 0;
+            prevBtn.style.opacity = currentModalImageIndex === 0 ? '0.5' : '1';
+        }
+        if (nextBtn) {
+            nextBtn.disabled = currentModalImageIndex === currentModalImages.length - 1;
+            nextBtn.style.opacity = currentModalImageIndex === currentModalImages.length - 1 ? '0.5' : '1';
+        }
+        
+        // Update indicators
+        if (indicators) {
+            indicators.innerHTML = '';
+            currentModalImages.forEach((img, index) => {
+                const dot = document.createElement('button');
+                dot.className = `w-2 h-2 rounded-full transition-all ${
+                    index === currentModalImageIndex 
+                        ? 'bg-white' 
+                        : 'bg-gray-600 hover:bg-gray-500'
+                }`;
+                dot.addEventListener('click', () => {
+                    currentModalImageIndex = index;
+                    updateModalImage();
+                    updateModalNavigation();
+                });
+                indicators.appendChild(dot);
+            });
+        }
+    }
+    
+    function nextModalImage() {
+        if (currentModalImageIndex < currentModalImages.length - 1) {
+            currentModalImageIndex++;
+            updateModalImage();
+            updateModalNavigation();
+        }
+    }
+    
+    function prevModalImage() {
+        if (currentModalImageIndex > 0) {
+            currentModalImageIndex--;
+            updateModalImage();
+            updateModalNavigation();
         }
     }
 
@@ -1116,6 +1321,69 @@ document.addEventListener('DOMContentLoaded', () => {
                 modalCheckout.textContent = 'Checkout';
             }
         });
+    }
+
+    // Modal image navigation
+    const modalImgPrev = document.getElementById('modal-img-prev');
+    const modalImgNext = document.getElementById('modal-img-next');
+    
+    if (modalImgPrev) {
+        modalImgPrev.addEventListener('click', (e) => {
+            e.stopPropagation();
+            prevModalImage();
+        });
+    }
+    
+    if (modalImgNext) {
+        modalImgNext.addEventListener('click', (e) => {
+            e.stopPropagation();
+            nextModalImage();
+        });
+    }
+    
+    // Keyboard navigation for modal images
+    document.addEventListener('keydown', (e) => {
+        if (modalOverlay && !modalOverlay.classList.contains('hidden')) {
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevModalImage();
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                nextModalImage();
+            }
+        }
+    });
+    
+    // Swipe support for modal images on mobile
+    if (modalImg) {
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        modalImg.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+        
+        modalImg.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, { passive: true });
+        
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    // Swipe left - next image
+                    nextModalImage();
+                } else {
+                    // Swipe right - previous image
+                    prevModalImage();
+                }
+            }
+            touchStartX = 0;
+            touchEndX = 0;
+        }
     }
 
     if (closeModalBtn) {
