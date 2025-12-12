@@ -595,6 +595,43 @@ document.addEventListener('DOMContentLoaded', () => {
     init();
     animate();
 
+    // --- Zodiac Carousel ---
+    const zodiacCarousel = document.getElementById('zodiac-carousel');
+    const zodiacSigns = [
+        'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
+        'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'
+    ];
+
+    if (zodiacCarousel) {
+        zodiacSigns.forEach(sign => {
+            const card = document.createElement('div');
+            card.className = 'zodiac-card';
+            card.dataset.zodiac = sign.toLowerCase();
+            card.innerHTML = `
+                <div class="zodiac-card-content">
+                    <div class="zodiac-card-name">${sign}</div>
+                </div>
+            `;
+            card.addEventListener('click', () => {
+                // Filter products by zodiac
+                activeZodiac = sign.toLowerCase();
+                zodiacBtns.forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.zodiac === activeZodiac) {
+                        btn.classList.add('active');
+                    }
+                });
+                filterProducts();
+                // Scroll to products section
+                const productsSection = document.getElementById('products-section');
+                if (productsSection) {
+                    productsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+            zodiacCarousel.appendChild(card);
+        });
+    }
+
     // --- Scroll Animations ---
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {

@@ -173,7 +173,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
     
-    // Camera controls
+    // CapCut Integration
+    const openCapCutBtn = document.getElementById('open-capcut-btn');
+    if (openCapCutBtn) {
+        openCapCutBtn.addEventListener('click', () => {
+            // Open CapCut web editor in a new window
+            const capcutUrl = 'https://www.capcut.com/editor';
+            window.open(capcutUrl, '_blank', 'noopener,noreferrer');
+        });
+    }
+    
+    // Camera controls (kept for manual use if needed)
     const captureBtn = document.getElementById('capture-photo-btn');
     const switchCameraBtn = document.getElementById('switch-camera-btn');
     const closeCameraBtn = document.getElementById('close-camera-btn');
@@ -199,12 +209,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (removeMediaBtn) {
         removeMediaBtn.addEventListener('click', () => {
             hideMediaPreview();
-            // Restart camera if this is a new product
-            if (!currentEditingProductId) {
-                setTimeout(() => {
-                    startCamera();
-                }, 100);
-            }
         });
     }
     
@@ -966,12 +970,6 @@ function showProductForm(product = null) {
         categoryInput.value = '';
         descInput.value = '';
         hideMediaPreview();
-        
-        // Auto-activate camera for new products
-        overlay.classList.remove('hidden');
-        setTimeout(() => {
-            startCamera();
-        }, 100);
     }
 
     overlay.classList.remove('hidden');

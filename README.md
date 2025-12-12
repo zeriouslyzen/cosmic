@@ -12,10 +12,11 @@ A curated e-commerce platform for art, vintage relics, and unique finds with a c
   
 - **Product Display**
   - Horizontal scrolling product carousels (4 items per row on desktop)
-  - Multiple product rows organized by category (rando, aries, taurus, gemini)
+  - Product categories: My Art, Consignment, Deals
   - Touch/swipe support for mobile devices
   - Mouse drag and wheel scroll support for desktop
   - Smooth scroll-snap behavior
+  - Zodiac carousel section (modular upright rectangle cards)
   
 - **User Interface**
   - Glassmorphism design effects
@@ -23,7 +24,18 @@ A curated e-commerce platform for art, vintage relics, and unique finds with a c
   - Products section that appears on scroll
   - Search and filter functionality by zodiac signs
   - Product detail modal with smooth transitions
+  - About and Live streaming slide-over panels
   - Responsive design (mobile, tablet, desktop)
+  
+- **Owner Dashboard**
+  - Swipeable navigation between sections (Semi's Cloud, Orders, Messages, Settings)
+  - Product management with image/video upload
+  - CapCut integration for media editing
+  - Order processing and management
+  - Sales metrics and analytics
+  - Live status toggle for Whatnot streaming
+  - Customer message management
+  - Comprehensive settings panel
   
 - **Animations & Interactions**
   - Smooth scroll-triggered animations
