@@ -5,30 +5,36 @@ import { getProducts, getProductById } from './api.js';
 let isOwner = false;
 const ownerDevMode = import.meta?.env?.VITE_OWNER_DASH_DEV_MODE === 'true';
 
-// Check if user is owner (simple check - in production, use proper role-based auth)
+// Check if user is owner
 export async function checkOwnerAccess() {
-    if (ownerDevMode) {
-        // In dev mode, treat current user as owner if any session exists
-        try {
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            isOwner = !!user;
-            return isOwner;
-        } catch {
-            // If Supabase is not configured, allow access in dev for UI testing
-            isOwner = true;
-            return true;
-        }
+    // 1. Check for manual debug override (Console: localStorage.setItem('owner_debug_mode', 'true'))
+    if (localStorage.getItem('owner_debug_mode') === 'true') {
+        console.warn('⚠️ DASHBOARD DEBUG MODE ACTIVE - Security Bypassed');
+        isOwner = true;
+        return true;
     }
 
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    if (!user) return false;
-    
-    // Check owner_settings for owner email/ID
-    // In production, use Supabase RLS policies or a separate owners table
-    const ownerEmail = localStorage.getItem('owner_email') || 'owner@cosmicdeals.com';
-    isOwner = user.email === ownerEmail;
-    
-    return isOwner;
+    const { data: { user }, error } = await supabaseClient.auth.getUser();
+
+    if (error || !user) {
+        isOwner = false;
+        return false;
+    }
+
+    // Tight email-based check for the owner
+    // In production, you would check a 'role' column in a 'profiles' table
+    const ownerEmails = [
+        'owner@cosmicdeals.com',
+        localStorage.getItem('owner_email') // Allow dev override if explicitly set
+    ].filter(Boolean);
+
+    if (ownerEmails.includes(user.email)) {
+        isOwner = true;
+        return true;
+    }
+
+    isOwner = false;
+    return false;
 }
 
 // Owner authentication
@@ -37,17 +43,17 @@ export async function ownerLogin(email, password) {
         email,
         password
     });
-    
+
     if (error) {
         return { success: false, error };
     }
-    
+
     const isOwnerUser = await checkOwnerAccess();
     if (!isOwnerUser) {
         await supabaseClient.auth.signOut();
         return { success: false, error: { message: 'Not an owner account' } };
     }
-    
+
     return { success: true, user: data.user };
 }
 
@@ -57,19 +63,19 @@ export async function getDashboardStats() {
         await checkOwnerAccess();
         if (!isOwner) return null;
     }
-    
+
     const { useLocalStorage } = await import('./supabase.js');
-    
+
     if (useLocalStorage) {
         // Use localStorage fallback for development
         const orders = JSON.parse(localStorage.getItem('all_orders') || '[]');
         const products = await getProducts();
         const transactions = JSON.parse(localStorage.getItem('all_stardust_transactions') || '[]');
-        
+
         const totalRevenue = orders.reduce((sum, order) => sum + parseFloat(order.total || 0), 0);
         const pendingOrders = orders.filter(o => o.status === 'pending').length;
         const totalStardust = transactions.reduce((sum, t) => sum + (t.type === 'earned' ? t.amount : -t.amount), 0);
-        
+
         return {
             totalOrders: orders.length,
             pendingOrders,
@@ -78,23 +84,23 @@ export async function getDashboardStats() {
             totalStardust
         };
     }
-    
+
     const { data: orders } = await supabaseClient
         .from('orders')
         .select('*');
-    
+
     const { data: products } = await supabaseClient
         .from('products')
         .select('*');
-    
+
     const { data: transactions } = await supabaseClient
         .from('stardust_transactions')
         .select('*');
-    
+
     const totalRevenue = orders?.reduce((sum, order) => sum + parseFloat(order.total || 0), 0) || 0;
     const pendingOrders = orders?.filter(o => o.status === 'pending').length || 0;
     const totalStardust = transactions?.reduce((sum, t) => sum + (t.type === 'earned' ? t.amount : -t.amount), 0) || 0;
-    
+
     return {
         totalOrders: orders?.length || 0,
         pendingOrders,
@@ -110,9 +116,9 @@ export async function createProduct(productData) {
         await checkOwnerAccess();
         if (!isOwner) return null;
     }
-    
+
     const { useLocalStorage } = await import('./supabase.js');
-    
+
     if (useLocalStorage) {
         // Store in localStorage for development
         const products = await getProducts();
@@ -126,18 +132,18 @@ export async function createProduct(productData) {
         localStorage.setItem('all_products', JSON.stringify(products));
         return newProduct;
     }
-    
+
     const { data, error } = await supabaseClient
         .from('products')
         .insert(productData)
         .select()
         .single();
-    
+
     if (error) {
         console.error('Error creating product:', error);
         return null;
     }
-    
+
     return data;
 }
 
@@ -146,9 +152,9 @@ export async function updateProduct(productId, productData) {
         await checkOwnerAccess();
         if (!isOwner) return null;
     }
-    
+
     const { useLocalStorage } = await import('./supabase.js');
-    
+
     if (useLocalStorage) {
         // Update in localStorage for development
         const products = await getProducts();
@@ -160,19 +166,19 @@ export async function updateProduct(productId, productData) {
         }
         return null;
     }
-    
+
     const { data, error } = await supabaseClient
         .from('products')
         .update(productData)
         .eq('id', productId)
         .select()
         .single();
-    
+
     if (error) {
         console.error('Error updating product:', error);
         return null;
     }
-    
+
     return data;
 }
 
@@ -181,9 +187,9 @@ export async function deleteProduct(productId) {
         await checkOwnerAccess();
         if (!isOwner) return false;
     }
-    
+
     const { useLocalStorage } = await import('./supabase.js');
-    
+
     if (useLocalStorage) {
         // Delete from localStorage for development
         const products = await getProducts();
@@ -191,17 +197,17 @@ export async function deleteProduct(productId) {
         localStorage.setItem('all_products', JSON.stringify(filtered));
         return true;
     }
-    
+
     const { error } = await supabaseClient
         .from('products')
         .delete()
         .eq('id', productId);
-    
+
     if (error) {
         console.error('Error deleting product:', error);
         return false;
     }
-    
+
     return true;
 }
 
@@ -211,9 +217,9 @@ export async function getOrders(filters = {}) {
         await checkOwnerAccess();
         if (!isOwner) return [];
     }
-    
+
     const { useLocalStorage } = await import('./supabase.js');
-    
+
     if (useLocalStorage) {
         // Get orders from localStorage for development
         let orders = JSON.parse(localStorage.getItem('all_orders') || '[]');
@@ -222,20 +228,20 @@ export async function getOrders(filters = {}) {
         }
         return orders.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
     }
-    
+
     let query = supabaseClient.from('orders').select('*');
-    
+
     if (filters.status) {
         query = query.eq('status', filters.status);
     }
-    
+
     const { data, error } = await query.order('created_at', { ascending: false });
-    
+
     if (error) {
         console.error('Error fetching orders:', error);
         return [];
     }
-    
+
     return data || [];
 }
 
@@ -244,9 +250,9 @@ export async function updateOrderStatus(orderId, status) {
         await checkOwnerAccess();
         if (!isOwner) return false;
     }
-    
+
     const { useLocalStorage } = await import('./supabase.js');
-    
+
     if (useLocalStorage) {
         // Update order in localStorage for development
         const orders = JSON.parse(localStorage.getItem('all_orders') || '[]');
@@ -259,17 +265,17 @@ export async function updateOrderStatus(orderId, status) {
         }
         return false;
     }
-    
+
     const { error } = await supabaseClient
         .from('orders')
         .update({ status })
         .eq('id', orderId);
-    
+
     if (error) {
         console.error('Error updating order:', error);
         return false;
     }
-    
+
     return true;
 }
 
@@ -279,26 +285,26 @@ export async function getSetting(key) {
         await checkOwnerAccess();
         if (!isOwner) return null;
     }
-    
+
     const { useLocalStorage } = await import('./supabase.js');
-    
+
     if (useLocalStorage) {
         // Get setting from localStorage for development
         const settings = JSON.parse(localStorage.getItem('owner_settings') || '{}');
         return settings[key] || null;
     }
-    
+
     const { data, error } = await supabaseClient
         .from('owner_settings')
         .select('value')
         .eq('key', key)
         .single();
-    
+
     if (error) {
         console.error('Error fetching setting:', error);
         return null;
     }
-    
+
     return data?.value;
 }
 
@@ -307,9 +313,9 @@ export async function setSetting(key, value) {
         await checkOwnerAccess();
         if (!isOwner) return false;
     }
-    
+
     const { useLocalStorage } = await import('./supabase.js');
-    
+
     if (useLocalStorage) {
         // Store setting in localStorage for development
         const settings = JSON.parse(localStorage.getItem('owner_settings') || '{}');
@@ -317,7 +323,7 @@ export async function setSetting(key, value) {
         localStorage.setItem('owner_settings', JSON.stringify(settings));
         return true;
     }
-    
+
     const { error } = await supabaseClient
         .from('owner_settings')
         .upsert({
@@ -327,12 +333,12 @@ export async function setSetting(key, value) {
         }, {
             onConflict: 'key'
         });
-    
+
     if (error) {
         console.error('Error setting setting:', error);
         return false;
     }
-    
+
     return true;
 }
 

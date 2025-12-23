@@ -1,0 +1,63 @@
+/* Skeleton Loading Styles */
+.skeleton {
+    background: rgba(255, 255, 255, 0.05);
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.5rem;
+}
+
+.skeleton::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg,
+            rgba(255, 255, 255, 0) 0,
+            rgba(255, 255, 255, 0.05) 20%,
+            rgba(255, 255, 255, 0.1) 60%,
+            rgba(255, 255, 255, 0));
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.skeleton-text {
+    height: 1rem;
+    width: 80%;
+    margin-bottom: 0.5rem;
+}
+
+.skeleton-text.short {
+    width: 40%;
+}
+
+.skeleton-card {
+    height: 280px;
+    width: 100%;
+}
+
+.loading-skeleton-container {
+    display: flex;
+    gap: 1rem;
+    overflow: hidden;
+    padding: 0.5rem 0;
+}
+
+.skeleton-item {
+    flex: 0 0 calc(20% - 0.75rem);
+    min-width: 120px;
+    max-width: 160px;
+}
+
+@media (max-width: 768px) {
+    .skeleton-item {
+        flex: 0 0 calc(50% - 0.5rem);
+    }
+}

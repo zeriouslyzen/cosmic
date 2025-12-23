@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Login | Cosmic Deals</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../styles/main.css">
+    <style>
+        body {
+            background: #0a0a0c;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(210, 180, 140, 0.2);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="star-background" class="fixed inset-0 pointer-events-none opacity-50"></canvas>
+
+    <div class="login-card w-full max-w-md p-8 rounded-2xl z-10 mx-4">
+        <div class="text-center mb-8">
+            <h1 class="font-heading text-3xl font-bold text-[#D2B48C] tracking-tighter mb-2">Cosmic Owner</h1>
+            <p class="text-gray-400 text-sm">Secure Portal Access</p>
+        </div>
+
+        <form id="owner-login-form" class="space-y-6">
+            <div>
+                <label class="block text-gray-400 text-xs uppercase tracking-widest mb-2">Email Address</label>
+                <input type="email" id="login-email" required placeholder="owner@cosmicdeals.com"
+                    class="w-full bg-white/5 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D2B48C] transition-colors">
+            </div>
+            <div>
+                <label class="block text-gray-400 text-xs uppercase tracking-widest mb-2">Secret Password</label>
+                <input type="password" id="login-password" required placeholder="••••••••"
+                    class="w-full bg-white/5 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D2B48C] transition-colors">
+            </div>
+            <button type="submit" id="login-submit"
+                class="w-full bg-[#D2B48C] text-gray-900 font-bold py-3 rounded-xl hover:bg-[#C1A37B] transition-all transform active:scale-95">
+                Authenticate
+            </button>
+            <div id="login-error" class="text-red-400 text-xs text-center hidden"></div>
+        </form>
+
+        <div class="mt-8 text-center">
+            <a href="../../index.html" class="text-gray-500 text-xs hover:text-[#D2B48C] transition-colors">← Return to
+                Main Store</a>
+        </div>
+    </div>
+
+    <script type="module">
+        import { ownerLogin } from '../js/owner.js';
+        import { supabaseClient } from '../js/supabase.js';
+
+        const form = document.getElementById('owner-login-form');
+        const errorEl = document.getElementById('login-error');
+        const submitBtn = document.getElementById('login-submit');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            errorEl.classList.add('hidden');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Authenticating...';
+
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            try {
+                const result = await ownerLogin(email, password);
+                if (result.success) {
+                    window.location.href = './owner-dashboard.html';
+                } else {
+                    errorEl.textContent = result.error.message || 'Authentication failed';
+                    errorEl.classList.remove('hidden');
+                }
+            } catch (err) {
+                errorEl.textContent = 'An unexpected error occurred';
+                errorEl.classList.remove('hidden');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Authenticate';
+            }
+        });
+
+        // Simple star background
+        const canvas = document.getElementById('star-background');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+
+        function initStars() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            stars = [];
+            for (let i = 0; i < 200; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2,
+                    opacity: Math.random()
+                });
+            }
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            stars.forEach(star => {
+                ctx.fillStyle = `rgba(210, 180, 140, ${star.opacity})`;
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
+                star.opacity += (Math.random() - 0.5) * 0.05;
+                if (star.opacity < 0) star.opacity = 0;
+                if (star.opacity > 1) star.opacity = 1;
+            });
+            requestAnimationFrame(drawStars);
+        }
+
+        window.addEventListener('resize', initStars);
+        initStars();
+        drawStars();
+    </script>
+</body>
+
+</html>

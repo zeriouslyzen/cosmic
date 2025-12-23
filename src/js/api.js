@@ -7,13 +7,13 @@ export async function getUserProfile(userId) {
         const profile = JSON.parse(localStorage.getItem(`profile_${userId}`) || 'null');
         return profile || { id: userId, zodiac: null, email: null, phone: null, stardust_balance: 0 };
     }
-    
+
     const { data, error } = await supabaseClient
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .single();
-    
+
     if (error) {
         console.error('Error fetching user profile:', error);
         return null;
@@ -28,7 +28,7 @@ export async function createOrUpdateProfile(userId, profileData) {
         localStorage.setItem(`profile_${userId}`, JSON.stringify(updated));
         return updated;
     }
-    
+
     const { data, error } = await supabaseClient
         .from('profiles')
         .upsert({
@@ -40,7 +40,7 @@ export async function createOrUpdateProfile(userId, profileData) {
         })
         .select()
         .single();
-    
+
     if (error) {
         console.error('Error creating/updating profile:', error);
         return null;
@@ -53,7 +53,7 @@ export async function getProducts(filters = {}) {
     if (useLocalStorage) {
         // Try to get products from localStorage first
         let products = JSON.parse(localStorage.getItem('all_products') || '[]');
-        
+
         // Seed a default set for local fallback so the page is never empty
         if (products.length === 0) {
             products = [
@@ -102,7 +102,7 @@ export async function getProducts(filters = {}) {
             ];
             localStorage.setItem('all_products', JSON.stringify(products));
         }
-        
+
         // If no products in localStorage, try to get from DOM (for main page)
         if (products.length === 0 && typeof document !== 'undefined') {
             const productCards = document.querySelectorAll('.product-card-small, .product-card');
@@ -123,7 +123,7 @@ export async function getProducts(filters = {}) {
                 localStorage.setItem('all_products', JSON.stringify(products));
             }
         }
-        
+
         let filtered = products;
         if (filters.zodiac && filters.zodiac !== 'all') {
             filtered = filtered.filter(p => p.zodiac === filters.zodiac);
@@ -134,19 +134,19 @@ export async function getProducts(filters = {}) {
         }
         return filtered;
     }
-    
+
     let query = supabaseClient.from('products').select('*');
-    
+
     if (filters.zodiac && filters.zodiac !== 'all') {
         query = query.eq('zodiac', filters.zodiac);
     }
-    
+
     if (filters.search) {
         query = query.ilike('title', `%${filters.search}%`);
     }
-    
+
     const { data, error } = await query.order('created_at', { ascending: false });
-    
+
     if (error) {
         console.error('Error fetching products:', error);
         return [];
@@ -159,13 +159,13 @@ export async function getProductById(productId) {
         const products = await getProducts();
         return products.find(p => p.id === productId) || null;
     }
-    
+
     const { data, error } = await supabaseClient
         .from('products')
         .select('*')
         .eq('id', productId)
         .single();
-    
+
     if (error) {
         console.error('Error fetching product:', error);
         return null;
@@ -184,7 +184,7 @@ export async function getCartItems(userId) {
             products: products.find(p => p.id === item.product_id) || { title: 'Product', price: 0, image_url: '' }
         }));
     }
-    
+
     const { data, error } = await supabaseClient
         .from('cart_items')
         .select(`
@@ -193,7 +193,7 @@ export async function getCartItems(userId) {
         `)
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
-    
+
     if (error) {
         console.error('Error fetching cart items:', error);
         return [];
@@ -205,7 +205,7 @@ export async function addToCart(userId, productId, quantity = 1) {
     if (useLocalStorage) {
         const cart = JSON.parse(localStorage.getItem(`cart_${userId}`) || '[]');
         const existing = cart.find(item => item.product_id === productId);
-        
+
         if (existing) {
             existing.quantity += quantity;
         } else {
@@ -220,7 +220,7 @@ export async function addToCart(userId, productId, quantity = 1) {
         localStorage.setItem(`cart_${userId}`, JSON.stringify(cart));
         return existing || cart[cart.length - 1];
     }
-    
+
     // Check if item already in cart
     const { data: existing } = await supabaseClient
         .from('cart_items')
@@ -228,7 +228,7 @@ export async function addToCart(userId, productId, quantity = 1) {
         .eq('user_id', userId)
         .eq('product_id', productId)
         .single();
-    
+
     if (existing) {
         // Update quantity
         const { data, error } = await supabaseClient
@@ -237,7 +237,7 @@ export async function addToCart(userId, productId, quantity = 1) {
             .eq('id', existing.id)
             .select()
             .single();
-        
+
         if (error) {
             console.error('Error updating cart item:', error);
             return null;
@@ -254,7 +254,7 @@ export async function addToCart(userId, productId, quantity = 1) {
             })
             .select()
             .single();
-        
+
         if (error) {
             console.error('Error adding to cart:', error);
             return null;
@@ -267,7 +267,7 @@ export async function updateCartItemQuantity(cartItemId, quantity) {
     if (quantity <= 0) {
         return await removeFromCart(cartItemId);
     }
-    
+
     if (useLocalStorage) {
         const user = JSON.parse(localStorage.getItem('mock_user') || 'null');
         if (!user) return null;
@@ -280,14 +280,14 @@ export async function updateCartItemQuantity(cartItemId, quantity) {
         }
         return null;
     }
-    
+
     const { data, error } = await supabaseClient
         .from('cart_items')
         .update({ quantity })
         .eq('id', cartItemId)
         .select()
         .single();
-    
+
     if (error) {
         console.error('Error updating cart item quantity:', error);
         return null;
@@ -304,12 +304,12 @@ export async function removeFromCart(cartItemId) {
         localStorage.setItem(`cart_${user.id}`, JSON.stringify(filtered));
         return true;
     }
-    
+
     const { error } = await supabaseClient
         .from('cart_items')
         .delete()
         .eq('id', cartItemId);
-    
+
     if (error) {
         console.error('Error removing from cart:', error);
         return false;
@@ -322,12 +322,12 @@ export async function clearCart(userId) {
         localStorage.removeItem(`cart_${userId}`);
         return true;
     }
-    
+
     const { error } = await supabaseClient
         .from('cart_items')
         .delete()
         .eq('user_id', userId);
-    
+
     if (error) {
         console.error('Error clearing cart:', error);
         return false;
@@ -350,7 +350,7 @@ export async function createOrder(userId, orderData) {
         localStorage.setItem(`orders_${userId}`, JSON.stringify(orders));
         return order;
     }
-    
+
     const { data, error } = await supabaseClient
         .from('orders')
         .insert({
@@ -360,7 +360,7 @@ export async function createOrder(userId, orderData) {
         })
         .select()
         .single();
-    
+
     if (error) {
         console.error('Error creating order:', error);
         return null;
@@ -369,12 +369,12 @@ export async function createOrder(userId, orderData) {
 }
 
 export async function getOrders(userId) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('orders')
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
-    
+
     if (error) {
         console.error('Error fetching orders:', error);
         return [];
@@ -393,7 +393,7 @@ export async function addStardust(userId, amount, description) {
         const profile = await getUserProfile(userId);
         const newBalance = (profile.stardust_balance || 0) + amount;
         await createOrUpdateProfile(userId, { stardust_balance: newBalance });
-        
+
         // Store transaction
         const transactions = JSON.parse(localStorage.getItem(`stardust_${userId}`) || '[]');
         transactions.push({
@@ -407,14 +407,14 @@ export async function addStardust(userId, amount, description) {
         localStorage.setItem(`stardust_${userId}`, JSON.stringify(transactions));
         return newBalance;
     }
-    
+
     // Get current balance
     const currentBalance = await getStardustBalance(userId);
     const newBalance = currentBalance + amount;
-    
+
     // Update profile
     await createOrUpdateProfile(userId, { stardust_balance: newBalance });
-    
+
     // Create transaction record
     const { data, error } = await supabaseClient
         .from('stardust_transactions')
@@ -426,29 +426,29 @@ export async function addStardust(userId, amount, description) {
         })
         .select()
         .single();
-    
+
     if (error) {
         console.error('Error recording stardust transaction:', error);
     }
-    
+
     return newBalance;
 }
 
 export async function spendStardust(userId, amount, description) {
     // Get current balance
     const currentBalance = await getStardustBalance(userId);
-    
+
     if (currentBalance < amount) {
         throw new Error('Insufficient star dust balance');
     }
-    
+
     const newBalance = currentBalance - amount;
-    
+
     // Update profile
     await createOrUpdateProfile(userId, { stardust_balance: newBalance });
-    
+
     // Create transaction record
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('stardust_transactions')
         .insert({
             user_id: userId,
@@ -458,22 +458,22 @@ export async function spendStardust(userId, amount, description) {
         })
         .select()
         .single();
-    
+
     if (error) {
         console.error('Error recording stardust transaction:', error);
     }
-    
+
     return newBalance;
 }
 
 export async function getStardustTransactions(userId, limit = 50) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('stardust_transactions')
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .limit(limit);
-    
+
     if (error) {
         console.error('Error fetching stardust transactions:', error);
         return [];

@@ -1,22 +1,43 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Owner Dashboard - Cosmic Deals</title>
-    
-    <!-- Tailwind CSS -->
+
+    <!-- Google Analytics 4 (Placeholder) -->
+    <!-- Replace G-XXXXXXXXXX with your actual Measurement ID -->
+    <!--
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX');
+    </script>
+    -->
+    <script>
+        // Mock Analytics for Demo
+        window.gtag = function () { console.log('Analytics Event:', arguments); };
+        console.log('Analytics initialized (Mock Mode)');
+    </script>
+
+    <!-- Tailwind CSS (Dev Only) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Cropper.js for image editing -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.css">
     <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.js"></script>
-    
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500&display=swap"
+        rel="stylesheet">
+
     <style>
         body {
             background-color: #f5f5f5;
@@ -26,17 +47,20 @@
             -moz-osx-font-smoothing: grayscale;
             padding-bottom: 80px;
         }
+
         .font-heading {
             font-family: 'Playfair Display', serif;
         }
+
         .light-card {
             background: #ffffff;
             border: 1px solid #e5e5e5;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
-        
+
         /* Global overflow control */
-        html, body {
+        html,
+        body {
             overflow-x: hidden !important;
             overflow-y: auto;
             margin: 0;
@@ -44,18 +68,19 @@
             width: 100%;
             max-width: 100vw;
         }
-        
+
         /* Swipeable Container */
         .swipe-container {
             display: flex;
             overflow-x: hidden;
-            width: 400vw; /* 4 sections * 100vw */
+            width: 500vw;
+            /* 5 sections * 100vw */
             position: relative;
             transition: transform 0.3s ease;
             min-height: calc(100vh - 70px);
             will-change: transform;
         }
-        
+
         .swipe-section {
             min-width: 100vw;
             width: 100vw;
@@ -66,7 +91,7 @@
             display: block;
             box-sizing: border-box;
         }
-        
+
         /* Bottom Navigation */
         .bottom-nav {
             position: fixed;
@@ -83,7 +108,7 @@
             z-index: 100;
             height: 70px;
         }
-        
+
         .nav-item {
             display: flex;
             flex-direction: column;
@@ -100,33 +125,33 @@
             flex: 1;
             min-width: 0;
         }
-        
+
         .nav-item.active {
             color: #D2B48C;
         }
-        
+
         .nav-item svg {
             width: 20px;
             height: 20px;
             stroke-width: 1.5;
         }
-        
+
         .post-item-btn {
             color: #D2B48C;
             font-weight: 600;
         }
-        
+
         .post-item-btn.active {
             color: #D2B48C;
         }
-        
+
         /* Mobile Optimizations */
         @media (max-width: 768px) {
             .swipe-section {
                 padding: 1rem;
                 padding-bottom: 6rem;
             }
-            
+
             .modal-content {
                 width: 95vw !important;
                 max-width: 95vw !important;
@@ -135,43 +160,46 @@
                 overflow-y: auto;
                 -webkit-overflow-scrolling: touch;
             }
-            
+
             button {
                 min-height: 44px;
                 min-width: 44px;
                 touch-action: manipulation;
             }
-            
+
             #media-preview {
                 max-height: 200px !important;
             }
-            
-            input, select, textarea {
+
+            input,
+            select,
+            textarea {
                 font-size: 16px !important;
                 padding: 0.75rem !important;
             }
-            
+
             .zodiac-grid {
                 grid-template-columns: repeat(2, 1fr) !important;
                 max-height: 200px;
                 font-size: 0.875rem;
             }
-            
+
             #edit-controls {
                 grid-template-columns: repeat(2, 1fr) !important;
             }
-            
+
             #upload-area {
                 padding: 1.5rem !important;
             }
         }
-        
-        img, video {
+
+        img,
+        video {
             max-width: 100%;
             height: auto;
             object-fit: contain;
         }
-        
+
         .no-select {
             -webkit-user-select: none;
             -moz-user-select: none;
@@ -179,11 +207,11 @@
             user-select: none;
             -webkit-touch-callout: none;
         }
-        
+
         * {
             -webkit-overflow-scrolling: touch;
         }
-        
+
         /* Modern Slider Styles - Light Theme */
         .modern-slider {
             -webkit-appearance: none;
@@ -193,7 +221,7 @@
             outline: none;
             transition: background 0.3s ease;
         }
-        
+
         .modern-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
@@ -206,12 +234,12 @@
             transition: all 0.2s ease;
             border: 2px solid #ffffff;
         }
-        
+
         .modern-slider::-webkit-slider-thumb:hover {
             transform: scale(1.2);
             box-shadow: 0 4px 12px rgba(210, 180, 140, 0.6);
         }
-        
+
         .modern-slider::-moz-range-thumb {
             width: 20px;
             height: 20px;
@@ -222,30 +250,30 @@
             transition: all 0.2s ease;
             border: 2px solid #ffffff;
         }
-        
+
         .modern-slider::-moz-range-track {
             height: 8px;
             background: #e5e5e5;
             border-radius: 4px;
         }
-        
+
         .edit-tool-btn:active {
             transform: scale(0.95);
         }
-        
+
         .edit-tool-btn.active {
             border-color: #D2B48C;
             background: linear-gradient(to-br, rgba(210, 180, 140, 0.1), rgba(210, 180, 140, 0.05));
         }
-        
+
         .edit-tool-btn.active svg {
             color: #D2B48C;
         }
-        
+
         .edit-tool-btn.active span {
             color: #D2B48C;
         }
-        
+
         /* Filter button active state */
         .order-filter-btn.active,
         .message-filter-btn.active {
@@ -253,7 +281,7 @@
             color: #1a1a1a;
             border-color: #D2B48C;
         }
-        
+
         /* Status badges */
         .status-badge {
             display: inline-block;
@@ -262,280 +290,1108 @@
             font-size: 0.75rem;
             font-weight: 500;
         }
+
+        /* Wizard Styles */
+        .wizard-step {
+            display: none;
+        }
+
+        .wizard-step.active {
+            display: block;
+        }
+
+        .wizard-step-indicator {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e5e5e5;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+
+        .wizard-step-indicator.active {
+            background: #D2B48C;
+            color: #1a1a1a;
+        }
+
+        .wizard-step-indicator.completed {
+            background: #10b981;
+            color: white;
+        }
+
+        .wizard-progress-bar {
+            height: 4px;
+            background: #e5e5e5;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .wizard-progress-fill {
+            height: 100%;
+            background: #D2B48C;
+            transition: width 0.3s ease;
+        }
+
+        .post-item-widget {
+            background: linear-gradient(135deg, rgba(210, 180, 140, 0.1), rgba(210, 180, 140, 0.05));
+        }
     </style>
 </head>
+
 <body>
     <!-- Debug: Remove this after testing -->
-    <div id="debug-info" style="position: fixed; top: 10px; right: 10px; background: red; color: white; padding: 10px; z-index: 9999; display: none;">
+    <div id="debug-info"
+        style="position: fixed; top: 10px; right: 10px; background: red; color: white; padding: 10px; z-index: 9999; display: none;">
         Page loaded, JS initializing...
     </div>
-    
+
     <!-- Swipeable Content Container Wrapper -->
     <div style="overflow-x: hidden; width: 100vw; position: relative;">
         <div class="swipe-container" id="swipe-container">
-        <!-- Semi's Cloud Section -->
-        <section id="section-my-site" class="swipe-section">
-            <div class="max-w-4xl mx-auto">
-                <h2 class="font-heading text-2xl font-bold text-gray-900 mb-6">Semi's Cloud</h2>
-                <div class="light-card rounded-lg p-6 mb-4">
-                    <p class="text-gray-600 mb-4">View your live site</p>
-                    <button onclick="window.open('/', '_blank')" class="w-full bg-[#D2B48C] text-gray-900 font-semibold px-4 py-3 rounded-lg hover:bg-[#c4a67a] transition-colors">
-                        Cosmic Deals
-                    </button>
-                </div>
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div class="light-card rounded-lg p-4">
-                        <p class="text-gray-500 text-sm mb-1">Products</p>
-                        <p class="text-2xl font-bold text-gray-900" id="stat-products-quick">0</p>
-                    </div>
-                    <div class="light-card rounded-lg p-4">
-                        <p class="text-gray-500 text-sm mb-1">Orders</p>
-                        <p class="text-2xl font-bold text-gray-900" id="stat-orders-quick">0</p>
-                    </div>
-                </div>
-                <div class="grid grid-cols-3 gap-4">
-                    <div class="light-card rounded-lg p-4">
-                        <p class="text-gray-500 text-sm mb-1">Users Today</p>
-                        <p class="text-2xl font-bold text-gray-900" id="stat-users-today">0</p>
-                    </div>
-                    <div class="light-card rounded-lg p-4">
-                        <p class="text-gray-500 text-sm mb-1">Users This Year</p>
-                        <p class="text-2xl font-bold text-gray-900" id="stat-users-year">0</p>
-                    </div>
-                    <div class="light-card rounded-lg p-4">
-                        <p class="text-gray-500 text-sm mb-1">Avg Time Spent</p>
-                        <p class="text-2xl font-bold text-gray-900" id="stat-time-spent">0m</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+            <!-- Marketing & Growth Center Section -->
+            <section id="section-my-site" class="swipe-section">
+                <div class="max-w-4xl mx-auto px-2">
+                    <style>
+                        @keyframes fadeInUp {
+                            from {
+                                opacity: 0;
+                                transform: translateY(8px);
+                            }
 
-        <!-- Orders Section -->
-        <section id="section-orders" class="swipe-section">
-            <div class="max-w-4xl mx-auto">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="font-heading text-2xl font-bold text-gray-900">Orders</h2>
-                    <button id="export-orders-btn" class="text-sm text-gray-600 hover:text-gray-900 px-3 py-1.5 border border-gray-300 rounded-lg hover:border-gray-400 transition-colors">
-                        Export CSV
-                    </button>
-                </div>
-                
-                <!-- Sales Summary -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                    <div class="light-card rounded-lg p-4">
-                        <p class="text-gray-500 text-xs mb-1">Today's Sales</p>
-                        <p class="text-xl font-bold text-gray-900" id="sales-today">$0.00</p>
-                    </div>
-                    <div class="light-card rounded-lg p-4">
-                        <p class="text-gray-500 text-xs mb-1">This Week</p>
-                        <p class="text-xl font-bold text-gray-900" id="sales-week">$0.00</p>
-                    </div>
-                    <div class="light-card rounded-lg p-4">
-                        <p class="text-gray-500 text-xs mb-1">This Month</p>
-                        <p class="text-xl font-bold text-gray-900" id="sales-month">$0.00</p>
-                    </div>
-                    <div class="light-card rounded-lg p-4">
-                        <p class="text-gray-500 text-xs mb-1">All Time</p>
-                        <p class="text-xl font-bold text-gray-900" id="sales-total">$0.00</p>
-                    </div>
-                </div>
-                
-                <!-- Order Filters -->
-                <div class="flex gap-2 mb-4 overflow-x-auto pb-2">
-                    <button class="order-filter-btn active px-4 py-2 rounded-lg text-sm border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition-colors whitespace-nowrap" data-filter="all">
-                        All Orders
-                    </button>
-                    <button class="order-filter-btn px-4 py-2 rounded-lg text-sm border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap" data-filter="pending">
-                        Pending
-                    </button>
-                    <button class="order-filter-btn px-4 py-2 rounded-lg text-sm border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap" data-filter="processing">
-                        Processing
-                    </button>
-                    <button class="order-filter-btn px-4 py-2 rounded-lg text-sm border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap" data-filter="shipped">
-                        Shipped
-                    </button>
-                    <button class="order-filter-btn px-4 py-2 rounded-lg text-sm border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap" data-filter="delivered">
-                        Delivered
-                    </button>
-                </div>
-                
-                <!-- Orders List -->
-                <div id="orders-list" class="space-y-3">
-                    <!-- Orders will be loaded here -->
-                </div>
-            </div>
-        </section>
+                            to {
+                                opacity: 1;
+                                transform: translateY(0);
+                            }
+                        }
 
-        <!-- Messages Section -->
-        <section id="section-messages" class="swipe-section">
-            <div class="max-w-4xl mx-auto">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="font-heading text-2xl font-bold text-gray-900">Messages</h2>
-                    <button id="mark-all-read-btn" class="text-sm text-gray-600 hover:text-gray-900 px-3 py-1.5 border border-gray-300 rounded-lg hover:border-gray-400 transition-colors">
-                        Mark All Read
-                    </button>
-                </div>
-                
-                <!-- Message Filters -->
-                <div class="flex gap-2 mb-4 overflow-x-auto pb-2">
-                    <button class="message-filter-btn active px-4 py-2 rounded-lg text-sm border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition-colors whitespace-nowrap" data-filter="all">
-                        All
-                    </button>
-                    <button class="message-filter-btn px-4 py-2 rounded-lg text-sm border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap" data-filter="unread">
-                        Unread
-                    </button>
-                    <button class="message-filter-btn px-4 py-2 rounded-lg text-sm border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap" data-filter="order">
-                        Order Related
-                    </button>
-                    <button class="message-filter-btn px-4 py-2 rounded-lg text-sm border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap" data-filter="general">
-                        General
-                    </button>
-                </div>
-                
-                <div id="messages-list" class="space-y-3">
-                    <div class="light-card rounded-lg p-6 text-center">
-                        <p class="text-gray-500">No messages yet</p>
-                        <p class="text-sm text-gray-400 mt-2">Customer inquiries and order messages will appear here</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+                        @keyframes pulse {
 
-        <!-- Settings Section -->
-        <section id="section-settings" class="swipe-section">
-            <div class="max-w-4xl mx-auto">
-                <h2 class="font-heading text-2xl font-bold text-gray-900 mb-6">Settings</h2>
-                <div class="space-y-4">
-                    <!-- Star Dust Settings -->
-                    <div class="light-card rounded-lg p-4 space-y-3">
-                        <h3 class="font-heading text-sm font-bold text-gray-900 mb-3">Star Dust System</h3>
-                        <div>
-                            <label class="block text-gray-600 text-sm mb-1">Star Dust Rate (per $1)</label>
-                            <input type="number" id="setting-stardust-rate" value="1" class="w-full bg-white border border-gray-300 rounded px-3 py-1.5 text-gray-900 text-sm focus:outline-none focus:border-[#D2B48C]">
-                        </div>
-                        <div>
-                            <label class="block text-gray-600 text-sm mb-1">Daily Check-in Bonus</label>
-                            <input type="number" id="setting-checkin-bonus" value="5" class="w-full bg-white border border-gray-300 rounded px-3 py-1.5 text-gray-900 text-sm focus:outline-none focus:border-[#D2B48C]">
+                            0%,
+                            100% {
+                                opacity: 1;
+                            }
+
+                            50% {
+                                opacity: 0.7;
+                            }
+                        }
+
+                        .animate-fadeIn {
+                            animation: fadeInUp 0.3s ease-out;
+                        }
+
+                        .animate-pulse-slow {
+                            animation: pulse 2s infinite;
+                        }
+
+                        .widget {
+                            background: white;
+                            border-radius: 10px;
+                            border: 1px solid #e5e5e5;
+                        }
+
+                        .widget:hover {
+                            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+                        }
+
+                        .metric-pill {
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 4px;
+                            padding: 4px 10px;
+                            border-radius: 20px;
+                            font-size: 11px;
+                            font-weight: 600;
+                        }
+                    </style>
+
+                    <!-- Header with Live Status -->
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="font-heading text-lg font-bold text-gray-900">Dashboard</h2>
+                        <div class="flex items-center gap-2">
+                            <span class="animate-pulse-slow w-2 h-2 bg-green-500 rounded-full"></span>
+                            <span class="text-[10px] text-gray-500 uppercase tracking-wider">Live</span>
                         </div>
                     </div>
-                    
-                    <!-- Whatnot & Live Streaming -->
-                    <div class="light-card rounded-lg p-4 space-y-3">
-                        <h3 class="font-heading text-sm font-bold text-gray-900 mb-3">Whatnot & Live Streaming</h3>
-                        <div class="flex items-center justify-between pb-3 border-b border-gray-200">
+
+                    <!-- Compact Metrics Bar -->
+                    <div class="widget p-3 mb-3 animate-fadeIn flex flex-wrap items-center gap-2">
+                        <div class="metric-pill bg-blue-50 text-blue-700">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            <span id="metric-visitors-today">47</span> visitors
+                        </div>
+                        <div class="metric-pill bg-purple-50 text-purple-700">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                            </svg>
+                            <span id="metric-conversion-rate">3.2%</span> conv
+                        </div>
+                        <div class="metric-pill bg-green-50 text-green-700">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                            </svg>
+                            <span id="metric-popular-product">Crystal Set</span>
+                        </div>
+                        <div class="metric-pill bg-amber-50 text-amber-700">
+                            <span class="font-bold" id="metric-top-zodiac">Leo</span> top sign
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity (RIGHT UNDER METRICS) -->
+                    <div class="widget p-3 mb-3 animate-fadeIn">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Recent
+                                Activity</span>
+                            <span class="flex items-center gap-1 text-[10px] text-gray-400">
+                                <span class="animate-pulse-slow w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                                Live
+                            </span>
+                        </div>
+                        <div id="recent-activity-feed" class="space-y-1 max-h-24 overflow-y-auto text-[11px]">
+                            <div class="text-center py-4 text-gray-400 text-[10px]">Loading...</div>
+                        </div>
+                    </div>
+
+                    <!-- Schedule & Calendar -->
+                    <div class="widget p-3 mb-3 animate-fadeIn">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold text-gray-700 flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                This Week
+                            </span>
+                            <button class="text-[10px] text-[#D2B48C] hover:underline">+ Schedule</button>
+                        </div>
+                        <div id="content-calendar-week" class="grid grid-cols-7 gap-1"></div>
+                    </div>
+
+                    <!-- 2-Column: Platforms + Quick Actions -->
+                    <div class="grid grid-cols-2 gap-2 mb-3">
+                        <!-- Social Platforms -->
+                        <div class="widget p-3 animate-fadeIn">
+                            <span
+                                class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2 block">Platforms</span>
+                            <div class="grid grid-cols-5 gap-1">
+                                <button onclick="window.open('/', '_blank')"
+                                    class="p-2 bg-[#D2B48C] rounded-lg hover:scale-105 transition-transform flex items-center justify-center"
+                                    title="Cosmic Deals">
+                                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                                    </svg>
+                                </button>
+                                <button id="social-whatnot-btn"
+                                    class="p-2 bg-purple-600 rounded-lg hover:scale-105 transition-transform flex items-center justify-center"
+                                    title="Whatnot">
+                                    <span class="text-white text-xs font-black">W</span>
+                                </button>
+                                <button id="social-facebook-btn"
+                                    class="p-2 bg-[#1877F2] rounded-lg hover:scale-105 transition-transform flex items-center justify-center"
+                                    title="Facebook">
+                                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                        <path
+                                            d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                                    </svg>
+                                </button>
+                                <button id="social-instagram-btn"
+                                    class="p-2 bg-gradient-to-tr from-[#833AB4] via-[#FD1D1D] to-[#F77737] rounded-lg hover:scale-105 transition-transform flex items-center justify-center"
+                                    title="Instagram">
+                                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                        <path
+                                            d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                                    </svg>
+                                </button>
+                                <button id="social-tiktok-btn"
+                                    class="p-2 bg-black rounded-lg hover:scale-105 transition-transform flex items-center justify-center"
+                                    title="TikTok">
+                                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                        <path
+                                            d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0011.14-4.02v-6.95a8.16 8.16 0 004.65 1.46v-3.45a4.84 4.84 0 01-1.2-.45z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="widget p-3 animate-fadeIn">
+                            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2 block">Quick
+                                Actions</span>
+                            <div class="grid grid-cols-2 gap-1">
+                                <button id="post-announcement-btn"
+                                    class="p-2 bg-green-50 text-green-700 rounded-lg text-[10px] font-semibold hover:bg-green-100 transition-colors flex items-center justify-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+                                    </svg>
+                                    Announce
+                                </button>
+                                <button
+                                    class="p-2 bg-indigo-50 text-indigo-700 rounded-lg text-[10px] font-semibold hover:bg-indigo-100 transition-colors flex items-center justify-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                                    </svg>
+                                    Promo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hashtag Tags (Copy Sets for Social Media) -->
+                    <div class="widget p-3 mb-3 animate-fadeIn">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Hashtag
+                                Sets</span>
+                            <span class="text-[9px] text-gray-400">Click to copy</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <button
+                                class="hashtag-set-btn flex-1 p-2 bg-purple-50 rounded text-[10px] hover:bg-purple-100 transition-colors text-center font-medium text-purple-700"
+                                data-tags="#crystals #healing #spiritual #energy #metaphysical">
+                                Crystals
+                            </button>
+                            <button
+                                class="hashtag-set-btn flex-1 p-2 bg-amber-50 rounded text-[10px] hover:bg-amber-100 transition-colors text-center font-medium text-amber-700"
+                                data-tags="#zodiac #astrology #horoscope #starsign #cosmicenergy">
+                                Zodiac
+                            </button>
+                            <button
+                                class="hashtag-set-btn flex-1 p-2 bg-green-50 rounded text-[10px] hover:bg-green-100 transition-colors text-center font-medium text-green-700"
+                                data-tags="#deals #sale #discount #shopsmall #smallbusiness">
+                                Deals
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Personalization Toggle (Minimal) -->
+                    <div class="widget p-3 mt-3 flex items-center justify-between animate-fadeIn">
+                        <div>
+                            <span class="text-xs font-semibold text-gray-800">Zodiac Recommendations</span>
+                            <p class="text-[10px] text-gray-400">Personalized products by birthday</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="personalization-zodiac-toggle" class="sr-only peer" checked>
+                            <div
+                                class="w-9 h-5 bg-gray-200 peer-focus:ring-2 peer-focus:ring-indigo-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-200 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-500">
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- Orders Section -->
+            <section id="section-orders" class="swipe-section">
+                <div class="max-w-4xl mx-auto">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="font-heading text-2xl font-bold text-gray-900">Orders</h2>
+                        <button id="export-orders-btn"
+                            class="text-sm text-gray-600 hover:text-gray-900 px-3 py-1.5 border border-gray-300 rounded-lg hover:border-gray-400 transition-colors">
+                            Export CSV
+                        </button>
+                    </div>
+
+                    <!-- Sales Summary -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div class="light-card rounded-lg p-4">
+                            <p class="text-gray-500 text-xs mb-1">Today's Sales</p>
+                            <p class="text-xl font-bold text-gray-900" id="sales-today">$0.00</p>
+                        </div>
+                        <div class="light-card rounded-lg p-4">
+                            <p class="text-gray-500 text-xs mb-1">This Week</p>
+                            <p class="text-xl font-bold text-gray-900" id="sales-week">$0.00</p>
+                        </div>
+                        <div class="light-card rounded-lg p-4">
+                            <p class="text-gray-500 text-xs mb-1">This Month</p>
+                            <p class="text-xl font-bold text-gray-900" id="sales-month">$0.00</p>
+                        </div>
+                        <div class="light-card rounded-lg p-4">
+                            <p class="text-gray-500 text-xs mb-1">All Time</p>
+                            <p class="text-xl font-bold text-gray-900" id="sales-total">$0.00</p>
+                        </div>
+                    </div>
+
+                    <!-- Order Filters -->
+                    <div class="flex gap-2 mb-4 overflow-x-auto pb-2">
+                        <button
+                            class="order-filter-btn active px-4 py-2 rounded-lg text-sm border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition-colors whitespace-nowrap"
+                            data-filter="all">
+                            All Orders
+                        </button>
+                        <button
+                            class="order-filter-btn px-4 py-2 rounded-lg text-sm border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap"
+                            data-filter="pending">
+                            Pending
+                        </button>
+                        <button
+                            class="order-filter-btn px-4 py-2 rounded-lg text-sm border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap"
+                            data-filter="processing">
+                            Processing
+                        </button>
+                        <button
+                            class="order-filter-btn px-4 py-2 rounded-lg text-sm border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap"
+                            data-filter="shipped">
+                            Shipped
+                        </button>
+                        <button
+                            class="order-filter-btn px-4 py-2 rounded-lg text-sm border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap"
+                            data-filter="delivered">
+                            Delivered
+                        </button>
+                    </div>
+
+                    <!-- Orders List -->
+                    <div id="orders-list" class="space-y-3">
+                        <!-- Orders will be loaded here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Post Item Wizard Section -->
+            <section id="section-post-item" class="swipe-section">
+                <div class="max-w-4xl mx-auto">
+                    <!-- Top Widget -->
+                    <div class="post-item-widget light-card rounded-lg p-4 mb-6">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
                             <div>
-                                <label class="text-gray-600 text-sm font-medium">Go Live on Whatnot</label>
-                                <p class="text-xs text-gray-500 mt-0.5">Shows red notification on main site</p>
+                                <h2 class="font-heading text-2xl font-bold text-gray-900 mb-2">Post Item</h2>
+                                <div class="flex gap-4 text-sm">
+                                    <div>
+                                        <span class="text-gray-500">Total Products:</span>
+                                        <span class="font-bold text-gray-900 ml-1" id="widget-total-products">0</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-500">Drafts:</span>
+                                        <span class="font-bold text-gray-900 ml-1" id="widget-drafts">0</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-500">Low Stock:</span>
+                                        <span class="font-bold text-red-600 ml-1" id="widget-low-stock">0</span>
+                                    </div>
+                                </div>
                             </div>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="setting-live-status" class="sr-only peer">
-                                <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#D2B48C] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
-                            </label>
-                        </div>
-                        <div>
-                            <label class="block text-gray-600 text-sm mb-1">Whatnot Username</label>
-                            <input type="text" id="setting-whatnot-username" placeholder="@yourusername" class="w-full bg-white border border-gray-300 rounded px-3 py-1.5 text-gray-900 text-sm focus:outline-none focus:border-[#D2B48C]">
-                        </div>
-                        <div>
-                            <label class="block text-gray-600 text-sm mb-1">Live Stream Schedule</label>
-                            <textarea id="setting-live-schedule" rows="4" placeholder="e.g., Mon-Fri 7-9 PM EST, Pop-up shows announced 24hrs in advance" class="w-full bg-white border border-gray-300 rounded px-3 py-1.5 text-gray-900 text-sm focus:outline-none focus:border-[#D2B48C]"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-gray-600 text-sm mb-1">Whatnot Profile URL</label>
-                            <input type="url" id="setting-whatnot-url" placeholder="https://www.whatnot.com/user/..." class="w-full bg-white border border-gray-300 rounded px-3 py-1.5 text-gray-900 text-sm focus:outline-none focus:border-[#D2B48C]">
-                        </div>
-                    </div>
-                    
-                    <!-- Order Processing Settings -->
-                    <div class="light-card rounded-lg p-4 space-y-3">
-                        <h3 class="font-heading text-sm font-bold text-gray-900 mb-3">Order Processing</h3>
-                        <div>
-                            <label class="block text-gray-600 text-sm mb-1">Default Shipping Method</label>
-                            <select id="setting-default-shipping" class="w-full bg-white border border-gray-300 rounded px-3 py-1.5 text-gray-900 text-sm focus:outline-none focus:border-[#D2B48C]">
-                                <option value="standard">Standard Shipping</option>
-                                <option value="express">Express Shipping</option>
-                                <option value="priority">Priority Shipping</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-gray-600 text-sm mb-1">Processing Time (days)</label>
-                            <input type="number" id="setting-processing-days" value="1" min="0" class="w-full bg-white border border-gray-300 rounded px-3 py-1.5 text-gray-900 text-sm focus:outline-none focus:border-[#D2B48C]">
-                        </div>
-                        <div>
-                            <label class="block text-gray-600 text-sm mb-1">Auto-Update Status</label>
-                            <div class="flex items-center justify-between">
-                                <span class="text-gray-600 text-sm">Automatically mark as processing after payment</span>
-                                <input type="checkbox" id="setting-auto-process" class="w-4 h-4 rounded border-gray-300 text-[#D2B48C] focus:ring-[#D2B48C]">
+                            <div class="flex flex-wrap gap-2">
+                                <button id="import-temu-btn"
+                                    class="px-3 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors">
+                                    Import from Temu
+                                </button>
+                                <button id="import-aliexpress-btn"
+                                    class="px-3 py-2 bg-orange-500 text-white text-sm rounded-lg hover:bg-orange-600 transition-colors">
+                                    Import from AliExpress
+                                </button>
+                                <button id="bulk-upload-widget-btn"
+                                    class="px-3 py-2 bg-gray-200 text-gray-900 text-sm rounded-lg hover:bg-gray-300 transition-colors">
+                                    Bulk Upload
+                                </button>
+                                <button id="use-template-btn"
+                                    class="px-3 py-2 bg-gray-200 text-gray-900 text-sm rounded-lg hover:bg-gray-300 transition-colors">
+                                    Use Template
+                                </button>
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Customer Communication -->
-                    <div class="light-card rounded-lg p-4 space-y-3">
-                        <h3 class="font-heading text-sm font-bold text-gray-900 mb-3">Customer Communication</h3>
-                        <div>
-                            <label class="block text-gray-600 text-sm mb-1">Order Confirmation Email Template</label>
-                            <textarea id="setting-confirmation-email" rows="3" placeholder="Thank you for your order!..." class="w-full bg-white border border-gray-300 rounded px-3 py-1.5 text-gray-900 text-sm focus:outline-none focus:border-[#D2B48C]"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-gray-600 text-sm mb-1">Shipping Notification Email Template</label>
-                            <textarea id="setting-shipping-email" rows="3" placeholder="Your order has shipped!..." class="w-full bg-white border border-gray-300 rounded px-3 py-1.5 text-gray-900 text-sm focus:outline-none focus:border-[#D2B48C]"></textarea>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <label class="text-gray-600 text-sm">Send Order Updates via Email</label>
-                            <input type="checkbox" id="setting-send-order-updates" class="w-4 h-4 rounded border-gray-300 text-[#D2B48C] focus:ring-[#D2B48C]">
-                        </div>
-                    </div>
-                    
-                    <!-- Payment Settings -->
-                    <div class="light-card rounded-lg p-4 space-y-3">
-                        <h3 class="font-heading text-sm font-bold text-gray-900 mb-3">Payment Processing</h3>
-                        <div>
-                            <label class="block text-gray-600 text-sm mb-1">Accepted Payment Methods</label>
-                            <div class="space-y-2">
-                                <label class="flex items-center space-x-2">
-                                    <input type="checkbox" id="setting-payment-stripe" class="w-4 h-4 rounded border-gray-300 text-[#D2B48C] focus:ring-[#D2B48C]">
-                                    <span class="text-gray-600 text-sm">Credit/Debit Cards (Stripe)</span>
-                                </label>
-                                <label class="flex items-center space-x-2">
-                                    <input type="checkbox" id="setting-payment-venmo" class="w-4 h-4 rounded border-gray-300 text-[#D2B48C] focus:ring-[#D2B48C]">
-                                    <span class="text-gray-600 text-sm">Venmo</span>
-                                </label>
-                                <label class="flex items-center space-x-2">
-                                    <input type="checkbox" id="setting-payment-crypto" class="w-4 h-4 rounded border-gray-300 text-[#D2B48C] focus:ring-[#D2B48C]">
-                                    <span class="text-gray-600 text-sm">Cryptocurrency</span>
-                                </label>
+
+                    <!-- Wizard Container -->
+                    <div class="wizard-container light-card rounded-lg p-6">
+                        <!-- Progress Indicator -->
+                        <div class="wizard-progress mb-6">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <div class="wizard-step-indicator active" data-step="1">1</div>
+                                        <span class="text-sm font-medium text-gray-900">Stock</span>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <div class="wizard-step-indicator" data-step="2">2</div>
+                                        <span class="text-sm font-medium text-gray-600">Product</span>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <div class="wizard-step-indicator" data-step="3">3</div>
+                                        <span class="text-sm font-medium text-gray-600">Edit</span>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <div class="wizard-step-indicator" data-step="4">4</div>
+                                        <span class="text-sm font-medium text-gray-600">Serial</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="wizard-progress-bar">
+                                <div class="wizard-progress-fill" style="width: 25%"></div>
                             </div>
                         </div>
-                        <div>
-                            <label class="block text-gray-600 text-sm mb-1">Auto-Refund Policy (days)</label>
-                            <input type="number" id="setting-refund-days" value="30" min="0" class="w-full bg-white border border-gray-300 rounded px-3 py-1.5 text-gray-900 text-sm focus:outline-none focus:border-[#D2B48C]">
+
+                        <!-- Step 1: Stock Management -->
+                        <div class="wizard-step active" data-step="stock" id="wizard-step-stock">
+                            <h3 class="font-heading text-xl font-bold text-gray-900 mb-4">Stock Management</h3>
+                            <div class="space-y-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="wizard-stock-quantity"
+                                            class="block text-gray-600 text-sm mb-1">Stock
+                                            Quantity</label>
+                                        <input type="number" id="wizard-stock-quantity" min="0" value="0"
+                                            class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-[#D2B48C]">
+                                    </div>
+                                    <div>
+                                        <label for="wizard-stock-location"
+                                            class="block text-gray-600 text-sm mb-1">Stock
+                                            Location</label>
+                                        <input type="text" id="wizard-stock-location"
+                                            placeholder="Warehouse, Shelf, etc."
+                                            class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-[#D2B48C]">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="wizard-low-stock-threshold" class="block text-gray-600 text-sm mb-1">Low
+                                        Stock Threshold</label>
+                                    <input type="number" id="wizard-low-stock-threshold" min="0" value="10"
+                                        class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-[#D2B48C]">
+                                    <p class="text-xs text-gray-500 mt-1">Alert when stock falls below this number</p>
+                                </div>
+                                <div class="border-t border-gray-200 pt-4">
+                                    <div class="flex justify-between items-center mb-3">
+                                        <h4 class="text-sm font-semibold text-gray-900">Quick Actions</h4>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button type="button" id="add-stock-btn"
+                                            class="px-3 py-2 bg-green-500 text-white text-sm rounded-lg hover:bg-green-600 transition-colors">
+                                            + Add Stock
+                                        </button>
+                                        <button type="button" id="remove-stock-btn"
+                                            class="px-3 py-2 bg-red-500 text-white text-sm rounded-lg hover:bg-red-600 transition-colors">
+                                            - Remove Stock
+                                        </button>
+                                        <button type="button" id="transfer-stock-btn"
+                                            class="px-3 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors">
+                                            Transfer Stock
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="border-t border-gray-200 pt-4">
+                                    <h4 class="text-sm font-semibold text-gray-900 mb-2">Stock History</h4>
+                                    <div id="stock-history-list" class="space-y-2 max-h-40 overflow-y-auto">
+                                        <p class="text-sm text-gray-500 text-center py-4">No stock history yet</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Product Details -->
+                        <div class="wizard-step hidden" data-step="product" id="wizard-step-product">
+                            <h3 class="font-heading text-xl font-bold text-gray-900 mb-4">Product Details</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="wizard-product-title" class="block text-gray-600 text-sm mb-1">Title
+                                        *</label>
+                                    <input type="text" id="wizard-product-title" required
+                                        class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-[#D2B48C]">
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="wizard-product-price" class="block text-gray-600 text-sm mb-1">Price
+                                            (USD) *</label>
+                                        <input type="number" id="wizard-product-price" step="0.01" min="0" required
+                                            class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-[#D2B48C]">
+                                    </div>
+                                    <div>
+                                        <label for="wizard-product-category"
+                                            class="block text-gray-600 text-sm mb-1">Category</label>
+                                        <input type="text" id="wizard-product-category"
+                                            placeholder="Art, Silver, Thrift, etc."
+                                            class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-[#D2B48C]">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="wizard-product-zodiac" class="block text-gray-600 text-sm mb-1">Zodiac
+                                        Signs</label>
+                                    <div
+                                        class="zodiac-grid grid grid-cols-3 gap-2 mt-2 max-h-40 overflow-y-auto p-2 bg-gray-50 border border-gray-300 rounded-lg">
+                                        <label
+                                            class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
+                                            <input type="checkbox" value="all" class="wizard-zodiac-checkbox"
+                                                data-zodiac="all">
+                                            <span class="text-gray-900 text-xs">All</span>
+                                        </label>
+                                        <label
+                                            class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
+                                            <input type="checkbox" value="aries" class="wizard-zodiac-checkbox"
+                                                data-zodiac="aries">
+                                            <span class="text-gray-900 text-xs">Aries</span>
+                                        </label>
+                                        <label
+                                            class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
+                                            <input type="checkbox" value="taurus" class="wizard-zodiac-checkbox"
+                                                data-zodiac="taurus">
+                                            <span class="text-gray-900 text-xs">Taurus</span>
+                                        </label>
+                                        <label
+                                            class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
+                                            <input type="checkbox" value="gemini" class="wizard-zodiac-checkbox"
+                                                data-zodiac="gemini">
+                                            <span class="text-gray-900 text-xs">Gemini</span>
+                                        </label>
+                                        <label
+                                            class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
+                                            <input type="checkbox" value="cancer" class="wizard-zodiac-checkbox"
+                                                data-zodiac="cancer">
+                                            <span class="text-gray-900 text-xs">Cancer</span>
+                                        </label>
+                                        <label
+                                            class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
+                                            <input type="checkbox" value="leo" class="wizard-zodiac-checkbox"
+                                                data-zodiac="leo">
+                                            <span class="text-gray-900 text-xs">Leo</span>
+                                        </label>
+                                        <label
+                                            class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
+                                            <input type="checkbox" value="virgo" class="wizard-zodiac-checkbox"
+                                                data-zodiac="virgo">
+                                            <span class="text-gray-900 text-xs">Virgo</span>
+                                        </label>
+                                        <label
+                                            class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
+                                            <input type="checkbox" value="libra" class="wizard-zodiac-checkbox"
+                                                data-zodiac="libra">
+                                            <span class="text-gray-900 text-xs">Libra</span>
+                                        </label>
+                                        <label
+                                            class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
+                                            <input type="checkbox" value="scorpio" class="wizard-zodiac-checkbox"
+                                                data-zodiac="scorpio">
+                                            <span class="text-gray-900 text-xs">Scorpio</span>
+                                        </label>
+                                        <label
+                                            class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
+                                            <input type="checkbox" value="sagittarius" class="wizard-zodiac-checkbox"
+                                                data-zodiac="sagittarius">
+                                            <span class="text-gray-900 text-xs">Sagittarius</span>
+                                        </label>
+                                        <label
+                                            class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
+                                            <input type="checkbox" value="capricorn" class="wizard-zodiac-checkbox"
+                                                data-zodiac="capricorn">
+                                            <span class="text-gray-900 text-xs">Capricorn</span>
+                                        </label>
+                                        <label
+                                            class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
+                                            <input type="checkbox" value="aquarius" class="wizard-zodiac-checkbox"
+                                                data-zodiac="aquarius">
+                                            <span class="text-gray-900 text-xs">Aquarius</span>
+                                        </label>
+                                        <label
+                                            class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
+                                            <input type="checkbox" value="pisces" class="wizard-zodiac-checkbox"
+                                                data-zodiac="pisces">
+                                            <span class="text-gray-900 text-xs">Pisces</span>
+                                        </label>
+                                    </div>
+                                    <input type="hidden" id="wizard-product-zodiac" value="">
+                                </div>
+                                <div>
+                                    <label for="wizard-product-description"
+                                        class="block text-gray-600 text-sm mb-1">Description</label>
+                                    <textarea id="wizard-product-description" rows="3"
+                                        class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-[#D2B48C]"
+                                        placeholder="Short description for this product"></textarea>
+                                </div>
+                                <div class="border-t border-gray-200 pt-4">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div>
+                                            <label class="text-gray-600 text-sm font-medium">Dropshipping</label>
+                                            <p class="text-xs text-gray-500">Enable if this is a dropshipped product</p>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" id="wizard-is-dropshipped" class="sr-only peer">
+                                            <div
+                                                class="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#D2B48C] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D2B48C]">
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <div id="wizard-dropshipping-fields" class="hidden space-y-3 mt-3">
+                                        <div>
+                                            <label for="wizard-dropship-source"
+                                                class="block text-gray-600 text-sm mb-1">Dropshipping Platform</label>
+                                            <select id="wizard-dropship-source"
+                                                class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-[#D2B48C]">
+                                                <option value="">Select Platform</option>
+                                                <option value="temu">Temu</option>
+                                                <option value="aliexpress">AliExpress</option>
+                                                <option value="other">Other</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label for="wizard-dropship-product-id"
+                                                class="block text-gray-600 text-sm mb-1">Platform Product ID</label>
+                                            <input type="text" id="wizard-dropship-product-id"
+                                                placeholder="Product ID from platform"
+                                                class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-[#D2B48C]">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Media Editing -->
+                        <div class="wizard-step hidden" data-step="edit" id="wizard-step-edit">
+                            <h3 class="font-heading text-xl font-bold text-gray-900 mb-4">Media Editing</h3>
+                            <div class="space-y-4">
+                                <!-- Reuse existing media upload UI from modal -->
+                                <div>
+                                    <label class="block text-gray-600 text-sm mb-1">Product Image/Video</label>
+                                    <div class="space-y-3">
+                                        <div class="mb-3">
+                                            <button type="button" id="wizard-open-capcut-btn"
+                                                class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold px-4 py-3 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                                </svg>
+                                                <span>Edit in CapCut</span>
+                                            </button>
+                                            <p class="text-xs text-gray-500 mt-1 text-center">Edit your media in CapCut,
+                                                then upload the finished file below</p>
+                                        </div>
+                                        <div id="wizard-upload-area"
+                                            class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-[#D2B48C] transition-colors">
+                                            <input type="file" id="wizard-product-file" accept="image/*,video/*"
+                                                class="hidden" multiple>
+                                            <div id="wizard-upload-placeholder" class="py-4">
+                                                <svg class="mx-auto h-16 w-16 text-gray-400" stroke="currentColor"
+                                                    fill="none" viewBox="0 0 48 48">
+                                                    <path
+                                                        d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                                                        stroke-width="2" stroke-linecap="round"
+                                                        stroke-linejoin="round" />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div id="wizard-preview-container" class="hidden">
+                                            <div class="grid grid-cols-2 md:grid-cols-3 gap-4"
+                                                id="wizard-media-gallery">
+                                                <!-- Media previews will be added here -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 4: Serial/SKU -->
+                        <div class="wizard-step hidden" data-step="serial" id="wizard-step-serial">
+                            <h3 class="font-heading text-xl font-bold text-gray-900 mb-4">Serial & SKU</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="wizard-sku" class="block text-gray-600 text-sm mb-1">SKU / Serial
+                                        Number</label>
+                                    <div class="flex gap-2">
+                                        <input type="text" id="wizard-sku"
+                                            placeholder="Auto-generated or enter manually"
+                                            class="flex-1 bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-[#D2B48C]">
+                                        <button type="button" id="generate-sku-btn"
+                                            class="px-4 py-2 bg-gray-200 text-gray-900 text-sm rounded-lg hover:bg-gray-300 transition-colors">
+                                            Generate
+                                        </button>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">Unique identifier for inventory tracking</p>
+                                </div>
+                                <div id="wizard-dropship-tracking" class="hidden">
+                                    <label for="wizard-dropship-tracking-id"
+                                        class="block text-gray-600 text-sm mb-1">Dropshipping Tracking ID</label>
+                                    <input type="text" id="wizard-dropship-tracking-id"
+                                        placeholder="Tracking number from platform"
+                                        class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-[#D2B48C]">
+                                </div>
+                                <div class="border-t border-gray-200 pt-4">
+                                    <h4 class="text-sm font-semibold text-gray-900 mb-2">Product Summary</h4>
+                                    <div id="wizard-product-summary"
+                                        class="bg-gray-50 rounded-lg p-4 space-y-2 text-sm">
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-600">Title:</span>
+                                            <span class="font-medium text-gray-900" id="summary-title">-</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-600">Price:</span>
+                                            <span class="font-medium text-gray-900" id="summary-price">-</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-600">Stock:</span>
+                                            <span class="font-medium text-gray-900" id="summary-stock">-</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-600">SKU:</span>
+                                            <span class="font-medium text-gray-900" id="summary-sku">-</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Wizard Navigation -->
+                        <div class="wizard-nav flex justify-between items-center mt-6 pt-6 border-t border-gray-200">
+                            <div>
+                                <button type="button" id="wizard-save-draft-btn"
+                                    class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                                    Save Draft
+                                </button>
+                            </div>
+                            <div class="flex gap-3">
+                                <button type="button" id="wizard-prev-btn"
+                                    class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors hidden">
+                                    Previous
+                                </button>
+                                <button type="button" id="wizard-next-btn"
+                                    class="px-4 py-2 bg-[#D2B48C] text-gray-900 font-semibold rounded-lg hover:bg-[#c4a67a] transition-colors">
+                                    Next
+                                </button>
+                                <button type="button" id="wizard-publish-btn"
+                                    class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors hidden">
+                                    Publish Product
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    
-                    <!-- Notifications -->
-                    <div class="light-card rounded-lg p-4 space-y-3">
-                        <h3 class="font-heading text-sm font-bold text-gray-900 mb-3">Notifications</h3>
-                        <div class="flex items-center justify-between">
-                            <label class="text-gray-600 text-sm">Email Notifications</label>
-                            <input type="checkbox" id="setting-email-notifications" class="w-4 h-4 rounded border-gray-300 text-[#D2B48C] focus:ring-[#D2B48C]">
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <label class="text-gray-600 text-sm">SMS Notifications</label>
-                            <input type="checkbox" id="setting-sms-notifications" class="w-4 h-4 rounded border-gray-300 text-[#D2B48C] focus:ring-[#D2B48C]">
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <label class="text-gray-600 text-sm">New Order Alerts</label>
-                            <input type="checkbox" id="setting-new-order-alerts" class="w-4 h-4 rounded border-gray-300 text-[#D2B48C] focus:ring-[#D2B48C]">
-                        </div>
-                    </div>
-                    
-                    <button id="save-settings-btn" class="w-full bg-[#D2B48C] text-gray-900 font-bold px-3 py-1.5 rounded text-sm hover:bg-[#c4a67a] transition-colors">
-                        Save All Settings
-                    </button>
                 </div>
-            </div>
-        </section>
+            </section>
+
+            <!-- Messages Section -->
+            <section id="section-messages" class="swipe-section">
+                <div class="max-w-4xl mx-auto">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="font-heading text-2xl font-bold text-gray-900">Messages</h2>
+                        <button id="mark-all-read-btn"
+                            class="text-sm text-gray-600 hover:text-gray-900 px-3 py-1.5 border border-gray-300 rounded-lg hover:border-gray-400 transition-colors">
+                            Mark All Read
+                        </button>
+                    </div>
+
+                    <!-- Message Filters -->
+                    <div class="flex gap-2 mb-4 overflow-x-auto pb-2">
+                        <button
+                            class="message-filter-btn active px-4 py-2 rounded-lg text-sm border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition-colors whitespace-nowrap"
+                            data-filter="all">
+                            All
+                        </button>
+                        <button
+                            class="message-filter-btn px-4 py-2 rounded-lg text-sm border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap"
+                            data-filter="unread">
+                            Unread
+                        </button>
+                        <button
+                            class="message-filter-btn px-4 py-2 rounded-lg text-sm border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap"
+                            data-filter="order">
+                            Order Related
+                        </button>
+                        <button
+                            class="message-filter-btn px-4 py-2 rounded-lg text-sm border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap"
+                            data-filter="general">
+                            General
+                        </button>
+                    </div>
+
+                    <div id="messages-list" class="space-y-3">
+                        <div class="light-card rounded-lg p-6 text-center">
+                            <p class="text-gray-500">No messages yet</p>
+                            <p class="text-sm text-gray-400 mt-2">Customer inquiries and order messages will appear here
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="section-settings" class="swipe-section">
+                <div class="max-w-4xl mx-auto px-2">
+                    <h2 class="font-heading text-lg font-bold text-gray-900 mb-4">Settings</h2>
+
+                    <!-- Settings Category Pills -->
+                    <div class="flex gap-2 mb-4 overflow-x-auto pb-2 -mx-2 px-2">
+                        <button
+                            class="settings-tab-btn active px-3 py-1.5 rounded-full text-[11px] font-semibold bg-gray-900 text-white whitespace-nowrap"
+                            data-tab="store">Store</button>
+                        <button
+                            class="settings-tab-btn px-3 py-1.5 rounded-full text-[11px] font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap"
+                            data-tab="payments">Payments</button>
+                        <button
+                            class="settings-tab-btn px-3 py-1.5 rounded-full text-[11px] font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap"
+                            data-tab="integrations">Integrations</button>
+                        <button
+                            class="settings-tab-btn px-3 py-1.5 rounded-full text-[11px] font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap"
+                            data-tab="notifications">Alerts</button>
+                    </div>
+
+                    <!-- Store Tab -->
+                    <div class="settings-tab-content" data-tab="store">
+                        <div class="space-y-3">
+                            <!-- Whatnot Live Toggle -->
+                            <div class="widget p-3 flex items-center justify-between">
+                                <div>
+                                    <span class="text-sm font-semibold text-gray-900">Live on Whatnot</span>
+                                    <p class="text-[10px] text-gray-500">Shows notification banner on site</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="setting-live-status" class="sr-only peer">
+                                    <div
+                                        class="w-10 h-6 bg-gray-200 rounded-full peer peer-checked:bg-red-500 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all">
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- Whatnot Username -->
+                            <div class="widget p-3">
+                                <label
+                                    class="block text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Whatnot
+                                    Username</label>
+                                <input type="text" id="setting-whatnot-username" placeholder="@yourusername"
+                                    class="w-full bg-gray-50 border-0 rounded-lg px-3 py-2 text-sm text-gray-900 focus:ring-2 focus:ring-[#D2B48C]">
+                            </div>
+
+                            <!-- Star Dust Settings -->
+                            <div class="widget p-3">
+                                <label
+                                    class="block text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2">Rewards</label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="text-[10px] text-gray-500 mb-1 block">Star Dust per $1</label>
+                                        <input type="number" id="setting-stardust-rate" value="1"
+                                            class="w-full bg-gray-50 border-0 rounded-lg px-3 py-2 text-sm text-gray-900 focus:ring-2 focus:ring-[#D2B48C]">
+                                    </div>
+                                    <div>
+                                        <label class="text-[10px] text-gray-500 mb-1 block">Daily Check-in</label>
+                                        <input type="number" id="setting-checkin-bonus" value="5"
+                                            class="w-full bg-gray-50 border-0 rounded-lg px-3 py-2 text-sm text-gray-900 focus:ring-2 focus:ring-[#D2B48C]">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Shipping -->
+                            <div class="widget p-3">
+                                <label
+                                    class="block text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2">Shipping</label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="text-[10px] text-gray-500 mb-1 block">Default Method</label>
+                                        <select id="setting-default-shipping"
+                                            class="w-full bg-gray-50 border-0 rounded-lg px-3 py-2 text-sm text-gray-900 focus:ring-2 focus:ring-[#D2B48C]">
+                                            <option value="standard">Standard</option>
+                                            <option value="express">Express</option>
+                                            <option value="priority">Priority</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="text-[10px] text-gray-500 mb-1 block">Processing Days</label>
+                                        <input type="number" id="setting-processing-days" value="1" min="0"
+                                            class="w-full bg-gray-50 border-0 rounded-lg px-3 py-2 text-sm text-gray-900 focus:ring-2 focus:ring-[#D2B48C]">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payments Tab -->
+                    <div class="settings-tab-content hidden" data-tab="payments">
+                        <div class="space-y-3">
+                            <!-- Automated -->
+                            <div class="widget p-3">
+                                <label
+                                    class="block text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2">Automated</label>
+                                <div class="space-y-2">
+                                    <label
+                                        class="flex items-center justify-between p-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+                                        <span class="flex items-center gap-2 text-sm"><span
+                                                class="w-5 h-5 bg-[#635BFF] rounded flex items-center justify-center text-white text-[8px] font-bold">S</span>
+                                            Stripe</span>
+                                        <input type="checkbox" id="setting-payment-stripe"
+                                            class="w-4 h-4 rounded border-gray-300 text-[#D2B48C] focus:ring-[#D2B48C]">
+                                    </label>
+                                    <label
+                                        class="flex items-center justify-between p-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+                                        <span class="flex items-center gap-2 text-sm"><span
+                                                class="w-5 h-5 bg-[#0052FF] rounded flex items-center justify-center text-white text-[8px] font-bold">C</span>
+                                            Coinbase</span>
+                                        <input type="checkbox" id="setting-payment-crypto"
+                                            class="w-4 h-4 rounded border-gray-300 text-[#D2B48C] focus:ring-[#D2B48C]">
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Manual Payments -->
+                            <div class="widget p-3">
+                                <label
+                                    class="block text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2">Manual
+                                    Payments</label>
+                                <div class="space-y-2">
+                                    <div class="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
+                                        <input type="checkbox" id="setting-payment-venmo"
+                                            class="w-4 h-4 rounded border-gray-300 text-[#D2B48C] focus:ring-[#D2B48C]">
+                                        <span class="text-sm w-16">Venmo</span>
+                                        <input type="text" id="setting-venmo-handle" placeholder="@username"
+                                            class="flex-1 bg-white border border-gray-200 rounded px-2 py-1 text-xs focus:ring-1 focus:ring-[#D2B48C]">
+                                    </div>
+                                    <div class="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
+                                        <input type="checkbox" id="setting-payment-cashapp"
+                                            class="w-4 h-4 rounded border-gray-300 text-[#D2B48C] focus:ring-[#D2B48C]">
+                                        <span class="text-sm w-16">CashApp</span>
+                                        <input type="text" id="setting-cashapp-handle" placeholder="$Cashtag"
+                                            class="flex-1 bg-white border border-gray-200 rounded px-2 py-1 text-xs focus:ring-1 focus:ring-[#D2B48C]">
+                                    </div>
+                                    <div class="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
+                                        <input type="checkbox" id="setting-payment-zelle"
+                                            class="w-4 h-4 rounded border-gray-300 text-[#D2B48C] focus:ring-[#D2B48C]">
+                                        <span class="text-sm w-16">Zelle</span>
+                                        <input type="text" id="setting-zelle-handle" placeholder="Email/Phone"
+                                            class="flex-1 bg-white border border-gray-200 rounded px-2 py-1 text-xs focus:ring-1 focus:ring-[#D2B48C]">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Refund Policy -->
+                            <div class="widget p-3 flex items-center justify-between">
+                                <span class="text-sm text-gray-700">Refund Window</span>
+                                <div class="flex items-center gap-2">
+                                    <input type="number" id="setting-refund-days" value="30" min="0"
+                                        class="w-16 bg-gray-50 border-0 rounded-lg px-2 py-1 text-sm text-center focus:ring-2 focus:ring-[#D2B48C]">
+                                    <span class="text-xs text-gray-500">days</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Integrations Tab -->
+                    <div class="settings-tab-content hidden" data-tab="integrations">
+                        <div class="space-y-3">
+                            <!-- Stripe -->
+                            <div class="widget p-3">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span
+                                        class="w-6 h-6 bg-[#635BFF] rounded flex items-center justify-center text-white text-[10px] font-bold">S</span>
+                                    <span class="text-sm font-semibold text-gray-900">Stripe</span>
+                                </div>
+                                <div class="space-y-2">
+                                    <input type="text" id="setting-stripe-key" placeholder="pk_test_..."
+                                        class="w-full bg-gray-50 border-0 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-[#D2B48C]">
+                                    <input type="password" id="setting-stripe-secret" placeholder="whsec_..."
+                                        class="w-full bg-gray-50 border-0 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-[#D2B48C]">
+                                </div>
+                            </div>
+
+                            <!-- Shopify -->
+                            <div class="widget p-3">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span
+                                        class="w-6 h-6 bg-[#96BF48] rounded flex items-center justify-center text-white text-[10px] font-bold">S</span>
+                                    <span class="text-sm font-semibold text-gray-900">Shopify</span>
+                                </div>
+                                <div class="space-y-2">
+                                    <input type="text" id="setting-shopify-url" placeholder="store.myshopify.com"
+                                        class="w-full bg-gray-50 border-0 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-[#D2B48C]">
+                                    <input type="password" id="setting-shopify-token" placeholder="Admin API Token"
+                                        class="w-full bg-gray-50 border-0 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-[#D2B48C]">
+                                </div>
+                            </div>
+
+                            <!-- Square -->
+                            <div class="widget p-3">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span
+                                        class="w-6 h-6 bg-black rounded flex items-center justify-center text-white text-[10px] font-bold">Sq</span>
+                                    <span class="text-sm font-semibold text-gray-900">Square</span>
+                                </div>
+                                <div class="space-y-2">
+                                    <input type="text" id="setting-square-id" placeholder="Application ID"
+                                        class="w-full bg-gray-50 border-0 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-[#D2B48C]">
+                                    <input type="password" id="setting-square-token" placeholder="Access Token"
+                                        class="w-full bg-gray-50 border-0 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-[#D2B48C]">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notifications Tab -->
+                    <div class="settings-tab-content hidden" data-tab="notifications">
+                        <div class="space-y-3">
+                            <div class="widget p-3 flex items-center justify-between">
+                                <div>
+                                    <span class="text-sm font-semibold text-gray-900">Email Alerts</span>
+                                    <p class="text-[10px] text-gray-500">Order & shipping updates</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="setting-email-notifications" class="sr-only peer"
+                                        checked>
+                                    <div
+                                        class="w-10 h-6 bg-gray-200 rounded-full peer peer-checked:bg-green-500 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all">
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="widget p-3 flex items-center justify-between">
+                                <div>
+                                    <span class="text-sm font-semibold text-gray-900">SMS Alerts</span>
+                                    <p class="text-[10px] text-gray-500">Text for urgent orders</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="setting-sms-notifications" class="sr-only peer">
+                                    <div
+                                        class="w-10 h-6 bg-gray-200 rounded-full peer peer-checked:bg-green-500 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all">
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="widget p-3 flex items-center justify-between">
+                                <div>
+                                    <span class="text-sm font-semibold text-gray-900">New Order Sound</span>
+                                    <p class="text-[10px] text-gray-500">Play sound on new orders</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="setting-new-order-alerts" class="sr-only peer" checked>
+                                    <div
+                                        class="w-10 h-6 bg-gray-200 rounded-full peer peer-checked:bg-green-500 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all">
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Save Button -->
+                    <button id="save-settings-btn"
+                        class="w-full mt-4 bg-gray-900 text-white font-semibold px-4 py-3 rounded-xl text-sm hover:bg-gray-800 transition-colors">
+                        Save Changes
+                    </button>
+
+                    <!-- Sign Out -->
+                    <button id="sign-out-btn"
+                        class="w-full mt-3 flex items-center justify-center gap-2 py-3 rounded-xl border border-gray-200 text-gray-500 hover:text-red-600 hover:border-red-200 transition-colors text-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        Sign Out
+                    </button>
+
+                    <div class="h-24"></div>
+                </div>
+            </section>
         </div>
     </div>
 
@@ -543,13 +1399,15 @@
     <nav class="bottom-nav">
         <button class="nav-item active" data-section="my-site">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
             </svg>
             <span>Semi's Cloud</span>
         </button>
         <button class="nav-item" data-section="orders">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
             <span>Orders</span>
         </button>
@@ -561,44 +1419,53 @@
         </button>
         <button class="nav-item" data-section="messages">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
             <span>Messages</span>
         </button>
         <button class="nav-item" data-section="settings">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
             <span>Settings</span>
         </button>
     </nav>
 
     <!-- Product Modal -->
-    <div id="owner-product-modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div id="owner-product-modal" class="light-card rounded-lg p-6 w-full max-w-lg relative max-h-[90vh] overflow-y-auto">
-            <button id="owner-product-modal-close" class="absolute top-3 right-3 text-gray-400 hover:text-gray-900 transition-colors">
+    <div id="owner-product-modal-overlay"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div id="owner-product-modal"
+            class="light-card rounded-lg p-6 w-full max-w-lg relative max-h-[90vh] overflow-y-auto">
+            <button id="owner-product-modal-close"
+                class="absolute top-3 right-3 text-gray-400 hover:text-gray-900 transition-colors">
                 ✕
             </button>
-            <h2 id="owner-product-modal-title" class="font-heading text-2xl font-bold text-gray-900 mb-4">Add Product</h2>
+            <h2 id="owner-product-modal-title" class="font-heading text-2xl font-bold text-gray-900 mb-4">Add Product
+            </h2>
             <form id="owner-product-form" class="space-y-4">
                 <input type="hidden" id="owner-product-id">
 
                 <div>
                     <label for="owner-product-title" class="block text-gray-600 text-sm mb-1">Title</label>
                     <input id="owner-product-title" type="text" required
-                           class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-[#D2B48C]">
+                        class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-[#D2B48C]">
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label for="owner-product-price" class="block text-gray-600 text-sm mb-1">Price (USD)</label>
                         <input id="owner-product-price" type="number" step="0.01" min="0" required
-                               class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-[#D2B48C]">
+                            class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-[#D2B48C]">
                     </div>
                     <div>
-                        <label for="owner-product-zodiac" class="block text-gray-600 text-sm mb-1">Zodiac Signs (select multiple)</label>
-                        <div class="zodiac-grid grid grid-cols-3 gap-2 mt-2 max-h-40 overflow-y-auto p-2 bg-gray-50 border border-gray-300 rounded-lg">
+                        <label for="owner-product-zodiac" class="block text-gray-600 text-sm mb-1">Zodiac Signs (select
+                            multiple)</label>
+                        <div
+                            class="zodiac-grid grid grid-cols-3 gap-2 mt-2 max-h-40 overflow-y-auto p-2 bg-gray-50 border border-gray-300 rounded-lg">
                             <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
                                 <input type="checkbox" value="all" class="zodiac-checkbox" data-zodiac="all">
                                 <span class="text-gray-900 text-xs">All</span>
@@ -636,11 +1503,13 @@
                                 <span class="text-gray-900 text-xs">Scorpio</span>
                             </label>
                             <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
-                                <input type="checkbox" value="sagittarius" class="zodiac-checkbox" data-zodiac="sagittarius">
+                                <input type="checkbox" value="sagittarius" class="zodiac-checkbox"
+                                    data-zodiac="sagittarius">
                                 <span class="text-gray-900 text-xs">Sagittarius</span>
                             </label>
                             <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
-                                <input type="checkbox" value="capricorn" class="zodiac-checkbox" data-zodiac="capricorn">
+                                <input type="checkbox" value="capricorn" class="zodiac-checkbox"
+                                    data-zodiac="capricorn">
                                 <span class="text-gray-900 text-xs">Capricorn</span>
                             </label>
                             <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
@@ -659,8 +1528,8 @@
                 <div>
                     <label for="owner-product-category" class="block text-gray-600 text-sm mb-1">Category</label>
                     <input id="owner-product-category" type="text"
-                           class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-[#D2B48C]"
-                           placeholder="Art, Silver, Thrift, etc.">
+                        class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-[#D2B48C]"
+                        placeholder="Art, Silver, Thrift, etc.">
                 </div>
 
                 <!-- Image/Video Upload Section -->
@@ -670,78 +1539,106 @@
                         <!-- Camera Preview -->
                         <div id="camera-preview-container" class="hidden">
                             <div class="relative rounded-lg overflow-hidden bg-gray-900 border border-gray-300">
-                                <video id="camera-preview" autoplay playsinline class="w-full h-64 object-cover"></video>
+                                <video id="camera-preview" autoplay playsinline
+                                    class="w-full h-64 object-cover"></video>
                                 <canvas id="camera-canvas" class="hidden"></canvas>
                                 <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-4">
-                                    <button type="button" id="capture-photo-btn" class="bg-white rounded-full p-3 hover:bg-gray-100 transition-colors">
-                                        <svg class="w-8 h-8 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <button type="button" id="capture-photo-btn"
+                                        class="bg-white rounded-full p-3 hover:bg-gray-100 transition-colors">
+                                        <svg class="w-8 h-8 text-gray-900" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                                         </svg>
                                     </button>
-                                    <button type="button" id="switch-camera-btn" class="bg-white rounded-full p-3 hover:bg-gray-100 transition-colors">
-                                        <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                    <button type="button" id="switch-camera-btn"
+                                        class="bg-white rounded-full p-3 hover:bg-gray-100 transition-colors">
+                                        <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                         </svg>
                                     </button>
-                                    <button type="button" id="close-camera-btn" class="bg-white rounded-full p-3 hover:bg-gray-100 transition-colors">
-                                        <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    <button type="button" id="close-camera-btn"
+                                        class="bg-white rounded-full p-3 hover:bg-gray-100 transition-colors">
+                                        <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M6 18L18 6M6 6l12 12" />
                                         </svg>
                                     </button>
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- CapCut Integration Button -->
                         <div class="mb-3">
-                            <button type="button" id="open-capcut-btn" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold px-4 py-3 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                            <button type="button" id="open-capcut-btn"
+                                class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold px-4 py-3 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                                 </svg>
                                 <span>Edit in CapCut</span>
                             </button>
-                            <p class="text-xs text-gray-500 mt-1 text-center">Edit your media in CapCut, then upload the finished file below</p>
+                            <p class="text-xs text-gray-500 mt-1 text-center">Edit your media in CapCut, then upload the
+                                finished file below</p>
                         </div>
-                        
+
                         <!-- Upload Area (simplified - just icon) -->
-                        <div id="upload-area" class="no-select border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-[#D2B48C] active:border-[#D2B48C] transition-colors touch-manipulation">
+                        <div id="upload-area"
+                            class="no-select border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-[#D2B48C] active:border-[#D2B48C] transition-colors touch-manipulation">
                             <input type="file" id="owner-product-file" accept="image/*,video/*" class="hidden">
                             <div id="upload-placeholder" class="py-4">
-                                <svg class="mx-auto h-16 w-16 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                <svg class="mx-auto h-16 w-16 text-gray-400" stroke="currentColor" fill="none"
+                                    viewBox="0 0 48 48">
+                                    <path
+                                        d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                 </svg>
                             </div>
                         </div>
-                        
+
                         <!-- Preview Area -->
                         <div id="preview-container" class="hidden">
                             <div class="relative rounded-lg overflow-hidden bg-gray-50 border border-gray-300">
                                 <div id="media-preview" class="w-full h-32 md:h-48 flex items-center justify-center">
                                     <!-- Preview will be inserted here -->
                                 </div>
-                                <button type="button" id="remove-media" class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 text-xs">×</button>
+                                <button type="button" id="remove-media"
+                                    class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 text-xs">×</button>
                             </div>
-                            
+
                             <!-- Editing Controls -->
                             <div id="edit-controls" class="mt-4 space-y-4">
                                 <!-- Transform Tools -->
                                 <div class="flex items-center justify-center gap-3">
-                                    <button type="button" id="crop-btn" class="edit-tool-btn group relative flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-gray-50 border border-gray-300 hover:border-[#D2B48C] transition-all hover:scale-105 active:scale-95">
-                                        <svg class="w-6 h-6 text-gray-600 group-hover:text-[#D2B48C] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    <button type="button" id="crop-btn"
+                                        class="edit-tool-btn group relative flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-gray-50 border border-gray-300 hover:border-[#D2B48C] transition-all hover:scale-105 active:scale-95">
+                                        <svg class="w-6 h-6 text-gray-600 group-hover:text-[#D2B48C] transition-colors"
+                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                         </svg>
                                         <span class="text-[10px] text-gray-500 mt-0.5">Crop</span>
                                     </button>
-                                    <button type="button" id="rotate-btn" class="edit-tool-btn group relative flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-gray-50 border border-gray-300 hover:border-[#D2B48C] transition-all hover:scale-105 active:scale-95">
-                                        <svg class="w-6 h-6 text-gray-600 group-hover:text-[#D2B48C] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                    <button type="button" id="rotate-btn"
+                                        class="edit-tool-btn group relative flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-gray-50 border border-gray-300 hover:border-[#D2B48C] transition-all hover:scale-105 active:scale-95">
+                                        <svg class="w-6 h-6 text-gray-600 group-hover:text-[#D2B48C] transition-colors"
+                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                         </svg>
                                         <span class="text-[10px] text-gray-500 mt-0.5">Rotate</span>
                                     </button>
-                                    <button type="button" id="resize-btn" class="edit-tool-btn group relative flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-gray-50 border border-gray-300 hover:border-[#D2B48C] transition-all hover:scale-105 active:scale-95">
-                                        <svg class="w-6 h-6 text-gray-600 group-hover:text-[#D2B48C] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                                    <button type="button" id="resize-btn"
+                                        class="edit-tool-btn group relative flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-gray-50 border border-gray-300 hover:border-[#D2B48C] transition-all hover:scale-105 active:scale-95">
+                                        <svg class="w-6 h-6 text-gray-600 group-hover:text-[#D2B48C] transition-colors"
+                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
                                         </svg>
                                         <span class="text-[10px] text-gray-500 mt-0.5">Resize</span>
                                     </button>
@@ -753,17 +1650,23 @@
                                     <div id="brightness-control" class="hidden">
                                         <div class="flex items-center justify-between mb-2">
                                             <div class="flex items-center gap-2">
-                                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                                                 </svg>
                                                 <span class="text-sm text-gray-700 font-medium">Brightness</span>
                                             </div>
-                                            <div class="w-12 h-6 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center">
-                                                <span id="brightness-value" class="text-xs text-[#D2B48C] font-semibold">100</span>
+                                            <div
+                                                class="w-12 h-6 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center">
+                                                <span id="brightness-value"
+                                                    class="text-xs text-[#D2B48C] font-semibold">100</span>
                                             </div>
                                         </div>
                                         <div class="relative">
-                                            <input type="range" id="brightness-slider" min="0" max="200" value="100" class="modern-slider w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                                            <input type="range" id="brightness-slider" min="0" max="200" value="100"
+                                                class="modern-slider w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
                                         </div>
                                     </div>
 
@@ -771,17 +1674,23 @@
                                     <div id="contrast-control" class="hidden">
                                         <div class="flex items-center justify-between mb-2">
                                             <div class="flex items-center gap-2">
-                                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
                                                 </svg>
                                                 <span class="text-sm text-gray-700 font-medium">Contrast</span>
                                             </div>
-                                            <div class="w-12 h-6 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center">
-                                                <span id="contrast-value" class="text-xs text-[#D2B48C] font-semibold">100</span>
+                                            <div
+                                                class="w-12 h-6 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center">
+                                                <span id="contrast-value"
+                                                    class="text-xs text-[#D2B48C] font-semibold">100</span>
                                             </div>
                                         </div>
                                         <div class="relative">
-                                            <input type="range" id="contrast-slider" min="0" max="200" value="100" class="modern-slider w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                                            <input type="range" id="contrast-slider" min="0" max="200" value="100"
+                                                class="modern-slider w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
                                         </div>
                                     </div>
 
@@ -789,17 +1698,23 @@
                                     <div id="saturation-control" class="hidden">
                                         <div class="flex items-center justify-between mb-2">
                                             <div class="flex items-center gap-2">
-                                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
                                                 </svg>
                                                 <span class="text-sm text-gray-700 font-medium">Saturation</span>
                                             </div>
-                                            <div class="w-12 h-6 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center">
-                                                <span id="saturation-value" class="text-xs text-[#D2B48C] font-semibold">100</span>
+                                            <div
+                                                class="w-12 h-6 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center">
+                                                <span id="saturation-value"
+                                                    class="text-xs text-[#D2B48C] font-semibold">100</span>
                                             </div>
                                         </div>
                                         <div class="relative">
-                                            <input type="range" id="saturation-slider" min="0" max="200" value="100" class="modern-slider w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                                            <input type="range" id="saturation-slider" min="0" max="200" value="100"
+                                                class="modern-slider w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
                                         </div>
                                     </div>
                                 </div>
@@ -807,8 +1722,10 @@
                                 <!-- Resize Controls -->
                                 <div id="resize-controls" class="hidden">
                                     <div class="flex items-center gap-3 mb-3">
-                                        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                                        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
                                         </svg>
                                         <span class="text-sm text-gray-700 font-medium">Dimensions</span>
                                     </div>
@@ -816,19 +1733,24 @@
                                         <div class="relative">
                                             <label class="block text-xs text-gray-500 mb-1.5">Width</label>
                                             <div class="relative">
-                                                <input type="text" id="resize-width" placeholder="Auto" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2.5 text-gray-900 text-sm focus:outline-none focus:border-[#D2B48C] transition-colors">
-                                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">px</span>
+                                                <input type="text" id="resize-width" placeholder="Auto"
+                                                    class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2.5 text-gray-900 text-sm focus:outline-none focus:border-[#D2B48C] transition-colors">
+                                                <span
+                                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">px</span>
                                             </div>
                                         </div>
                                         <div class="relative">
                                             <label class="block text-xs text-gray-500 mb-1.5">Height</label>
                                             <div class="relative">
-                                                <input type="text" id="resize-height" placeholder="Auto" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2.5 text-gray-900 text-sm focus:outline-none focus:border-[#D2B48C] transition-colors">
-                                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">px</span>
+                                                <input type="text" id="resize-height" placeholder="Auto"
+                                                    class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2.5 text-gray-900 text-sm focus:outline-none focus:border-[#D2B48C] transition-colors">
+                                                <span
+                                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">px</span>
                                             </div>
                                         </div>
                                     </div>
-                                    <button type="button" id="apply-resize" class="mt-3 w-full px-4 py-2.5 bg-gradient-to-r from-[#D2B48C] to-[#c4a67a] text-gray-900 font-semibold rounded-lg hover:from-[#c4a67a] hover:to-[#b89668] transition-all active:scale-95 shadow-lg shadow-[#D2B48C]/20">
+                                    <button type="button" id="apply-resize"
+                                        class="mt-3 w-full px-4 py-2.5 bg-gradient-to-r from-[#D2B48C] to-[#c4a67a] text-gray-900 font-semibold rounded-lg hover:from-[#c4a67a] hover:to-[#b89668] transition-all active:scale-95 shadow-lg shadow-[#D2B48C]/20">
                                         Apply Resize
                                     </button>
                                 </div>
@@ -840,17 +1762,17 @@
                 <div>
                     <label for="owner-product-description" class="block text-gray-600 text-sm mb-1">Description</label>
                     <textarea id="owner-product-description" rows="3"
-                              class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-[#D2B48C]"
-                              placeholder="Short description for this product"></textarea>
+                        class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-[#D2B48C]"
+                        placeholder="Short description for this product"></textarea>
                 </div>
 
                 <div class="flex justify-end gap-3 pt-2">
                     <button type="button" id="owner-product-cancel"
-                            class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">
+                        class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">
                         Cancel
                     </button>
                     <button type="submit"
-                            class="px-4 py-2 rounded-lg bg-[#D2B48C] text-gray-900 font-bold hover:bg-[#c4a67a] transition-colors">
+                        class="px-4 py-2 rounded-lg bg-[#D2B48C] text-gray-900 font-bold hover:bg-[#c4a67a] transition-colors">
                         Save Product
                     </button>
                 </div>
@@ -859,43 +1781,59 @@
     </div>
 
     <!-- Crop Modal -->
-    <div id="crop-modal-overlay" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+    <div id="crop-modal-overlay"
+        class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
         <div class="modal-content light-card rounded-lg p-4 md:p-6 w-full max-w-2xl relative">
-            <button id="crop-modal-close" class="absolute top-3 right-3 text-gray-400 hover:text-gray-900 transition-colors z-10">✕</button>
+            <button id="crop-modal-close"
+                class="absolute top-3 right-3 text-gray-400 hover:text-gray-900 transition-colors z-10">✕</button>
             <h3 class="font-heading text-xl font-bold text-gray-900 mb-4">Crop Image</h3>
             <div class="mb-4">
                 <img id="crop-image" src="" alt="Crop" class="max-w-full max-h-96">
             </div>
             <div class="flex justify-end gap-3">
-                <button id="crop-cancel" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">Cancel</button>
-                <button id="crop-apply" class="px-4 py-2 rounded-lg bg-[#D2B48C] text-gray-900 font-bold hover:bg-[#c4a67a] transition-colors">Apply Crop</button>
+                <button id="crop-cancel"
+                    class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">Cancel</button>
+                <button id="crop-apply"
+                    class="px-4 py-2 rounded-lg bg-[#D2B48C] text-gray-900 font-bold hover:bg-[#c4a67a] transition-colors">Apply
+                    Crop</button>
             </div>
         </div>
     </div>
 
     <!-- Bulk Upload Modal -->
-    <div id="bulk-upload-modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div id="bulk-upload-modal" class="modal-content light-card rounded-lg p-4 md:p-6 w-full max-w-4xl relative max-h-[90vh] overflow-y-auto">
-            <button id="bulk-upload-close" class="absolute top-3 right-3 text-gray-400 hover:text-gray-900 transition-colors">✕</button>
+    <div id="bulk-upload-modal-overlay"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div id="bulk-upload-modal"
+            class="modal-content light-card rounded-lg p-4 md:p-6 w-full max-w-4xl relative max-h-[90vh] overflow-y-auto">
+            <button id="bulk-upload-close"
+                class="absolute top-3 right-3 text-gray-400 hover:text-gray-900 transition-colors">✕</button>
             <h2 class="font-heading text-2xl font-bold text-gray-900 mb-4">Bulk Upload Products</h2>
-            
+
             <!-- Upload Method Tabs -->
             <div class="flex gap-2 mb-4 border-b border-gray-300">
-                <button class="bulk-tab-btn active px-4 py-2 text-gray-900 border-b-2 border-[#D2B48C]" data-method="files">Upload Files</button>
-                <button class="bulk-tab-btn px-4 py-2 text-gray-500 hover:text-gray-900" data-method="csv">CSV Import</button>
-                <button class="bulk-tab-btn px-4 py-2 text-gray-500 hover:text-gray-900" data-method="manual">Manual Entry</button>
+                <button class="bulk-tab-btn active px-4 py-2 text-gray-900 border-b-2 border-[#D2B48C]"
+                    data-method="files">Upload Files</button>
+                <button class="bulk-tab-btn px-4 py-2 text-gray-500 hover:text-gray-900" data-method="csv">CSV
+                    Import</button>
+                <button class="bulk-tab-btn px-4 py-2 text-gray-500 hover:text-gray-900" data-method="manual">Manual
+                    Entry</button>
             </div>
 
             <!-- Upload Files Method -->
             <div id="bulk-method-files" class="bulk-method-content">
                 <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center mb-4">
                     <input type="file" id="bulk-files-input" multiple accept="image/*,video/*" class="hidden">
-                    <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" stroke="currentColor" fill="none"
+                        viewBox="0 0 48 48">
+                        <path
+                            d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                     <p class="text-gray-600 mb-2">Drag and drop multiple images/videos here</p>
                     <p class="text-gray-400 text-sm mb-4">or</p>
-                    <button id="bulk-select-files" class="bg-[#D2B48C] text-gray-900 font-bold px-4 py-2 rounded hover:bg-[#c4a67a] transition-colors">Select Files</button>
+                    <button id="bulk-select-files"
+                        class="bg-[#D2B48C] text-gray-900 font-bold px-4 py-2 rounded hover:bg-[#c4a67a] transition-colors">Select
+                        Files</button>
                     <p class="text-gray-400 text-xs mt-2">Selected: <span id="bulk-files-count">0</span> files</p>
                 </div>
                 <div id="bulk-files-preview" class="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-4"></div>
@@ -905,8 +1843,10 @@
             <div id="bulk-method-csv" class="bulk-method-content hidden">
                 <div class="mb-4">
                     <label class="block text-gray-600 text-sm mb-2">Upload CSV File</label>
-                    <input type="file" id="csv-file-input" accept=".csv" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 text-sm">
-                    <p class="text-gray-400 text-xs mt-2">CSV format: title,price,zodiac,category,description,image_url</p>
+                    <input type="file" id="csv-file-input" accept=".csv"
+                        class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 text-sm">
+                    <p class="text-gray-400 text-xs mt-2">CSV format: title,price,zodiac,category,description,image_url
+                    </p>
                 </div>
                 <div id="csv-preview" class="hidden mb-4">
                     <h4 class="text-gray-900 text-sm font-semibold mb-2">Preview:</h4>
@@ -921,7 +1861,9 @@
                 <div class="space-y-4 mb-4">
                     <div class="flex justify-between items-center">
                         <h4 class="text-gray-900 text-sm font-semibold">Products</h4>
-                        <button type="button" id="add-manual-product" class="bg-gray-200 text-gray-700 px-3 py-1 rounded text-xs hover:bg-gray-300">+ Add Product</button>
+                        <button type="button" id="add-manual-product"
+                            class="bg-gray-200 text-gray-700 px-3 py-1 rounded text-xs hover:bg-gray-300">+ Add
+                            Product</button>
                     </div>
                     <div id="manual-products-list" class="space-y-3 max-h-96 overflow-y-auto">
                         <!-- Manual product forms will be added here -->
@@ -934,7 +1876,8 @@
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div>
                         <label class="block text-gray-600 text-sm mb-1">Default Zodiac</label>
-                        <select id="bulk-default-zodiac" class="w-full bg-white border border-gray-300 rounded px-3 py-2 text-gray-900 text-sm">
+                        <select id="bulk-default-zodiac"
+                            class="w-full bg-white border border-gray-300 rounded px-3 py-2 text-gray-900 text-sm">
                             <option value="">All</option>
                             <option value="aries">Aries</option>
                             <option value="taurus">Taurus</option>
@@ -952,21 +1895,28 @@
                     </div>
                     <div>
                         <label class="block text-gray-600 text-sm mb-1">Default Category</label>
-                        <input type="text" id="bulk-default-category" placeholder="Art, Silver, Thrift, etc." class="w-full bg-white border border-gray-300 rounded px-3 py-2 text-gray-900 text-sm">
+                        <input type="text" id="bulk-default-category" placeholder="Art, Silver, Thrift, etc."
+                            class="w-full bg-white border border-gray-300 rounded px-3 py-2 text-gray-900 text-sm">
                     </div>
                 </div>
                 <div class="flex justify-end gap-3">
-                    <button id="bulk-upload-cancel" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">Cancel</button>
-                    <button id="bulk-upload-save" class="px-4 py-2 rounded-lg bg-[#D2B48C] text-gray-900 font-bold hover:bg-[#c4a67a] transition-colors">Save All Products</button>
+                    <button id="bulk-upload-cancel"
+                        class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">Cancel</button>
+                    <button id="bulk-upload-save"
+                        class="px-4 py-2 rounded-lg bg-[#D2B48C] text-gray-900 font-bold hover:bg-[#c4a67a] transition-colors">Save
+                        All Products</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Order Detail Modal -->
-    <div id="owner-order-modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div id="owner-order-modal" class="light-card rounded-lg p-6 w-full max-w-2xl relative max-h-[90vh] overflow-y-auto">
-            <button id="owner-order-modal-close" class="absolute top-3 right-3 text-gray-400 hover:text-gray-900 transition-colors">
+    <div id="owner-order-modal-overlay"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div id="owner-order-modal"
+            class="light-card rounded-lg p-6 w-full max-w-2xl relative max-h-[90vh] overflow-y-auto">
+            <button id="owner-order-modal-close"
+                class="absolute top-3 right-3 text-gray-400 hover:text-gray-900 transition-colors">
                 ✕
             </button>
             <h2 class="font-heading text-2xl font-bold text-gray-900 mb-4">Order Details</h2>
@@ -975,33 +1925,38 @@
             </div>
             <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
                 <button id="owner-order-modal-close-btn"
-                        class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">
+                    class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">
                     Close
                 </button>
                 <button id="owner-order-print-btn"
-                        class="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                    class="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
                     Print
                 </button>
             </div>
         </div>
     </div>
-    
+
     <!-- Message Reply Modal -->
-    <div id="message-reply-modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div id="message-reply-modal-overlay"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div id="message-reply-modal" class="light-card rounded-lg p-6 w-full max-w-lg relative">
-            <button id="message-reply-close" class="absolute top-3 right-3 text-gray-400 hover:text-gray-900 transition-colors">
+            <button id="message-reply-close"
+                class="absolute top-3 right-3 text-gray-400 hover:text-gray-900 transition-colors">
                 ✕
             </button>
             <h2 class="font-heading text-xl font-bold text-gray-900 mb-4">Reply to Message</h2>
             <div id="message-reply-original" class="mb-4 p-3 bg-gray-50 rounded-lg text-sm text-gray-600">
                 <!-- Original message will be shown here -->
             </div>
-            <textarea id="message-reply-text" rows="5" placeholder="Type your reply..." class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 text-sm focus:outline-none focus:border-[#D2B48C] mb-4"></textarea>
+            <textarea id="message-reply-text" rows="5" placeholder="Type your reply..."
+                class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 text-sm focus:outline-none focus:border-[#D2B48C] mb-4"></textarea>
             <div class="flex justify-end gap-3">
-                <button id="message-reply-cancel" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">
+                <button id="message-reply-cancel"
+                    class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">
                     Cancel
                 </button>
-                <button id="message-reply-send" class="px-4 py-2 rounded-lg bg-[#D2B48C] text-gray-900 font-semibold hover:bg-[#c4a67a] transition-colors">
+                <button id="message-reply-send"
+                    class="px-4 py-2 rounded-lg bg-[#D2B48C] text-gray-900 font-semibold hover:bg-[#c4a67a] transition-colors">
                     Send Reply
                 </button>
             </div>
@@ -1009,6 +1964,8 @@
     </div>
 
     <script type="module" src="/src/js/bulk-upload.js"></script>
+    <script type="module" src="/src/js/dropshipping.js"></script>
     <script type="module" src="/src/js/owner-dashboard.js"></script>
 </body>
+
 </html>

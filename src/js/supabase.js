@@ -60,4 +60,5 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export { useLocalStorage };
 export const supabaseClient = supabase;
+export { supabase }; // Alias for backward compatibility with imports
 

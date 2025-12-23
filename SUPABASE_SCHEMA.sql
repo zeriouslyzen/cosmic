@@ -22,8 +22,17 @@ CREATE TABLE IF NOT EXISTS products (
     price DECIMAL(10, 2) NOT NULL,
     zodiac TEXT,
     image_url TEXT,
+    image_urls JSONB,
     category TEXT,
     description TEXT,
+    stock_quantity INTEGER DEFAULT 0,
+    stock_location TEXT,
+    sku TEXT,
+    dropship_source TEXT,
+    dropship_product_id TEXT,
+    dropship_api_data JSONB,
+    is_dropshipped BOOLEAN DEFAULT FALSE,
+    low_stock_threshold INTEGER DEFAULT 10,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );

@@ -2,6 +2,40 @@
 
 All notable changes to the Cosmic Voyager project will be documented in this file.
 
+## [1.2.0] - 2024-12-15
+
+### Added
+- Product image gallery navigation with multiple image support
+- Product name updated to "Siriusly Gold" for enhanced branding
+- Zodiac carousel section with modular upright rectangle cards
+- CapCut integration button in owner dashboard for media editing
+- About and Live streaming slide-over panels on main site
+- Live status indicator with pulsing red notification when owner is live on Whatnot
+- Owner dashboard with swipeable navigation (Semi's Cloud, Orders, Messages, Settings)
+- Order management system with filtering and status updates
+- Sales metrics (Today, Week, Month, All Time)
+- Customer message management with filtering
+- Comprehensive settings panel (Star Dust, Whatnot/Live, Order Processing, Customer Communication, Payment Processing)
+- User metrics display (Users Today, Users This Year, Avg Time Spent)
+
+### Changed
+- UI updates: improved navbar, search bar, product cards, and zodiac colors
+- Removed light mode option for consistent dark theme experience
+- Revamped main page: removed curated paragraph, added zodiac carousel, updated categories to My Art/Consignment/Deals, updated footer
+- Footer updated to "2025 cosmic-deals"
+- Removed auto-camera activation in owner dashboard
+- Simplified upload UI to just upload icon
+- About and Live buttons now visible on all screen sizes
+- Hero subtitle improved with Space Grotesk font, removed repetitive text, added subtle lightning animation
+- Redesigned owner dashboard: modern editor, mobile optimization, bulk upload, and UI improvements
+
+### Technical
+- Implemented swipeable section navigation for owner dashboard
+- Added live status polling and custom event system
+- Integrated CapCut web editor link for media editing workflow
+- Enhanced order filtering and status management
+- Improved responsive design for owner dashboard
+
 ## [1.1.0] - 2024-12-11
 
 ### Added
