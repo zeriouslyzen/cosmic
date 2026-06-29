@@ -1,5 +1,6 @@
 // Cart Management
 import { getCurrentUser } from './auth.js';
+import { getCartUserId } from './session.js';
 import { getCartItems, addToCart, updateCartItemQuantity, removeFromCart, clearCart } from './api.js';
 import { getStardustBalance } from './api.js';
 import { updateCartUI, updateCartCount } from './cart-ui.js';
@@ -13,39 +14,26 @@ let stardustUsed = 0;
 export async function initCart() {
     await loadCart();
     await updateStardustDisplay();
-    
-    // Listen for cart updates
+
     setInterval(async () => {
         await loadCart();
-    }, 5000); // Refresh every 5 seconds
+    }, 5000);
 }
 
-// Load cart from database
+// Load cart from storage
 export async function loadCart() {
-    const user = await getCurrentUser();
-    if (!user) {
-        cartItems = [];
-        updateCartUI(cartItems, 0, 0, 0);
-        updateCartCount(0);
-        return;
-    }
-    
-    const items = await getCartItems(user.id);
+    const userId = await getCartUserId();
+    const items = await getCartItems(userId);
     cartItems = items || [];
     calculateTotals();
     updateCartUI(cartItems, cartSubtotal, stardustDiscount, stardustUsed);
     updateCartCount(cartItems.reduce((sum, item) => sum + item.quantity, 0));
 }
 
-// Add product to cart
+// Add product to cart (no account required)
 export async function addProductToCart(productId, quantity = 1) {
-    const user = await getCurrentUser();
-    if (!user) {
-        alert('Please sign in to add items to cart');
-        return false;
-    }
-    
-    const result = await addToCart(user.id, productId, quantity);
+    const userId = await getCartUserId();
+    const result = await addToCart(userId, productId, quantity);
     if (result) {
         await loadCart();
         return true;
@@ -75,10 +63,8 @@ export async function removeItem(cartItemId) {
 
 // Clear entire cart
 export async function clearUserCart() {
-    const user = await getCurrentUser();
-    if (!user) return false;
-    
-    const result = await clearCart(user.id);
+    const userId = await getCartUserId();
+    const result = await clearCart(userId);
     if (result) {
         cartItems = [];
         calculateTotals();
@@ -95,23 +81,22 @@ function calculateTotals() {
         const price = parseFloat(item.products?.price || 0);
         return sum + (price * item.quantity);
     }, 0);
-    
-    // Star dust discount (100 star dust = $1)
+
     const maxDiscount = Math.floor(stardustUsed / 100);
     stardustDiscount = Math.min(maxDiscount, cartSubtotal);
 }
 
-// Apply star dust discount
+// Apply star dust discount (signed-in users only)
 export async function applyStardustDiscount(amount) {
     const user = await getCurrentUser();
     if (!user) return false;
-    
+
     const balance = await getStardustBalance(user.id);
     if (balance < amount) {
         alert('Insufficient star dust');
         return false;
     }
-    
+
     stardustUsed = amount;
     calculateTotals();
     updateCartUI(cartItems, cartSubtotal, stardustDiscount, stardustUsed);
@@ -121,6 +106,11 @@ export async function applyStardustDiscount(amount) {
 // Get cart total
 export function getCartTotal() {
     return cartSubtotal - stardustDiscount;
+}
+
+// Get applied star dust discount
+export function getStardustDiscount() {
+    return stardustDiscount;
 }
 
 // Get cart items
@@ -136,15 +126,13 @@ async function updateStardustDisplay() {
         if (cartStardust) cartStardust.classList.add('hidden');
         return;
     }
-    
+
     const balance = await getStardustBalance(user.id);
     const cartStardust = document.getElementById('cart-stardust');
     const cartStardustBalance = document.getElementById('cart-stardust-balance');
-    
+
     if (cartStardust) cartStardust.classList.remove('hidden');
     if (cartStardustBalance) cartStardustBalance.textContent = balance;
 }
 
-// Export for use in other modules
 export { updateStardustDisplay };
-

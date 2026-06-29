@@ -849,17 +849,38 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(loadProductImages, 50);
     setTimeout(loadProductImages, 200);
 
-    // Function to dynamically render products from localStorage
+    // Function to dynamically render products from Stripe / API
     async function renderProductsFromStorage() {
         const { getProducts } = await import('./api.js');
         const products = await getProducts();
 
-        if (!products || products.length === 0) return;
+        const productsSection = document.getElementById('products-section');
+        const productsLoading = document.getElementById('products-loading');
+        if (!productsSection) return;
+
+        if (productsLoading) productsLoading.classList.add('hidden');
+
+        const container = productsSection.querySelector('.container');
+        if (!container) return;
+
+        container.querySelectorAll('.product-row, #products-empty-state').forEach((node) => node.remove());
+
+        if (!products || products.length === 0) {
+            const empty = document.createElement('div');
+            empty.id = 'products-empty-state';
+            empty.className = 'text-center py-16 text-gray-400';
+            empty.innerHTML = `
+                <p class="text-lg text-white mb-2">No products yet</p>
+                <p class="text-sm">Add products in your <a href="https://dashboard.stripe.com/products" class="text-tan-500 underline" target="_blank" rel="noopener noreferrer">Stripe dashboard</a> or from the owner Post Item page.</p>
+            `;
+            container.appendChild(empty);
+            productCards = [];
+            return;
+        }
 
         // Group products by zodiac (handle multiple zodiacs per product)
         const productsByZodiac = {};
         products.forEach(product => {
-            // Handle comma-separated zodiacs
             const zodiacs = product.zodiac ? product.zodiac.split(',').map(z => z.trim()) : ['just-in'];
 
             zodiacs.forEach(zodiac => {
@@ -867,46 +888,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!productsByZodiac[zodiacKey]) {
                     productsByZodiac[zodiacKey] = [];
                 }
-                // Only add if not already in this zodiac's list (avoid duplicates)
                 if (!productsByZodiac[zodiacKey].find(p => p.id === product.id)) {
                     productsByZodiac[zodiacKey].push(product);
                 }
             });
         });
 
-        const productsSection = document.getElementById('products-section');
-        const productsLoader = document.getElementById('products-loader');
-        if (!productsSection) return;
-
-        // Show loader
-        if (productsLoader) productsLoader.classList.remove('hidden');
-
-        // Clear existing product rows (keep structure)
-        const existingRows = productsSection.querySelectorAll('.product-row');
-        existingRows.forEach(row => {
-            const grid = row.querySelector('.product-grid-row');
-            if (grid) grid.innerHTML = '';
-        });
-
-        // Add products to appropriate rows or create new rows
         Object.keys(productsByZodiac).forEach(zodiac => {
-            let row = productsSection.querySelector(`.product-row[data-zodiac="${zodiac}"]`);
-
-            if (!row) {
-                // Create new row if it doesn't exist
-                row = document.createElement('div');
-                row.className = 'product-row';
-                row.setAttribute('data-zodiac', zodiac);
-                const displayName = zodiac === 'just-in' ? 'Just In' : zodiac.charAt(0).toUpperCase() + zodiac.slice(1);
-                row.innerHTML = `
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="font-heading text-2xl md:text-3xl font-bold text-white">${displayName}</h2>
-                        <button class="text-gray-400 hover:text-white transition-colors text-sm">view more →</button>
-                    </div>
-                    <div class="product-grid-row"></div>
-                `;
-                productsSection.appendChild(row);
-            }
+            const row = document.createElement('div');
+            row.className = 'product-row';
+            row.setAttribute('data-zodiac', zodiac);
+            const displayName = zodiac === 'just-in' ? 'Just In' : zodiac.charAt(0).toUpperCase() + zodiac.slice(1);
+            row.innerHTML = `
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="font-heading text-2xl md:text-3xl font-bold text-white">${displayName}</h2>
+                    <button class="text-gray-400 hover:text-white transition-colors text-sm">view more →</button>
+                </div>
+                <div class="product-grid-row"></div>
+            `;
+            container.appendChild(row);
 
             const grid = row.querySelector('.product-grid-row');
             if (!grid) return;
@@ -943,13 +943,66 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Hide loader
-        if (productsLoader) productsLoader.classList.add('hidden');
-
         // Re-attach handlers and reload images
         productCards = document.querySelectorAll('.product-card-small');
         attachProductCardHandlers();
+        filterProducts();
         loadProductImages();
+        initProductGridTouch();
+    }
+
+    function initProductGridTouch() {
+        document.querySelectorAll('.product-grid-row').forEach((productGrid) => {
+            if (productGrid.dataset.touchBound === 'true') return;
+            productGrid.dataset.touchBound = 'true';
+
+            let touchStartX = 0;
+            let touchStartY = 0;
+            let isHorizontalSwipe = false;
+
+            productGrid.addEventListener('touchstart', (e) => {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+                isHorizontalSwipe = false;
+            }, { passive: true });
+
+            productGrid.addEventListener('touchmove', (e) => {
+                if (!touchStartX || !touchStartY) return;
+
+                const deltaX = Math.abs(e.touches[0].clientX - touchStartX);
+                const deltaY = Math.abs(e.touches[0].clientY - touchStartY);
+
+                if (deltaX > deltaY && deltaX > 10) {
+                    isHorizontalSwipe = true;
+                    e.preventDefault();
+                } else if (deltaY > deltaX) {
+                    isHorizontalSwipe = false;
+                }
+            }, { passive: false });
+
+            productGrid.addEventListener('touchend', (e) => {
+                if (!isHorizontalSwipe || !touchStartX) {
+                    touchStartX = 0;
+                    touchStartY = 0;
+                    return;
+                }
+
+                const touchEndX = e.changedTouches[0].clientX;
+                const swipeDistance = touchStartX - touchEndX;
+                const scrollAmount = productGrid.clientWidth * 0.8;
+
+                if (Math.abs(swipeDistance) > 50) {
+                    if (swipeDistance > 0) {
+                        productGrid.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                    } else {
+                        productGrid.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                    }
+                }
+
+                touchStartX = 0;
+                touchStartY = 0;
+            }, { passive: true });
+        });
     }
 
     // Listen for product updates from dashboard
@@ -957,13 +1010,9 @@ document.addEventListener('DOMContentLoaded', () => {
         await renderProductsFromStorage();
     });
 
-    // Initial render from storage (after a short delay to let DOM settle)
+    // Initial render from catalog
     setTimeout(async () => {
-        const { getProducts } = await import('./api.js');
-        const products = await getProducts();
-        if (products && products.length > 0) {
-            await renderProductsFromStorage();
-        }
+        await renderProductsFromStorage();
     }, 500);
 
     function filterProducts() {
@@ -1017,70 +1066,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderFilterButtons();
 
     // --- Touch/Swipe Support for Mobile (Horizontal Only) ---
-    const productGridRows = document.querySelectorAll('.product-grid-row');
-
-    productGridRows.forEach(productGrid => {
-        let touchStartX = 0;
-        let touchStartY = 0;
-        let touchEndX = 0;
-        let isHorizontalSwipe = false;
-
-        function handleTouchStart(e) {
-            touchStartX = e.touches[0].clientX;
-            touchStartY = e.touches[0].clientY;
-            isHorizontalSwipe = false;
-        }
-
-        function handleTouchMove(e) {
-            if (!touchStartX || !touchStartY) return;
-
-            const deltaX = Math.abs(e.touches[0].clientX - touchStartX);
-            const deltaY = Math.abs(e.touches[0].clientY - touchStartY);
-
-            // Determine if this is a horizontal swipe (more horizontal than vertical)
-            if (deltaX > deltaY && deltaX > 10) {
-                isHorizontalSwipe = true;
-                // Prevent vertical scroll when swiping horizontally
-                e.preventDefault();
-            } else if (deltaY > deltaX) {
-                // Vertical scroll - allow it
-                isHorizontalSwipe = false;
-            }
-        }
-
-        function handleTouchEnd(e) {
-            if (!isHorizontalSwipe || !touchStartX) {
-                touchStartX = 0;
-                touchStartY = 0;
-                return;
-            }
-
-            touchEndX = e.changedTouches[0].clientX;
-            const swipeDistance = touchStartX - touchEndX;
-            const scrollAmount = productGrid.clientWidth * 0.8; // Scroll 80% of viewport
-
-            if (Math.abs(swipeDistance) > 50) { // Minimum swipe distance
-                if (swipeDistance > 0) {
-                    // Swipe left - scroll right
-                    productGrid.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-                } else {
-                    // Swipe right - scroll left
-                    productGrid.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-                }
-            }
-
-            touchStartX = 0;
-            touchStartY = 0;
-        }
-
-        // Touch event listeners - only prevent default on horizontal swipes
-        productGrid.addEventListener('touchstart', handleTouchStart, { passive: true });
-        productGrid.addEventListener('touchmove', handleTouchMove, { passive: false }); // Need to be able to preventDefault
-        productGrid.addEventListener('touchend', handleTouchEnd, { passive: true });
-
-        // NO mouse drag support - removed completely
-        // Users can scroll with mouse wheel or touch gestures only
-    });
+    initProductGridTouch();
 
     // --- Product Modal Logic ---
     const modalOverlay = document.getElementById('product-modal-overlay');
@@ -1102,25 +1088,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function openModal(card) {
         const productId = card.dataset.productId;
-        const productImg = card.dataset.img || 'https://placehold.co/400x400/1a1a1a/FFFFFF?text=Product';
+        const productImg = card.dataset.img || '';
         const productTitle = card.dataset.title || 'Product';
         const productCategory = card.dataset.category || 'Just In';
-        const productPrice = card.dataset.price || '$99.00';
+        const productPrice = card.dataset.price || '$0.00';
 
         // Try to get full product data to check for multiple images
-        let productImages = [productImg];
+        let productImages = productImg ? [productImg] : [];
         if (productId) {
             try {
                 const { getProductById } = await import('./api.js');
                 const product = await getProductById(productId);
-                if (product && product.image_urls && Array.isArray(product.image_urls) && product.image_urls.length > 0) {
+                if (product?.image_urls?.length) {
                     productImages = product.image_urls;
-                } else if (product && product.image_url) {
+                } else if (product?.image_url) {
                     productImages = [product.image_url];
                 }
             } catch (error) {
                 console.warn('Could not fetch product details:', error);
             }
+        }
+
+        if (productImages.length === 0) {
+            productImages = ['https://placehold.co/400x400/1a1a1a/FFFFFF?text=Product'];
         }
 
         // Extract numeric price for calculations
@@ -1138,11 +1128,17 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update navigation controls
         updateModalNavigation();
 
-        // Calculate and show star dust earnings (1 star dust per $1)
+        // Calculate and show star dust earnings for signed-in users only
         const stardustEarned = Math.floor(currentModalPrice);
         if (modalStardustEarn && modalStardustAmount) {
-            modalStardustAmount.textContent = stardustEarned;
-            modalStardustEarn.classList.remove('hidden');
+            const { getCurrentUser } = await import('./auth.js');
+            const user = await getCurrentUser();
+            if (user) {
+                modalStardustAmount.textContent = stardustEarned;
+                modalStardustEarn.classList.remove('hidden');
+            } else {
+                modalStardustEarn.classList.add('hidden');
+            }
         }
 
         // Store product ID on modal buttons
@@ -1249,21 +1245,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Update product cards click handlers - refresh when products are loaded
+    // Product clicks — use delegation so dynamically loaded Stripe products always work
     function attachProductCardHandlers() {
-        const cards = document.querySelectorAll('.product-card-small');
-        cards.forEach(card => {
-            // Remove existing listeners by cloning
-            const newCard = card.cloneNode(true);
-            card.parentNode.replaceChild(newCard, card);
+        const productsSection = document.getElementById('products-section');
+        if (!productsSection || productsSection.dataset.clickBound === 'true') {
+            return;
+        }
 
-            newCard.addEventListener('click', (e) => {
-                // Don't trigger if clicking on a button or link inside
-                if (e.target.closest('button') || e.target.closest('a')) {
-                    return;
-                }
-                openModal(newCard);
-            });
+        productsSection.dataset.clickBound = 'true';
+        productsSection.addEventListener('click', (e) => {
+            const card = e.target.closest('.product-card-small');
+            if (!card) return;
+            if (e.target.closest('button') || e.target.closest('a')) return;
+            openModal(card);
         });
     }
 
@@ -1306,7 +1300,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }, 500);
                 } else {
-                    toast.error('Failed to add item to cart. Please sign in first.');
+                    toast.error('Failed to add item to cart. Please try again.');
                     modalAddToCart.disabled = false;
                     modalAddToCart.textContent = 'Add to Cart';
                 }
@@ -1319,7 +1313,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Modal Checkout button
+    // Modal Quick Buy button
     if (modalCheckout) {
         modalCheckout.addEventListener('click', async () => {
             const productId = modalCheckout.dataset.productId || currentModalProductId;
@@ -1330,39 +1324,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 modalCheckout.disabled = true;
-                modalCheckout.textContent = 'Processing...';
+                modalCheckout.textContent = 'Redirecting...';
 
-                const { addProductToCart } = await import('./cart.js');
-                const success = await addProductToCart(productId, 1);
-
-                if (success) {
-                    closeModal();
-                    // Open cart sidebar and show payment methods
-                    const rightSidebarCart = document.getElementById('right-sidebar-cart');
-                    const rightSidebarOverlay = document.getElementById('right-sidebar-overlay');
-                    const paymentMethods = document.getElementById('payment-methods');
-
-                    if (rightSidebarCart && rightSidebarOverlay) {
-                        rightSidebarCart.classList.add('open');
-                        rightSidebarOverlay.classList.remove('hidden');
-                        setTimeout(() => {
-                            rightSidebarOverlay.style.opacity = '1';
-                            if (paymentMethods) {
-                                paymentMethods.classList.remove('hidden');
-                            }
-                        }, 10);
-                        document.body.style.overflow = 'hidden';
-                    }
-                } else {
-                    toast.error('Failed to add item to cart. Please sign in first.');
-                    modalCheckout.disabled = false;
-                    modalCheckout.textContent = 'Checkout';
-                }
+                const { quickBuyProduct } = await import('./payments.js');
+                await quickBuyProduct(productId, 1);
             } catch (error) {
-                console.error('Error adding to cart:', error);
-                toast.error('An error occurred. Please try again.');
+                console.error('Error starting checkout:', error);
+                toast.error('Could not start checkout. Please try again.');
+            } finally {
                 modalCheckout.disabled = false;
-                modalCheckout.textContent = 'Checkout';
+                modalCheckout.textContent = 'Quick Buy';
             }
         });
     }
@@ -1536,15 +1507,32 @@ document.addEventListener('DOMContentLoaded', () => {
     document.documentElement.setAttribute('data-theme', 'dark');
 
     // --- Initialize Authentication (temporarily disabled) ---
-    // import('./auth.js').then(({ initAuth }) => {
-    //     initAuth();
-    // }).catch(err => {
-    //     console.warn('Auth module not available:', err);
-    // });
+    import('./auth.js').then(({ initAuth }) => {
+        initAuth();
+    }).catch(err => {
+        console.warn('Auth module not available:', err);
+    });
 
     // --- Initialize Cart ---
     import('./cart.js').then(({ initCart }) => {
         initCart();
+
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('cart') === 'open') {
+            const rightSidebarCart = document.getElementById('right-sidebar-cart');
+            const rightSidebarOverlay = document.getElementById('right-sidebar-overlay');
+            const paymentMethods = document.getElementById('payment-methods');
+            if (rightSidebarCart && rightSidebarOverlay) {
+                rightSidebarCart.classList.add('open');
+                rightSidebarOverlay.classList.remove('hidden');
+                setTimeout(() => {
+                    rightSidebarOverlay.style.opacity = '1';
+                    if (paymentMethods) paymentMethods.classList.remove('hidden');
+                }, 10);
+                document.body.style.overflow = 'hidden';
+            }
+            window.history.replaceState({}, '', window.location.pathname);
+        }
     }).catch(err => {
         console.warn('Cart module not available:', err);
     });
@@ -1663,7 +1651,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const paymentMethods = document.getElementById('payment-methods');
 
     if (checkoutBtn) {
-        checkoutBtn.addEventListener('click', () => {
+        checkoutBtn.addEventListener('click', async () => {
+            const { getCartItemsList } = await import('./cart.js');
+            if (!getCartItemsList().length) {
+                toast.info('Your cart is empty');
+                return;
+            }
             if (paymentMethods) {
                 paymentMethods.classList.remove('hidden');
             }
@@ -1678,12 +1671,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (payStripe) {
         payStripe.addEventListener('click', async () => {
-            const { getCartItemsList, getCartTotal } = await import('./cart.js');
+            const { getCartItemsList, getCartTotal, getStardustDiscount } = await import('./cart.js');
             const { checkoutWithStripe } = await import('./payments.js');
             const items = getCartItemsList();
             const total = getCartTotal();
+            const discount = getStardustDiscount();
+
+            if (!items.length) {
+                toast.info('Your cart is empty');
+                return;
+            }
+
             setButtonLoading(payStripe, true);
-            await checkoutWithStripe(items, total);
+            await checkoutWithStripe(items, total, discount);
             setButtonLoading(payStripe, false);
         });
     }

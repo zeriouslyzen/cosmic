@@ -14,6 +14,17 @@ if (!supabaseUrl || !supabaseAnonKey) {
     supabase = {
         auth: {
             getUser: async () => ({ data: { user: JSON.parse(localStorage.getItem('mock_user') || 'null') }, error: null }),
+            getSession: async () => {
+                const user = JSON.parse(localStorage.getItem('mock_user') || 'null');
+                return {
+                    data: {
+                        session: user
+                            ? { access_token: 'mock-dev-token', user }
+                            : null
+                    },
+                    error: null
+                };
+            },
             signInWithPassword: async ({ email, password }) => {
                 const mockUser = { id: 'mock-' + Date.now(), email, phone: null };
                 localStorage.setItem('mock_user', JSON.stringify(mockUser));

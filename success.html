@@ -54,14 +54,14 @@
                 <div class="space-y-2 text-purple-200">
                     <p><span class="font-semibold">Order ID:</span> <span id="order-id">Loading...</span></p>
                     <p><span class="font-semibold">Status:</span> <span class="text-green-400">Confirmed</span></p>
-                    <p><span class="font-semibold">Email:</span> A confirmation has been sent to your email</p>
+                    <p><span class="font-semibold">Email:</span> <span id="order-email">A confirmation has been sent to your email</span></p>
                 </div>
             </div>
             
-            <!-- Star Dust Earned -->
-            <div class="bg-gradient-to-r from-yellow-500/20 to-purple-500/20 rounded-xl p-6 mb-8">
+            <!-- Star Dust Earned (signed-in users only) -->
+            <div id="stardust-section" class="bg-gradient-to-r from-yellow-500/20 to-purple-500/20 rounded-xl p-6 mb-8 hidden">
                 <p class="text-2xl text-white font-semibold">⭐ Star Dust Earned!</p>
-                <p class="text-purple-200 mt-2">You earned star dust points with this purchase</p>
+                <p id="stardust-message" class="text-purple-200 mt-2">You earned star dust points with this purchase</p>
             </div>
             
             <!-- Action Buttons -->
@@ -69,7 +69,7 @@
                 <a href="/" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors">
                     Continue Shopping
                 </a>
-                <a href="/?account=open" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-3 px-8 rounded-lg transition-colors border border-white/20">
+                <a id="view-account-btn" href="/?account=open" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-3 px-8 rounded-lg transition-colors border border-white/20 hidden">
                     View Account
                 </a>
             </div>
@@ -77,7 +77,9 @@
     </div>
     
     <script type="module">
-        // Create background stars
+        import { handlePaymentSuccess } from '/src/js/payments.js';
+        import { getCurrentUser } from '/src/js/auth.js';
+
         const container = document.getElementById('stars-container');
         for (let i = 0; i < 50; i++) {
             const star = document.createElement('div');
@@ -89,23 +91,64 @@
             star.style.animationDelay = Math.random() * 2 + 's';
             container.appendChild(star);
         }
-        
-        // Get session ID from URL
+
         const urlParams = new URLSearchParams(window.location.search);
         const sessionId = urlParams.get('session_id');
-        
-        if (sessionId) {
-            document.getElementById('order-id').textContent = sessionId.substring(0, 20) + '...';
-            
-            // TODO: Verify session with backend and update order in database
-            // This would typically call an API to:
-            // 1. Verify the Stripe session
-            // 2. Create order record in database
-            // 3. Award star dust to user
-            // 4. Send confirmation email
-        } else {
-            document.getElementById('order-id').textContent = 'No session found';
+        const orderIdEl = document.getElementById('order-id');
+        const orderEmailEl = document.getElementById('order-email');
+        const stardustSection = document.getElementById('stardust-section');
+        const stardustMessage = document.getElementById('stardust-message');
+        const viewAccountBtn = document.getElementById('view-account-btn');
+
+        async function finalizeOrder() {
+            if (!sessionId) {
+                orderIdEl.textContent = 'No session found';
+                return;
+            }
+
+            orderIdEl.textContent = 'Verifying payment...';
+
+            try {
+                const response = await fetch(`/api/verify-checkout-session?session_id=${encodeURIComponent(sessionId)}`);
+                const data = await response.json();
+
+                if (!response.ok || !data.paid) {
+                    orderIdEl.textContent = 'Payment verification failed';
+                    return;
+                }
+
+                orderIdEl.textContent = data.orderId || sessionId.substring(0, 20) + '...';
+
+                if (orderEmailEl && data.customerEmail) {
+                    orderEmailEl.textContent = data.customerEmail;
+                }
+
+                const user = await getCurrentUser();
+                if (data.orderId) {
+                    await handlePaymentSuccess(
+                        data.orderId,
+                        'stripe',
+                        data.amountTotal,
+                        data.userId,
+                        data.customerEmail
+                    );
+
+                    if (user && stardustSection && stardustMessage && data.amountTotal) {
+                        stardustMessage.textContent = `You earned ${Math.floor(data.amountTotal)} star dust points with this purchase`;
+                        stardustSection.classList.remove('hidden');
+                    }
+
+                    if (user && viewAccountBtn) {
+                        viewAccountBtn.classList.remove('hidden');
+                    }
+                }
+            } catch (error) {
+                console.error('Success page error:', error);
+                orderIdEl.textContent = 'Could not verify payment';
+            }
         }
+
+        finalizeOrder();
     </script>
 </body>
 </html>

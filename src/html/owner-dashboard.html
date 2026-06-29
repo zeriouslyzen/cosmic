@@ -19,9 +19,7 @@
     </script>
     -->
     <script>
-        // Mock Analytics for Demo
-        window.gtag = function () { console.log('Analytics Event:', arguments); };
-        console.log('Analytics initialized (Mock Mode)');
+        window.gtag = function () {};
     </script>
 
     <!-- Tailwind CSS (Dev Only) -->
@@ -429,24 +427,24 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                             </svg>
-                            <span id="metric-visitors-today">47</span> visitors
+                            <span id="metric-visitors-today">—</span> visitors
                         </div>
                         <div class="metric-pill bg-purple-50 text-purple-700">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                             </svg>
-                            <span id="metric-conversion-rate">3.2%</span> conv
+                            <span id="metric-conversion-rate">—</span> conv
                         </div>
                         <div class="metric-pill bg-green-50 text-green-700">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                             </svg>
-                            <span id="metric-popular-product">Crystal Set</span>
+                            <span id="metric-popular-product">—</span>
                         </div>
                         <div class="metric-pill bg-amber-50 text-amber-700">
-                            <span class="font-bold" id="metric-top-zodiac">Leo</span> top sign
+                            <span class="font-bold" id="metric-top-zodiac">—</span> top sign
                         </div>
                     </div>
 
@@ -669,6 +667,7 @@
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
                             <div>
                                 <h2 class="font-heading text-2xl font-bold text-gray-900 mb-2">Post Item</h2>
+                                <p class="text-sm text-gray-500 mb-2">Products live in Stripe. Add them here or in the Stripe dashboard, then refresh the catalog.</p>
                                 <div class="flex gap-4 text-sm">
                                     <div>
                                         <span class="text-gray-500">Total Products:</span>
@@ -685,6 +684,14 @@
                                 </div>
                             </div>
                             <div class="flex flex-wrap gap-2">
+                                <button id="import-stripe-btn"
+                                    class="px-3 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition-colors">
+                                    Refresh from Stripe
+                                </button>
+                                <a href="https://dashboard.stripe.com/products" target="_blank" rel="noopener noreferrer"
+                                    class="px-3 py-2 bg-white border border-indigo-200 text-indigo-700 text-sm rounded-lg hover:bg-indigo-50 transition-colors">
+                                    Manage in Stripe
+                                </a>
                                 <button id="import-temu-btn"
                                     class="px-3 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors">
                                     Import from Temu
@@ -1022,6 +1029,16 @@
                                     <input type="text" id="wizard-dropship-tracking-id"
                                         placeholder="Tracking number from platform"
                                         class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-[#D2B48C]">
+                                </div>
+                                <div class="border-t border-gray-200 pt-4">
+                                    <label class="flex items-start gap-3 cursor-pointer">
+                                        <input type="checkbox" id="wizard-sync-stripe" checked
+                                            class="mt-1 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                        <span>
+                                            <span class="block text-sm font-semibold text-gray-900">Publish to Stripe</span>
+                                            <span class="block text-xs text-gray-500 mt-1">Your store reads directly from Stripe. Image URLs must be public https links.</span>
+                                        </span>
+                                    </label>
                                 </div>
                                 <div class="border-t border-gray-200 pt-4">
                                     <h4 class="text-sm font-semibold text-gray-900 mb-2">Product Summary</h4>

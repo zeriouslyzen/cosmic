@@ -1,12 +1,25 @@
 // Payment Processing with Stripe and Alternatives
 import { loadStripe } from '@stripe/stripe-js';
 import { getCurrentUser } from './auth.js';
-import { createOrder, clearCart } from './api.js';
+import { getCartUserId } from './session.js';
+import { createOrder, clearCart, getProductById } from './api.js';
 import { earnStardustOnPurchase } from './stardust.js';
 import { toast } from './utils/toast.js';
 
 let stripe = null;
 const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '';
+
+function mapCartItemsForCheckout(cartItems) {
+    return cartItems.map((item) => ({
+        title: item.products?.title || 'Product',
+        name: item.products?.title || 'Product',
+        price: parseFloat(item.products?.price || 0),
+        quantity: item.quantity || 1,
+        image_url: item.products?.image_url || '',
+        stripe_price_id: item.products?.stripe_price_id || null,
+        product_id: item.product_id
+    }));
+}
 
 // Initialize Stripe
 export async function initStripe() {
@@ -24,30 +37,15 @@ export async function initStripe() {
     }
 }
 
-// Process checkout with Stripe
+// Process checkout with Stripe (guest or signed-in)
 export async function checkoutWithStripe(cartItems, total, stardustDiscount = 0) {
-    const user = await getCurrentUser();
-    if (!user) {
-        toast.info('Please sign in to checkout');
+    if (!cartItems?.length) {
+        toast.info('Your cart is empty');
         return false;
     }
 
     if (!stripePublishableKey) {
-        // Development mode - simulate checkout
-        toast.info(`Development Mode: Stripe checkout simulation\n\nTotal: $${total.toFixed(2)}\nItems: ${cartItems.length}`);
-
-        // Simulate successful order
-        const order = await createOrder(user.id, {
-            total: total,
-            payment_method: 'stripe',
-            payment_status: 'paid'
-        });
-
-        if (order) {
-            await handlePaymentSuccess(order.id, 'stripe');
-            toast.success('Order placed successfully! (Development mode)');
-            return true;
-        }
+        toast.error('Stripe is not configured. Add your publishable key to .env');
         return false;
     }
 
@@ -59,12 +57,21 @@ export async function checkoutWithStripe(cartItems, total, stardustDiscount = 0)
         }
     }
 
+    const userId = await getCartUserId();
+    const user = await getCurrentUser();
+
+    if (stardustDiscount > 0 && !user) {
+        toast.info('Sign in to use Star Dust rewards');
+        return false;
+    }
+
     try {
-        // Create order in database first
-        const order = await createOrder(user.id, {
-            total: total,
+        const order = await createOrder(userId, {
+            total,
             payment_method: 'stripe',
-            payment_status: 'pending'
+            payment_status: 'pending',
+            customer_email: user?.email || null,
+            is_guest: !user
         });
 
         if (!order) {
@@ -72,48 +79,60 @@ export async function checkoutWithStripe(cartItems, total, stardustDiscount = 0)
             return false;
         }
 
-        // Create Stripe Checkout session (requires backend endpoint)
-        // For now, we'll use a client-side approach with payment links
-        // In production, create a serverless function to handle this
-
         const response = await fetch('/api/create-checkout-session', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 orderId: order.id,
-                items: cartItems.map(item => ({
-                    product_id: item.product_id,
-                    quantity: item.quantity,
-                    price: item.products?.price
-                })),
-                total: total,
-                userId: user.id
+                userId,
+                discountAmount: stardustDiscount,
+                items: mapCartItemsForCheckout(cartItems)
             })
         });
 
+        const data = await response.json();
         if (!response.ok) {
-            throw new Error('Failed to create checkout session');
+            throw new Error(data.error || data.message || 'Failed to create checkout session');
         }
 
-        const { sessionId } = await response.json();
-
-        // Redirect to Stripe Checkout
-        const { error } = await stripe.redirectToCheckout({ sessionId });
-
-        if (error) {
-            console.error('Stripe checkout error:', error);
-            toast.error('Checkout failed: ' + error.message);
-            return false;
+        if (data.url) {
+            window.location.href = data.url;
+            return true;
         }
 
-        return true;
+        if (data.sessionId) {
+            const { error } = await stripe.redirectToCheckout({ sessionId: data.sessionId });
+            if (error) {
+                throw error;
+            }
+            return true;
+        }
+
+        throw new Error('No checkout session returned');
     } catch (error) {
         console.error('Checkout error:', error);
-        toast.error('Checkout failed. Please try again.');
+        toast.error(error.message || 'Checkout failed. Please try again.');
         return false;
     }
+}
+
+// Buy now — skip cart, go straight to Stripe (no account required)
+export async function quickBuyProduct(productId, quantity = 1) {
+    const product = await getProductById(productId);
+    if (!product) {
+        toast.error('Product not found');
+        return false;
+    }
+
+    const lineItem = {
+        product_id: productId,
+        quantity,
+        products: product
+    };
+    const total = parseFloat(product.price || 0) * quantity;
+    return checkoutWithStripe([lineItem], total, 0);
 }
 
 // Process payment with Venmo (via Stripe payment links or manual)
@@ -124,7 +143,6 @@ export async function checkoutWithVenmo(cartItems, total) {
         return false;
     }
 
-    // Create order
     const order = await createOrder(user.id, {
         total: total,
         payment_method: 'venmo',
@@ -136,12 +154,9 @@ export async function checkoutWithVenmo(cartItems, total) {
         return false;
     }
 
-    // In production, integrate Venmo SDK or use Stripe payment links
-    // For now, show manual payment instructions
     const venmoHandle = prompt('Enter your Venmo handle for payment instructions:');
     if (venmoHandle) {
         toast.success(`Please send $${total.toFixed(2)} to @${venmoHandle} with order ID: ${order.id}`);
-        // In production, send email/SMS with payment instructions
     }
 
     return order;
@@ -155,7 +170,6 @@ export async function checkoutWithCashApp(cartItems, total) {
         return false;
     }
 
-    // Create order
     const order = await createOrder(user.id, {
         total: total,
         payment_method: 'cashapp',
@@ -167,7 +181,6 @@ export async function checkoutWithCashApp(cartItems, total) {
         return false;
     }
 
-    // In production, integrate CashApp SDK or use Stripe payment links
     const cashTag = prompt('Enter your CashApp $tag for payment instructions:');
     if (cashTag) {
         toast.success(`Please send $${total.toFixed(2)} to $${cashTag} with order ID: ${order.id}`);
@@ -184,7 +197,6 @@ export async function checkoutWithCrypto(cartItems, total) {
         return false;
     }
 
-    // Create order
     const order = await createOrder(user.id, {
         total: total,
         payment_method: 'crypto',
@@ -196,40 +208,72 @@ export async function checkoutWithCrypto(cartItems, total) {
         return false;
     }
 
-    // In production, integrate Coinbase Commerce or similar
-    // For now, show manual instructions
     toast.info(`Crypto payment: Send $${total.toFixed(2)} worth of crypto. Order ID: ${order.id}`);
 
     return order;
 }
 
-// Handle successful payment (called from webhook or redirect)
-export async function handlePaymentSuccess(orderId, paymentMethod) {
-    const user = await getCurrentUser();
-    if (!user) return false;
+function syncOrderToOwnerList(orderId, updates) {
+    const allOrders = JSON.parse(localStorage.getItem('all_orders') || '[]');
+    const index = allOrders.findIndex((order) => order.id === orderId);
+    if (index !== -1) {
+        allOrders[index] = { ...allOrders[index], ...updates };
+        localStorage.setItem('all_orders', JSON.stringify(allOrders));
+    }
+}
+
+// Handle successful payment (called from success page)
+export async function handlePaymentSuccess(orderId, paymentMethod, amountTotal = null, userId = null, customerEmail = null) {
+    if (!orderId) return false;
+
+    const resolvedUserId = userId || await getCartUserId();
+    const processedKey = `checkout_processed_${orderId}`;
+    if (sessionStorage.getItem(processedKey) === 'true') {
+        return true;
+    }
 
     try {
         const { useLocalStorage, supabaseClient } = await import('./supabase.js');
+        const { isGuestUserId } = await import('./session.js');
+        const user = await getCurrentUser();
+        const useLocalOrders = useLocalStorage || isGuestUserId(resolvedUserId);
 
-        if (useLocalStorage) {
-            // Store order in localStorage for development
-            const orders = JSON.parse(localStorage.getItem(`orders_${user.id}`) || '[]');
-            const order = orders.find(o => o.id === orderId) || { id: orderId, total: 0 };
-            order.payment_status = 'paid';
-            order.status = 'processing';
-            localStorage.setItem(`orders_${user.id}`, JSON.stringify(orders));
-
-            // Earn star dust
-            if (order.total) {
-                await earnStardustOnPurchase(parseFloat(order.total));
+        if (useLocalOrders) {
+            const orders = JSON.parse(localStorage.getItem(`orders_${resolvedUserId}`) || '[]');
+            const order = orders.find((entry) => entry.id === orderId);
+            if (order) {
+                order.payment_status = 'paid';
+                order.status = 'processing';
+                if (amountTotal != null) {
+                    order.total = amountTotal;
+                }
+                if (customerEmail) {
+                    order.customer_email = customerEmail;
+                }
+                localStorage.setItem(`orders_${resolvedUserId}`, JSON.stringify(orders));
             }
 
-            // Clear cart
-            await clearCart(user.id);
+            syncOrderToOwnerList(orderId, {
+                payment_status: 'paid',
+                status: 'processing',
+                payment_method: paymentMethod,
+                customer_email: customerEmail || order?.customer_email || user?.email || null
+            });
+
+            const paidTotal = amountTotal ?? order?.total ?? 0;
+            if (user && paidTotal) {
+                await earnStardustOnPurchase(parseFloat(paidTotal));
+            }
+
+            await clearCart(resolvedUserId);
+            sessionStorage.setItem(processedKey, 'true');
             return true;
         }
 
-        // Update order status
+        if (!user) {
+            return false;
+        }
+
         const { error } = await supabaseClient
             .from('orders')
             .update({
@@ -244,7 +288,6 @@ export async function handlePaymentSuccess(orderId, paymentMethod) {
             return false;
         }
 
-        // Earn star dust
         const { data: orderData } = await supabaseClient
             .from('orders')
             .select('total')
@@ -255,9 +298,8 @@ export async function handlePaymentSuccess(orderId, paymentMethod) {
             await earnStardustOnPurchase(parseFloat(orderData.total));
         }
 
-        // Clear cart
         await clearCart(user.id);
-
+        sessionStorage.setItem(processedKey, 'true');
         return true;
     } catch (error) {
         console.error('Error handling payment success:', error);
@@ -265,10 +307,8 @@ export async function handlePaymentSuccess(orderId, paymentMethod) {
     }
 }
 
-// Initialize payments on page load
 export async function initPayments() {
     if (stripePublishableKey) {
         await initStripe();
     }
 }
-

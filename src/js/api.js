@@ -1,5 +1,43 @@
-// API Functions for Supabase operations with Local Storage Fallback
+// API Functions for Supabase operations with Stripe catalog
 import { supabaseClient, useLocalStorage } from './supabase.js';
+import { fetchStripeCatalog, normalizeStripeProduct } from './stripe-catalog.js';
+import { isGuestUserId } from './session.js';
+
+function useLocalCart(userId) {
+    return useLocalStorage || isGuestUserId(userId);
+}
+
+function applyProductFilters(products, filters = {}) {
+    let filtered = products;
+
+    if (filters.zodiac && filters.zodiac !== 'all') {
+        filtered = filtered.filter((product) => {
+            const zodiacs = (product.zodiac || '').split(',').map((z) => z.trim());
+            return zodiacs.includes(filters.zodiac);
+        });
+    }
+
+    if (filters.search) {
+        const searchLower = filters.search.toLowerCase();
+        filtered = filtered.filter((product) =>
+            product.title?.toLowerCase().includes(searchLower) ||
+            product.category?.toLowerCase().includes(searchLower) ||
+            product.description?.toLowerCase().includes(searchLower)
+        );
+    }
+
+    return filtered;
+}
+
+async function getStripeProducts(filters = {}) {
+    try {
+        const products = await fetchStripeCatalog();
+        return applyProductFilters(products, filters);
+    } catch (error) {
+        console.warn('Stripe catalog unavailable:', error.message);
+        return null;
+    }
+}
 
 // User Profile Operations
 export async function getUserProfile(userId) {
@@ -50,89 +88,13 @@ export async function createOrUpdateProfile(userId, profileData) {
 
 // Product Operations
 export async function getProducts(filters = {}) {
+    const stripeProducts = await getStripeProducts(filters);
+    if (stripeProducts) {
+        return stripeProducts;
+    }
+
     if (useLocalStorage) {
-        // Try to get products from localStorage first
-        let products = JSON.parse(localStorage.getItem('all_products') || '[]');
-
-        // Seed a default set for local fallback so the page is never empty
-        if (products.length === 0) {
-            products = [
-                {
-                    id: 'demo-1',
-                    title: 'Siriusly Gold',
-                    price: 120,
-                    zodiac: 'just-in',
-                    image_url: '/images/products/product-1-1.jpg',
-                    image_urls: [
-                        '/images/products/product-1-1.jpg',
-                        '/images/products/product-1-2.jpg',
-                        '/images/products/product-1-3.jpg',
-                        '/images/products/product-1-4.jpg'
-                    ],
-                    category: 'Just In',
-                    description: 'Retro chrome orb lamp with warm glow.'
-                },
-                {
-                    id: 'demo-2',
-                    title: 'Silver Signet',
-                    price: 85,
-                    zodiac: 'aries',
-                    image_url: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=400&fit=crop',
-                    category: 'Aries',
-                    description: 'Handmade silver signet ring.'
-                },
-                {
-                    id: 'demo-3',
-                    title: 'Studio Headphones',
-                    price: 199,
-                    zodiac: 'taurus',
-                    image_url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop',
-                    category: 'Taurus',
-                    description: 'Closed-back studio monitors.'
-                },
-                {
-                    id: 'demo-4',
-                    title: 'Analog Watch',
-                    price: 210,
-                    zodiac: 'gemini',
-                    image_url: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop',
-                    category: 'Gemini',
-                    description: 'Minimal steel case, leather band.'
-                }
-            ];
-            localStorage.setItem('all_products', JSON.stringify(products));
-        }
-
-        // If no products in localStorage, try to get from DOM (for main page)
-        if (products.length === 0 && typeof document !== 'undefined') {
-            const productCards = document.querySelectorAll('.product-card-small, .product-card');
-            products = [];
-            productCards.forEach((card, index) => {
-                products.push({
-                    id: card.dataset.productId || `product-${index}`,
-                    title: card.dataset.title || 'Product ' + (index + 1),
-                    price: parseFloat((card.dataset.price || '$99').replace('$', '').replace(',', '')) || 99,
-                    zodiac: card.dataset.zodiac || 'random',
-                    image_url: card.dataset.img || '',
-                    category: card.dataset.category || 'Random',
-                    description: 'A cosmic product'
-                });
-            });
-            // Save to localStorage for future use
-            if (products.length > 0) {
-                localStorage.setItem('all_products', JSON.stringify(products));
-            }
-        }
-
-        let filtered = products;
-        if (filters.zodiac && filters.zodiac !== 'all') {
-            filtered = filtered.filter(p => p.zodiac === filters.zodiac);
-        }
-        if (filters.search) {
-            const searchLower = filters.search.toLowerCase();
-            filtered = filtered.filter(p => p.title.toLowerCase().includes(searchLower));
-        }
-        return filtered;
+        return [];
     }
 
     let query = supabaseClient.from('products').select('*');
@@ -151,7 +113,19 @@ export async function getProducts(filters = {}) {
         console.error('Error fetching products:', error);
         return [];
     }
-    return data || [];
+    return applyProductFilters((data || []).map((product) => normalizeStripeProduct({
+        stripe_product_id: product.id,
+        stripe_price_id: product.stripe_price_id,
+        title: product.title,
+        description: product.description,
+        price: product.price,
+        image_url: product.image_url,
+        image_urls: product.image_urls,
+        category: product.category,
+        zodiac: product.zodiac,
+        sku: product.sku,
+        stock_quantity: product.stock_quantity
+    })), filters);
 }
 
 export async function getProductById(productId) {
@@ -175,7 +149,7 @@ export async function getProductById(productId) {
 
 // Cart Operations
 export async function getCartItems(userId) {
-    if (useLocalStorage) {
+    if (useLocalCart(userId)) {
         const cart = JSON.parse(localStorage.getItem(`cart_${userId}`) || '[]');
         // Enrich with product data
         const products = await getProducts();
@@ -202,7 +176,7 @@ export async function getCartItems(userId) {
 }
 
 export async function addToCart(userId, productId, quantity = 1) {
-    if (useLocalStorage) {
+    if (useLocalCart(userId)) {
         const cart = JSON.parse(localStorage.getItem(`cart_${userId}`) || '[]');
         const existing = cart.find(item => item.product_id === productId);
 
@@ -268,14 +242,15 @@ export async function updateCartItemQuantity(cartItemId, quantity) {
         return await removeFromCart(cartItemId);
     }
 
-    if (useLocalStorage) {
-        const user = JSON.parse(localStorage.getItem('mock_user') || 'null');
-        if (!user) return null;
-        const cart = JSON.parse(localStorage.getItem(`cart_${user.id}`) || '[]');
+    const { getCartUserId } = await import('./session.js');
+    const userId = await getCartUserId();
+
+    if (useLocalCart(userId)) {
+        const cart = JSON.parse(localStorage.getItem(`cart_${userId}`) || '[]');
         const item = cart.find(i => i.id === cartItemId);
         if (item) {
             item.quantity = quantity;
-            localStorage.setItem(`cart_${user.id}`, JSON.stringify(cart));
+            localStorage.setItem(`cart_${userId}`, JSON.stringify(cart));
             return item;
         }
         return null;
@@ -296,12 +271,13 @@ export async function updateCartItemQuantity(cartItemId, quantity) {
 }
 
 export async function removeFromCart(cartItemId) {
-    if (useLocalStorage) {
-        const user = JSON.parse(localStorage.getItem('mock_user') || 'null');
-        if (!user) return false;
-        const cart = JSON.parse(localStorage.getItem(`cart_${user.id}`) || '[]');
+    const { getCartUserId } = await import('./session.js');
+    const userId = await getCartUserId();
+
+    if (useLocalCart(userId)) {
+        const cart = JSON.parse(localStorage.getItem(`cart_${userId}`) || '[]');
         const filtered = cart.filter(i => i.id !== cartItemId);
-        localStorage.setItem(`cart_${user.id}`, JSON.stringify(filtered));
+        localStorage.setItem(`cart_${userId}`, JSON.stringify(filtered));
         return true;
     }
 
@@ -318,7 +294,7 @@ export async function removeFromCart(cartItemId) {
 }
 
 export async function clearCart(userId) {
-    if (useLocalStorage) {
+    if (useLocalCart(userId)) {
         localStorage.removeItem(`cart_${userId}`);
         return true;
     }
@@ -336,8 +312,14 @@ export async function clearCart(userId) {
 }
 
 // Order Operations
+function syncOrderToOwnerDashboard(order) {
+    const allOrders = JSON.parse(localStorage.getItem('all_orders') || '[]');
+    allOrders.unshift(order);
+    localStorage.setItem('all_orders', JSON.stringify(allOrders));
+}
+
 export async function createOrder(userId, orderData) {
-    if (useLocalStorage) {
+    if (useLocalCart(userId) || useLocalStorage) {
         const orders = JSON.parse(localStorage.getItem(`orders_${userId}`) || '[]');
         const order = {
             id: 'order-' + Date.now(),
@@ -348,6 +330,7 @@ export async function createOrder(userId, orderData) {
         };
         orders.push(order);
         localStorage.setItem(`orders_${userId}`, JSON.stringify(orders));
+        syncOrderToOwnerDashboard(order);
         return order;
     }
 

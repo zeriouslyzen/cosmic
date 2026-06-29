@@ -864,19 +864,7 @@ async function loadDashboard() {
         if (timeSpentEl) timeSpentEl.textContent = `${avgTime}m`;
     }
 
-    // Seed phone numbers for existing orders if missing (DEV ONLY)
-    const storedOrders = JSON.parse(localStorage.getItem('all_orders') || '[]');
-    let ordersUpdated = false;
-    storedOrders.forEach(order => {
-        if (!order.customer_phone) {
-            order.customer_phone = '555-0199'; // Mock number
-            ordersUpdated = true;
-        }
-    });
-    if (ordersUpdated) {
-        localStorage.setItem('all_orders', JSON.stringify(storedOrders));
-        console.log('Seeded mock phone numbers for orders');
-    }
+    // Orders load without fabricated customer data.
 
     await loadProducts();
     await loadOrders();
@@ -1922,6 +1910,12 @@ async function publishWizardProduct() {
         return;
     }
 
+    const primaryImage = wizardProductData.image_url || wizardProductData.image_urls[0] || '';
+    if (primaryImage.startsWith('data:')) {
+        alert('Stripe requires public image URLs (https://...). Add the image URL in Stripe, or host the file online first.');
+        return;
+    }
+
     // Generate SKU if not set
     if (!wizardProductData.sku) {
         wizardProductData.sku = generateSKU();
@@ -1944,6 +1938,12 @@ async function publishWizardProduct() {
         dropship_product_id: wizardProductData.dropship_product_id || null,
         dropship_api_data: wizardProductData.dropship_api_data || null
     };
+
+    const syncStripe = document.getElementById('wizard-sync-stripe')?.checked;
+    if (syncStripe === false) {
+        alert('Products are managed in Stripe. Turn "Also list in Stripe" back on to publish.');
+        return;
+    }
 
     const created = await createProduct(productData);
     if (created) {
@@ -1992,9 +1992,18 @@ function initWizard() {
     }
 
     // Dropshipping import buttons
+    const importStripeBtn = document.getElementById('import-stripe-btn');
     const importTemuBtn = document.getElementById('import-temu-btn');
     const importAliExpressBtn = document.getElementById('import-aliexpress-btn');
 
+    if (importStripeBtn) {
+        importStripeBtn.addEventListener('click', async () => {
+            await loadProducts();
+            await loadDashboard();
+            window.dispatchEvent(new CustomEvent('products-updated'));
+            alert('Store catalog refreshed from Stripe.');
+        });
+    }
     if (importTemuBtn) {
         importTemuBtn.addEventListener('click', () => importFromDropshipping('temu'));
     }
@@ -2300,62 +2309,33 @@ function loadRecentActivity() {
     const feed = document.getElementById('recent-activity-feed');
     if (!feed) return;
 
-    // Mock recent activity data with SVG icons
-    const mockActivities = [
-        {
-            type: 'purchase',
-            user: 'Customer',
-            product: 'Crystal Necklace',
-            time: '2 minutes ago',
-            icon: '<svg class="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>'
-        },
-        {
-            type: 'view',
-            user: 'Visitor',
-            product: 'Zodiac Ring',
-            time: '5 minutes ago',
-            icon: '<svg class="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>'
-        },
-        {
-            type: 'cart_add',
-            user: 'Customer',
-            product: 'Moonstone Bracelet',
-            time: '12 minutes ago',
-            icon: '<svg class="w-3 h-3 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>'
-        },
-        {
-            type: 'message',
-            user: 'Customer',
-            message: 'Asked about shipping',
-            time: '18 minutes ago',
-            icon: '<svg class="w-3 h-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>'
-        }
-    ];
+    const orders = JSON.parse(localStorage.getItem('all_orders') || '[]')
+        .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
+        .slice(0, 5);
 
-    feed.innerHTML = mockActivities.map(activity => `
-        <div class="flex items-center gap-2 p-1.5 bg-gray-50 rounded hover:bg-gray-100 transition-colors">
-            ${activity.icon}
-            <span class="flex-1 truncate text-gray-700">
-                ${activity.type === 'message' ? activity.message : activity.product}
-            </span>
-            <span class="text-gray-400 text-[9px]">${activity.time.replace(' minutes ago', 'm').replace(' ago', '')}</span>
+    if (orders.length === 0) {
+        feed.innerHTML = '<div class="text-center py-4 text-gray-400 text-[10px]">No recent activity yet</div>';
+        return;
+    }
+
+    feed.innerHTML = orders.map((order) => `
+        <div class="flex items-center gap-2 p-1.5 bg-gray-50 rounded">
+            <span class="flex-1 truncate text-gray-700">Order #${String(order.id).slice(0, 8)} · $${parseFloat(order.total || 0).toFixed(2)}</span>
+            <span class="text-gray-400 text-[9px]">${order.status || 'pending'}</span>
         </div>
     `).join('');
 }
 
 function loadMarketingMetrics() {
-    // Mock metrics data
     const visitorsToday = document.getElementById('metric-visitors-today');
     const conversionRate = document.getElementById('metric-conversion-rate');
     const popularProduct = document.getElementById('metric-popular-product');
     const topZodiac = document.getElementById('metric-top-zodiac');
 
-    if (visitorsToday) visitorsToday.textContent = Math.floor(Math.random() * 100 + 20);
-    if (conversionRate) conversionRate.textContent = `${(Math.random() * 5 + 2).toFixed(1)}%`;
-    if (popularProduct) popularProduct.textContent = 'Crystal Necklace';
-
-    const zodiacSymbols = ['♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐', '♑', '♒', '♓'];
-    if (topZodiac) topZodiac.textContent = zodiacSymbols[Math.floor(Math.random() * zodiacSymbols.length)];
+    if (visitorsToday) visitorsToday.textContent = '—';
+    if (conversionRate) conversionRate.textContent = '—';
+    if (popularProduct) popularProduct.textContent = currentProducts[0]?.title || '—';
+    if (topZodiac) topZodiac.textContent = '—';
 }
 
 function initContentCalendar() {
@@ -2365,14 +2345,6 @@ function initContentCalendar() {
     const today = new Date();
     const dayOfWeek = today.getDay();
 
-    // Platform colors for mock scheduled posts
-    const platforms = [
-        { color: 'bg-purple-400', label: 'W' }, // Whatnot
-        { color: 'bg-pink-400', label: 'I' },   // Instagram
-        { color: 'bg-gray-800', label: 'T' },   // TikTok
-        { color: 'bg-blue-400', label: 'F' }    // Facebook
-    ];
-
     let calendarHTML = '';
     for (let i = 0; i < 7; i++) {
         const date = new Date(today);
@@ -2380,14 +2352,10 @@ function initContentCalendar() {
         const dayNum = date.getDate();
         const isToday = i === dayOfWeek;
 
-        // Random mock posts for some days
-        const hasPosts = Math.random() > 0.5;
-        const randomPlatform = platforms[Math.floor(Math.random() * platforms.length)];
-
         calendarHTML += `
             <div class="text-center p-2 rounded ${isToday ? 'bg-[#D2B48C] text-white' : 'bg-gray-50'}">
                 <span class="text-xs font-bold">${dayNum}</span>
-                ${hasPosts ? `<div class="w-4 h-4 ${randomPlatform.color} rounded-full mx-auto mt-1 text-white text-[8px] flex items-center justify-center">${randomPlatform.label}</div>` : '<div class="h-5"></div>'}
+                <div class="h-5"></div>
             </div>
         `;
     }

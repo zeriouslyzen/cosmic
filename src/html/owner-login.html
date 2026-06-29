@@ -36,6 +36,10 @@
         </div>
 
         <form id="owner-login-form" class="space-y-6">
+            <div id="dev-login-hint"
+                class="hidden rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-xs text-amber-100">
+                Local dev mode: use any email and password, or click below to skip login.
+            </div>
             <div>
                 <label class="block text-gray-400 text-xs uppercase tracking-widest mb-2">Email Address</label>
                 <input type="email" id="login-email" required placeholder="owner@cosmicdeals.com"
@@ -53,6 +57,11 @@
             <div id="login-error" class="text-red-400 text-xs text-center hidden"></div>
         </form>
 
+        <button type="button" id="dev-dashboard-btn"
+            class="hidden mt-4 w-full border border-[#D2B48C]/40 text-[#D2B48C] py-3 rounded-xl hover:bg-[#D2B48C]/10 transition-colors text-sm font-semibold">
+            Open Dashboard (Dev Mode)
+        </button>
+
         <div class="mt-8 text-center">
             <a href="../../index.html" class="text-gray-500 text-xs hover:text-[#D2B48C] transition-colors">← Return to
                 Main Store</a>
@@ -61,11 +70,29 @@
 
     <script type="module">
         import { ownerLogin } from '../js/owner.js';
-        import { supabaseClient } from '../js/supabase.js';
+        import { supabaseClient, useLocalStorage } from '../js/supabase.js';
 
         const form = document.getElementById('owner-login-form');
         const errorEl = document.getElementById('login-error');
         const submitBtn = document.getElementById('login-submit');
+        const devHint = document.getElementById('dev-login-hint');
+        const devDashboardBtn = document.getElementById('dev-dashboard-btn');
+        const isDevBuild = import.meta.env.DEV;
+
+        if (isDevBuild && (useLocalStorage || import.meta.env.VITE_OWNER_DASH_DEV_MODE === 'true')) {
+            devHint?.classList.remove('hidden');
+            devDashboardBtn?.classList.remove('hidden');
+        }
+
+        devDashboardBtn?.addEventListener('click', async () => {
+            localStorage.setItem('owner_debug_mode', 'true');
+            const email = document.getElementById('login-email').value || 'owner@cosmicdeals.com';
+            await supabaseClient.auth.signInWithPassword({
+                email,
+                password: 'dev-mode'
+            });
+            window.location.href = './owner-dashboard.html';
+        });
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();

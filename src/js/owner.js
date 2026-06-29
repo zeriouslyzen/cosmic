@@ -1,14 +1,28 @@
 // Owner Dashboard Management
-import { supabaseClient } from './supabase.js';
+import { supabaseClient, useLocalStorage } from './supabase.js';
 import { getProducts, getProductById } from './api.js';
+import {
+    archiveProductInStripe,
+    isStripeCatalogAvailable,
+    publishProductToStripe,
+    updateProductInStripe
+} from './stripe-catalog.js';
 
 let isOwner = false;
-const ownerDevMode = import.meta?.env?.VITE_OWNER_DASH_DEV_MODE === 'true';
+const ownerDevMode = import.meta.env.DEV && import.meta?.env?.VITE_OWNER_DASH_DEV_MODE === 'true';
+
+function getOwnerEmails() {
+    return [
+        import.meta.env.VITE_OWNER_EMAIL,
+        import.meta.env.OWNER_EMAIL,
+        'owner@cosmicdeals.com',
+        import.meta.env.DEV ? localStorage.getItem('owner_email') : null
+    ].filter(Boolean);
+}
 
 // Check if user is owner
 export async function checkOwnerAccess() {
-    // 1. Check for manual debug override (Console: localStorage.setItem('owner_debug_mode', 'true'))
-    if (localStorage.getItem('owner_debug_mode') === 'true') {
+    if (import.meta.env.DEV && (localStorage.getItem('owner_debug_mode') === 'true' || ownerDevMode)) {
         console.warn('⚠️ DASHBOARD DEBUG MODE ACTIVE - Security Bypassed');
         isOwner = true;
         return true;
@@ -21,12 +35,14 @@ export async function checkOwnerAccess() {
         return false;
     }
 
-    // Tight email-based check for the owner
-    // In production, you would check a 'role' column in a 'profiles' table
-    const ownerEmails = [
-        'owner@cosmicdeals.com',
-        localStorage.getItem('owner_email') // Allow dev override if explicitly set
-    ].filter(Boolean);
+    // Local dev without Supabase: any signed-in user can access the dashboard
+    if (useLocalStorage) {
+        isOwner = true;
+        return true;
+    }
+
+    // Production: email-based owner check (or role column in profiles later)
+    const ownerEmails = getOwnerEmails();
 
     if (ownerEmails.includes(user.email)) {
         isOwner = true;
@@ -35,6 +51,10 @@ export async function checkOwnerAccess() {
 
     isOwner = false;
     return false;
+}
+
+export function isLocalOwnerMode() {
+    return useLocalStorage || (import.meta.env.DEV && (ownerDevMode || localStorage.getItem('owner_debug_mode') === 'true'));
 }
 
 // Owner authentication
@@ -117,20 +137,23 @@ export async function createProduct(productData) {
         if (!isOwner) return null;
     }
 
-    const { useLocalStorage } = await import('./supabase.js');
+    if (await isStripeCatalogAvailable()) {
+        try {
+            const created = await publishProductToStripe(productData);
+            return {
+                ...productData,
+                ...created,
+                id: created.stripe_product_id
+            };
+        } catch (error) {
+            console.error('Error creating Stripe product:', error);
+            return null;
+        }
+    }
 
     if (useLocalStorage) {
-        // Store in localStorage for development
-        const products = await getProducts();
-        const newProduct = {
-            id: 'product-' + Date.now(),
-            ...productData,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-        };
-        products.push(newProduct);
-        localStorage.setItem('all_products', JSON.stringify(products));
-        return newProduct;
+        console.error('Stripe is not configured. Add STRIPE_SECRET_KEY to .env to manage products.');
+        return null;
     }
 
     const { data, error } = await supabaseClient
@@ -153,17 +176,25 @@ export async function updateProduct(productId, productData) {
         if (!isOwner) return null;
     }
 
-    const { useLocalStorage } = await import('./supabase.js');
+    if (await isStripeCatalogAvailable()) {
+        try {
+            const updated = await updateProductInStripe(productId, {
+                ...productData,
+                stripe_price_id: productData.stripe_price_id
+            });
+            return {
+                ...productData,
+                ...updated,
+                id: productId
+            };
+        } catch (error) {
+            console.error('Error updating Stripe product:', error);
+            return null;
+        }
+    }
 
     if (useLocalStorage) {
-        // Update in localStorage for development
-        const products = await getProducts();
-        const index = products.findIndex(p => p.id === productId);
-        if (index !== -1) {
-            products[index] = { ...products[index], ...productData, updated_at: new Date().toISOString() };
-            localStorage.setItem('all_products', JSON.stringify(products));
-            return products[index];
-        }
+        console.error('Stripe is not configured. Add STRIPE_SECRET_KEY to .env to manage products.');
         return null;
     }
 
@@ -188,14 +219,18 @@ export async function deleteProduct(productId) {
         if (!isOwner) return false;
     }
 
-    const { useLocalStorage } = await import('./supabase.js');
+    if (await isStripeCatalogAvailable()) {
+        try {
+            return await archiveProductInStripe(productId);
+        } catch (error) {
+            console.error('Error archiving Stripe product:', error);
+            return false;
+        }
+    }
 
     if (useLocalStorage) {
-        // Delete from localStorage for development
-        const products = await getProducts();
-        const filtered = products.filter(p => p.id !== productId);
-        localStorage.setItem('all_products', JSON.stringify(filtered));
-        return true;
+        console.error('Stripe is not configured. Add STRIPE_SECRET_KEY to .env to manage products.');
+        return false;
     }
 
     const { error } = await supabaseClient
